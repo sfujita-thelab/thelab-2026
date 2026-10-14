@@ -131,9 +131,9 @@
   /* The footer's list, unchanged. Kept short for the same reason it is short there:
      the headline is nowrap, so a long phrase cannot wrap -- it would simply run wide. */
   const PHRASES = [
-    'commerce platform.',
+    'e-comm strategy.',
     'digital presence.',
-    'next growth channel.',
+    'audience funnel.',
     'AI capabilities.',
     'competitive edge.'
   ];
@@ -161,21 +161,19 @@
   const rand = (a, b) => a + Math.random() * (b - a);
 
   /* ---------------------------------------------------------------- order */
-  /* A fresh shuffle each pass rather than a fixed rotation. `last` carries across
-     the seam so a reshuffle cannot repeat the phrase that is already on screen. */
-  let queue = [];
-  let last  = PHRASES[0];
+  /* IN ORDER, straight down the list and round again. It used to draw a fresh shuffle
+     every pass, with `last` carried across the seam so a reshuffle could not repeat the
+     phrase already on screen -- which kept it unpredictable but meant the five read in a
+     different sequence on every visit, and the list is written in the order it is meant
+     to be read.
+
+     The index starts at 0 and the FIRST advance lands on 1, because the markup already
+     holds PHRASES[0] -- the line on screen before anything has changed is the first
+     phrase, so stepping to it again would show the same words twice. */
+  let idx = 0;
   function nextPhrase() {
-    if (!queue.length) {
-      queue = PHRASES.slice();
-      for (let i = queue.length - 1; i > 0; i--) {
-        const j = (Math.random() * (i + 1)) | 0;
-        [queue[i], queue[j]] = [queue[j], queue[i]];
-      }
-      if (queue[0] === last && queue.length > 1) [queue[0], queue[1]] = [queue[1], queue[0]];
-    }
-    last = queue.shift();
-    return last;
+    idx = (idx + 1) % PHRASES.length;
+    return PHRASES[idx];
   }
 
   /* ----------------------------------------------------------------- turn */

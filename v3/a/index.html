@@ -133,15 +133,15 @@
   h1 {
     white-space: nowrap;
 
-    /* 80px on the 1440 reference: 80 / 1440 = 5.556vw. The vw term is what renders at
+    /* 72px on the 1440 reference: 72 / 1440 = 5vw. The vw term is what renders at
        normal widths, so that is the value that sets the size; the cap just stops it
-       running away on a very wide screen. It was 88; the floor and the cap came down in
-       the same proportion so the clamp keeps its shape.
+       running away on a very wide screen. It was 88, then 80; the floor and the cap come
+       down in the same proportion each time so the clamp keeps its shape.
 
        Nothing downstream needs touching. app.js measures the headline's real box every
        time it places it, so the block re-centres on the mark by itself, and hero-type.js
        re-measures the roller's widest phrase on load and on resize. */
-    font-size: clamp(36px, 5.556vw, 100px);
+    font-size: clamp(32px, 5vw, 90px);
     line-height: 1.1;                   /* 110%, per the Figma file. It has been 1 (100%)
                                            and 0.963 before that -- an 88px line box at
                                            the measured cap height.
@@ -208,16 +208,20 @@
   .hero__mark {
     position: absolute; left: 50%; top: 50%;
     width: 0; height: 0; z-index: 0;
-    --hero-mark: calc(2 * var(--col));
+    /* Two grid columns LESS 32: 16 of clear air inside each side. The mark is a ring of
+       round dots, so a left/right padding is only meaningful as a smaller diameter --
+       padding the box would squash the circle on one axis. Taking it off the size gives
+       the same 16 at the left and right edges and keeps every dot round. */
+    --hero-mark: calc(2 * var(--col) - 32px);
     opacity: 0;
     transform: rotate(var(--spin, 0deg)) rotate(var(--enter-rot, -360deg));
     transition: opacity   .98s cubic-bezier(.62, .02, .34, 1) 380ms,
                 transform 1.96s cubic-bezier(.22, .61, .36, 1) 380ms;
   }
-  /* 0.8 -- 20% off. The mark is the hero's one large graphic and sits directly behind
-     the headline, so this is the knob that trades its presence against the type's. The
-     entrance still runs 0 -> this, so the fade reads the same, just to a lighter rest. */
-  .hero__mark.is-in { opacity: .8; --enter-rot: 0deg; }
+  /* FULL STRENGTH. It was .8 -- the knob that traded the mark's presence against the
+     headline's, since the two overlap -- and it is back at 1. The entrance still runs
+     0 -> this, so the fade reads the same, just to a heavier rest. */
+  .hero__mark.is-in { opacity: 1; --enter-rot: 0deg; }
   /* Once the entrance has landed the transform belongs to --spin alone, on its own
      slower curve. Added by app.js when the grid stops being an animated thing. */
   .hero__mark.is-settled { transition: transform .9s cubic-bezier(.22, .61, .36, 1); }
@@ -251,9 +255,26 @@
 
      stroke-width is written by hero-type.js, in user units, so it renders as one CSS
      pixel at whatever size the mark is. */
+  /* The two alphas here are what the mark's visibility actually is -- the layer opacity
+     on .hero__mark is 1, so taking that from .8 to 1 moved a 13% line to 13%, which is
+     why it did not read as a change.
+
+     THE OUTLINE IS THE GRID'S OWN LINE, written as the same --grid-a the vertical rules
+     use rather than as a copy of its value, so the two can never drift apart. That is
+     where it started: the mark replaced an optical circle whose rim was tuned by area to
+     read as exactly that line. It spent one round at full black, which made the mark the
+     loudest thing in the hero.
+
+     Compositing pure black at alpha a is arithmetically identical to multiplying by
+     (1 - a), so this IS the multiply the grid does with no blend mode -- which could not
+     work here anyway, since .hero carries will-change and is its own stacking context.
+
+     THE FILL STAYS AT 1. It was .5, the circle's half-strength veil; opaque is what gives
+     the mark a body for the hairline to sit on, and it is the fill rather than the stroke
+     that was making it read as a watermark. */
   .hero__dot {
-    fill: rgba(244, 244, 244, .5);
-    stroke: rgba(0, 0, 0, .130);
+    fill: rgba(244, 244, 244, 1);
+    stroke: rgba(0, 0, 0, var(--grid-a, .130));
   }
   /* The type sits over the mark. Both are absolute inside .hero, and the mark is
      first in the DOM, but these are explicit so re-ordering the markup cannot
@@ -321,7 +342,10 @@
 
   .cta {
     display: inline-flex; align-items: center; justify-content: center;
-    background: #111; color: #f4f4f4; border: 0; cursor: pointer;
+    /* #222, the page's own --dark -- the footer's field, the case-study disc and these
+       pills are now one ink. It was #111, which was a third dark on a page that already
+       had two. The token rather than the literal so the three cannot drift. */
+    background: var(--dark, #222); color: #f4f4f4; border: 0; cursor: pointer;
     font-family: inherit; font-size: clamp(10px, 0.9vw, 16px);
     letter-spacing: 0.085em; text-transform: uppercase;
     padding: 10px 50px 9px; border-radius: 999px; white-space: nowrap;
@@ -1122,10 +1146,25 @@
     margin-left: calc(-58 * var(--u)); margin-top: calc(-58 * var(--u));
     border-radius: 50%;
     display: grid; place-items: center; text-align: center;
-    background: rgba(248,248,248,.80);
-    -webkit-backdrop-filter: blur(9px) saturate(1.15);
-            backdrop-filter: blur(9px) saturate(1.15);
-    box-shadow: 0 1px 24px rgba(0,0,0,.07), inset 0 0 0 1px rgba(244,244,244,.55);
+    /* DARK. It was a near-white disc at .80 over a backdrop blur -- the hero circle it
+       was named after, carried into the Work section. On the card imagery that read as a
+       smudge as often as a button: the cards are photography and video, so a light
+       translucent disc takes its tone from whatever is under it and the label went with
+       it. #222 is the page's own dark, the same ink the footer and the solid CTAs use,
+       and it is OPAQUE -- a fixed ground the label always has the same contrast against.
+
+       OPAQUE. It went to .80 with a backdrop blur for one round, which is what the light
+       disc carried; at that strength the card's own imagery comes through the ground and
+       the label's contrast changes with whatever frame of the video is under it. A solid
+       #222 is one ground, and the label reads the same over every card.
+
+       The backdrop blur goes with the translucency -- there is nothing to see through any
+       more, and it was the expensive part of this element. The inset hairline stays gone
+       too: it was there to give a LIGHT disc an edge against light imagery, and a dark one
+       has contrast of its own. What is kept is the soft drop shadow, lifted a little,
+       which is what separates the disc from the card rather than letting it sit flat. */
+    background: var(--dark, #222);
+    box-shadow: 0 2px 28px rgba(0,0,0,.22);
     opacity: 0;                        /* transform is driven in JS, so that the
                                           eased position and scale stay as one */
     transition: opacity .42s cubic-bezier(.22,.61,.36,1);
@@ -1133,7 +1172,7 @@
   .cs-cursor.on { opacity: 1; }
   .cs-cursor span {
     font-size: calc(11.7 * var(--u)); line-height: 1.45;   /* 10% under the CTA labels */
-    letter-spacing: .1em; text-transform: uppercase; color: #141414;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--bg, #f4f4f4);
   }
   @media (hover: none) { .cs-cursor { display: none; } }
 
@@ -1346,17 +1385,23 @@
      Placed from the top in design units rather than stacked in flow, because the bands
      have to hold their positions against each other and not against whatever the copy
      happens to measure. */
-  /* 558, straight off footer.png, which is a 1440 x 558 export -- so one pixel in it is
+  /* 437, straight off footer.png, which is a 1440 x 437 export -- so one pixel in it is
      one design unit here and every number in this block is read, not converted.
+
+     It was 558 when the same reference carried a five-column office row under the mark.
+     That row is gone and so are the 121 units it occupied: the field now ends 42 under
+     the legal line, where before there was an empty band between the mark and it.
 
      --pf-mark is the mark's OVERALL size and --pf-mark-y its centre line, measured from
      the footer's top. Both are tokens rather than literals because three things hang off
-     them: the dots' diameter and ring radius are ratios of the first, and the CTA on the
-     right centres itself on the second. The reference puts the mark's centre at 165.5
-     and the CTA's at 165 -- one line, which is the point. */
-  .pf { min-height: calc(558 * var(--u));
+     them: the dots' diameter and ring radius are ratios of the first, and the HEADLINE
+     and the CTA both centre themselves on the second. The reference measures the mark's
+     middle row at 160-213 and the CTA at 170-202 -- centres of 186.5 and 186, one line,
+     which is the point. 240 is unchanged: the middle row's dots are 53 across on a ring
+     of radius 93, and 2 x 93 + 53 is 239. */
+  .pf { min-height: calc(437 * var(--u));
         --pf-mark:   calc(240 * var(--u));
-        --pf-mark-y: calc(165.5 * var(--u)); }
+        --pf-mark-y: calc(186.5 * var(--u)); }
 
   /* FLUSH at the margin, where every other block of text on the page carries the shared
      8u inset. That is what footer.png draws: the headline's B inks at 44, the w of
@@ -1435,6 +1480,13 @@
      if the mark ever moves; translateY(-50%) centres the pill on that line whatever its
      height turns out to be.
 
+     BACK AT THE RIGHT MARGIN, on the mark's own centre line, which is where every
+     version of footer.png has drawn it. It spent one round under the headline at the left
+     margin, with an address block in this spot; the new reference has no address block
+     and puts the button back. Hanging it off --pf-mark-y rather than a top of its own is
+     what guarantees it stays level with the mark if that ever moves -- which it just did,
+     165.5 to 186.5, and this needed no edit for it.
+
      THE SAME TYPE AS EVERY OTHER CTA, clamp(10px, 0.9vw, 16px) -- 12.96 at 1440 against
      the 15 this used to carry. 15 was solved from footer.png, where "START A
      CONVERSATION" inks 201 wide, and it was right about the reference and wrong about
@@ -1451,13 +1503,20 @@
              transform: translateY(-50%); z-index: 1;
              display: inline-flex; align-items: center; justify-content: center;
              background: none; color: var(--pf-ink);
-             border: 1px solid var(--pf-rule); border-radius: 999px;
+             /* --pf-ink, not --pf-rule: the outline is at FULL strength, the same
+                #f4f4f4 as the label inside it, where --pf-rule is that colour at .55.
+                The pill has no fill, so the outline is the whole of its shape -- at
+                just over half strength it read as a disabled control rather than as
+                the quiet one of the page's two CTA treatments. */
+             border: 1px solid var(--pf-ink); border-radius: 999px;
              font-family: inherit; font-size: clamp(10px, 0.9vw, 16px);
              letter-spacing: .085em; text-transform: uppercase;
              padding: calc(8 * var(--u)) calc(53 * var(--u));
              cursor: pointer; white-space: nowrap;
              transition: border-color .25s ease; }
-  .pf__cta:hover { border-color: var(--pf-ink); }
+  /* No border-colour hover any more: it lifted .55 to full, and full is where the border
+     now rests, so there was nothing left for it to do. The label roll is the feedback,
+     which is the same feedback every other CTA on the page gives. */
 
   /* TWO columns, three rows, filled DOWN each column -- New York / London / Sydney,
      then Los Angeles / Istanbul. grid-auto-flow:column with the rows fixed at three is
@@ -1472,17 +1531,15 @@
      The full width is what the row buys: a 272 column against the 205 it had starting
      from the second grid line, so the addresses wrap less even though there are still
      five of them. */
-  /* 347, which puts the city cap line on 350 -- the reference's number. A 20u name in a
-     20u line box sits 3 below its own box top, so the box has to start 3 above the ink.
+  /* NO ADDRESSES IN THE FOOTER AT ALL any more. There was a five-column office row on
+     its own band under the mark, then one Headquarters block in the CTA's old spot; the
+     current reference has neither, and the band they occupied is the 121 units this
+     footer lost in height.
 
-     Five equal tracks margin to margin and NO gutter: 1360 / 5 = 272, and the reference's
-     five columns start on 40 / 312 / 584 / 856 / 1128, which is that exactly. The gutter
-     is .pf__office's own right padding instead, so the text measure is narrower than the
-     track without any column starting anywhere but on its track. */
-  .pf__locations { position: absolute; left: var(--m); right: var(--m); width: auto;
-                   top: calc(347 * var(--u));
-                   display: grid; grid-template-columns: repeat(5, 1fr);
-                   grid-auto-flow: row; column-gap: 0; row-gap: 0; }
+     .pf__city / .pf__addr / .pf__tel below are therefore unused. They are left standing
+     because they are the only description of how that type was set -- 20 over 14/19 with
+     a 10 between the address and the phone, all solved off the reference -- and losing
+     them means solving it again if the offices ever come back. */
   /* 16 on the right only. It is the gutter AND the wrap measure: 272 - 16 = 256, and 256
      is what reproduces the reference's SHAPE -- one line for New York, London and
      Istanbul, two for Los Angeles and Sydney.
@@ -1520,7 +1577,7 @@
                bottom: calc(37 * var(--u)); z-index: 1;
                display: flex; justify-content: center; align-items: center;
                gap: calc(26 * var(--u));
-               font-size: calc(12 * var(--u)); color: var(--pf-dim); }
+               font-size: calc(14 * var(--u)); color: var(--pf-dim); }
 
   /* ---- the socials and the lockup -----------------------------------------
      The socials sit in the legal row here, grouped with the links as its right-hand
@@ -1734,8 +1791,8 @@
            be read; the real list is in .hero__sr below. It is BOTH a .mask (the intro
            reveal, unchanged) and the roller box (the hand-over), which works because
            h1 .mask already carries exactly the clip padding the roller needs. -->
-      <span class="mask hero__head-dyn" data-hv="2" aria-hidden="true"><span>commerce platform.</span></span>
-      <span class="hero__sr">commerce platform., digital presence., next growth channel., AI capabilities., or competitive edge.</span>
+      <span class="mask hero__head-dyn" data-hv="2" aria-hidden="true"><span>e-comm strategy.</span></span>
+      <span class="hero__sr">e-comm strategy., digital presence., audience funnel., AI capabilities., or competitive edge.</span>
     </h1>
 
     <div class="hero__foot">
@@ -2007,36 +2064,6 @@
 
       <button class="pf__cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start a conversation</span><span aria-hidden="true">Start a conversation</span></span></span></button>
 
-      <div class="pf__locations">
-        <!-- ROW ORDER, left to right, as the reference reads them: New York, Los Angeles,
-             London, Istanbul, Sydney. They used to be ordered for a two-column block that
-             filled downward; one row of five has no pairing to preserve. -->
-        <div class="pf__office">
-          <p class="pf__city">New York</p>
-          <p class="pf__addr">1115 Broadway, 5th fl New York, NY 10010, US</p>
-          <p class="pf__tel">+1.212.209.1333</p>
-        </div>
-        <div class="pf__office">
-          <p class="pf__city">Los Angeles</p>
-          <p class="pf__addr">909 N. Sepulveda Blvd, Suite 860 El Segundo, CA 90245, US</p>
-          <p class="pf__tel">+1.310.392.4892</p>
-        </div>
-        <div class="pf__office">
-          <p class="pf__city">London</p>
-          <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
-          <p class="pf__tel">+90.310.392.4892</p>
-        </div>
-        <div class="pf__office">
-          <p class="pf__city">Istanbul</p>
-          <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
-          <p class="pf__tel">+90.310.392.4892</p>
-        </div>
-        <div class="pf__office">
-          <p class="pf__city">Sydney</p>
-          <p class="pf__addr">40-50 Francis St, Darlinghurst, NSW 2010, Australia</p>
-          <p class="pf__tel">+61.2.9310.4458</p>
-        </div>
-      </div>
 
     </div>
 

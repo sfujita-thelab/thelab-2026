@@ -131,11 +131,11 @@
   /* The footer's list, unchanged. Kept short for the same reason it is short there:
      the headline is nowrap, so a long phrase cannot wrap -- it would simply run wide. */
   const PHRASES = [
-    'e-comm strategy.',
+    'e-comm platform.',
     'digital presence.',
     'audience funnel.',
     'AI capabilities.',
-    'competitive edge.'
+    'social campaign.'
   ];
 
   const T = {

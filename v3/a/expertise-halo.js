@@ -45,7 +45,7 @@
      expertise.js's; they are restated rather than imported because this file has no way
      to reach inside that IIFE, and they are the graphic's fixed geometry. */
   const AXIS = 720;        // the central vertical line
-  const CY   = 700.2;      // the band's centre
+  const CY   = 740.2;      // the band's centre
   const RY   = 340;        // its half-height
   const REACH = 400;       // how far either side of the axis the mass may wander
   /* And how far above and below the band's centre. A bit over a third of the band's

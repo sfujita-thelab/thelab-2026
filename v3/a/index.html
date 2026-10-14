@@ -845,7 +845,7 @@
 
      Shortening this is how Proof and the footer move up: every section below is in flow,
      so the Expertise section's height IS the offset of everything after it. */
-  .exp__inner { position: relative; z-index: 4; height: calc(1154.2 * var(--u)); }
+  .exp__inner { position: relative; z-index: 4; height: calc(1194.2 * var(--u)); }
 
   /* The covering surface. Its centre is pinned; only its radius grows with
      scroll, so the curved top edge sweeps up over the Work gradient and the
@@ -870,7 +870,7 @@
      widely tracked -- so the two read as one family rather than two small-type styles.
      Sits 66u above the headline's cap line. */
   .exp__eyebrow {
-    position: absolute; z-index: 2; left: calc(380 * var(--u)); right: auto; width: calc(680 * var(--u)); top: calc(116 * var(--u));
+    position: absolute; z-index: 2; left: calc(380 * var(--u)); right: auto; width: calc(680 * var(--u)); top: calc(156 * var(--u));
     text-align: center;
     font-size: calc(13 * var(--u)); line-height: 1.2;
     letter-spacing: 0.085em; text-transform: uppercase;
@@ -880,11 +880,17 @@
        copy wraps on the same measure. It had no width at all before, so it was
        shrink-to-fit and only happened to line up because it is one short line. */}
 
-  /* EVERYTHING IN THIS SECTION EXCEPT THE GRAPHIC SITS 80 HIGHER than it used to --
-     the eyebrow, the headline, the body, the four area blocks and the CTA all came up
-     by the same 80, and the loops did not move. So the numbers below are each 80 off
-     what the comment under them describes, and the gaps between them are unchanged;
-     what changed is where the whole text layer sits against a fixed graphic.
+  /* EVERYTHING IN THIS SECTION EXCEPT THE GRAPHIC SITS 40 HIGHER than it used to --
+     the eyebrow, the headline, the body, the four area blocks and the CTA all came up by
+     80 and then back down by 40, and the loops did not move either time. So the numbers
+     below are each 40 off what the comment under them describes, and the gaps between
+     them are unchanged; what changed is where the whole text layer sits against a fixed
+     graphic.
+
+     The section's own height went DOWN with them, 1154.2 to 1194.2 -- which is how Proof
+     and the footer move too. Every section below is in flow, so this height is the offset
+     of everything after it, and the svg's viewBox height tracks it or the graphic
+     stretches.
 
      The two relationships that WERE tied to the graphic are the ones to watch: the area
      blocks were centred on the band's own centre (CY in expertise.js), and in options b
@@ -896,7 +902,7 @@
      the same 70%, 476, centred inside it -- 380 + (680-476)/2 = 482. */
   .exp__head {
     position: absolute; z-index: 2; left: calc(380 * var(--u)); right: auto;
-    width: calc(680 * var(--u)); top: calc(148 * var(--u));
+    width: calc(680 * var(--u)); top: calc(188 * var(--u));
     text-align: center;
     font-size: calc(56 * var(--u)); line-height: 1.1;
     font-weight: 400; letter-spacing: -0.024em;
@@ -906,7 +912,7 @@
        numbers that keep the 32 under it. */
     /* 24 under the headline, not 32. The CTA follows it up so its own 32 holds. */
     /* 80% of the 680 container, centred inside it: 544 wide, so 380 + (680-544)/2 = 448. */
-    position: absolute; z-index: 2; left: calc(448 * var(--u)); top: calc(295.2 * var(--u));
+    position: absolute; z-index: 2; left: calc(448 * var(--u)); top: calc(335.2 * var(--u));
     width: calc(544 * var(--u)); margin-left: 0;
     text-align: center;
     font-size: calc(18 * var(--u)); line-height: calc(30 / 18);
@@ -926,7 +932,7 @@
        then a button.
 
        z-index 2 keeps it above the loops and the halo, and below the copy at 3. */
-    position: absolute; z-index: 2; left: 50%; top: calc(911.2 * var(--u));
+    position: absolute; z-index: 2; left: 50%; top: calc(951.2 * var(--u));
     transform: translateX(-50%);
   }
   /* the CTA mask must not fight the centring transform */
@@ -984,7 +990,7 @@
        bounding box is one block and this is simply 785.2 (the band's centre, CY in
        expertise.js) - 149.6 / 2. It follows CY by hand: the band is drawn in JS and the
        blocks are placed in CSS, so moving the graphic means moving both. */
-    position: absolute; z-index: 3; top: calc(630.4 * var(--u));
+    position: absolute; z-index: 3; top: calc(670.4 * var(--u));
     /* THE BOX IS NOW THE COLUMN, and the inset is padding inside it. 340 wide on a
        -170 margin puts each block's edges exactly on the grid lines either side of its
        column -- 40/380, 380/720, 720/1060, 1060/1400 -- and the padding then holds the
@@ -1889,7 +1895,7 @@
                grid line, so the four span 40->720, 380->720, 720->1060 and 720->1400,
                which is what nests the narrow pair inside the wide pair. rx is what the
                entrance animates, from nothing out to full. -->
-          <svg class="areas__svg" viewBox="0 0 1440 1154.2" preserveAspectRatio="none" aria-hidden="true">
+          <svg class="areas__svg" viewBox="0 0 1440 1194.2" preserveAspectRatio="none" aria-hidden="true">
             <!-- The halo. An orange mass that floats UNDER the loops -- first in the
                  document, so every wire, every dot and all four blocks of copy draw
                  over it -- and follows the cursor with a heavy lag.

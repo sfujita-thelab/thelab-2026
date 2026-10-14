@@ -151,7 +151,7 @@
      because everything that hangs off this number moves with it: the capability row is
      centred on the band, and the section's height comes down by the same 75 so the tail
      under the graphic is the 99 it has always been. */
-  const CY   = 700.2;       // the band's centre
+  const CY   = 740.2;       // the band's centre
   const AXIS = 720;       // the central vertical line, and the centre grid line
   /* 340, matching the outer loops' rx exactly, so those two are true 1:1 circles.
      Every loop shares this half-height, so the inner pair stands exactly as tall as
@@ -165,6 +165,15 @@
   const RY   = 340;       // shared half-height
 
   /* In document order, which is also left-to-right order and so opening order. */
+  /* Every loop is drawn with its NEAR edge on the axis -- centreOf() puts the centre one
+     rx to the side of AXIS -- so rx alone decides where the FAR edge falls, and the near
+     edge cannot come off the centre however this is tuned.
+
+     At these widths the far edges land on the grid lines exactly: 40 / 380 / 1060 / 1400.
+     They were briefly pulled 16 inside them (332 and 162, since the far edge sits at
+     AXIS +/- 2 x rx) and put back.
+
+     START_RX below is a ratio of these, so the entrance follows without an edit. */
   const LOOPS = [
     { side: -1, rx: 340 },   //  40 -> 720
     { side: -1, rx: 170 },   // 380 -> 720

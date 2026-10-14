@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Frozen earlier builds and retired options — kept locally, not uploaded.
+# Delete the line to start tracking one of these.
+v1/
+v2/
+_archive/

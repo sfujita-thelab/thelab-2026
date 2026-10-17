@@ -1,6 +1,7 @@
-# v3/c — tokenised against thelab.co
+# v3/a — tokenised against thelab.co
 
-`v3/c` is `v3/b` with every font and spacing value tied to thelab's tokens.
+`v3/a` is the prototype with every font and spacing value tied to thelab's tokens.
+It is the STEPPED build; the fluid twin is in `_archive/2026-10-16/v3-c`.
 `v3/b` is untouched and is the "before".
 
 Load order in `index.html`, before the inline `<style>`:

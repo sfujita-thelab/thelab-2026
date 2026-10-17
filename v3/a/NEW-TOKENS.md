@@ -124,7 +124,7 @@ Line height 150%, matching the other body tokens.
 `thelab-type-fluid.css` deliberately does NOT name it, so the fluid build leaves it alone
 and it stays a flat 14 above 767 as well — which is the point of the token.
 
-Measured at 375, 1024 and 1440 in both v3/c and v3/d: **14 / 14 / 14**.
+Measured at 375, 1024 and 1440 in both the fluid and stepped builds: **14 / 14 / 14**.
 
 Still worth a decision for production: the footer is the only place on the page that asks
 for 14, so this is a one-component token. Accepting 16 there instead would avoid adding a
@@ -136,7 +136,7 @@ The prototype's side margin is 40px at 1440 and scales with the window. The shad
 The live site uses `--container-margin`: 64 desktop · 48 tablet · 16 mobile.
 Decision needed: adopt the live margin (graphics re-fit to it), or keep 40px and propose it as a redesign change.
 
-**Decided (2026-10-16, v3/c): keep 40px. Proposed as a redesign change to `--container-margin`.**
+**Decided (2026-10-16): keep 40px. Proposed as a redesign change to `--container-margin`.**
 
 `--m` stays as app.js computes it — `clamp(20, 2.78vw, 72)`, which is 40 at 1440 — and `--container-margin`
 is loaded but unused. Reasons, and what each option does to the graphics:

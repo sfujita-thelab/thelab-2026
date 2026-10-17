@@ -5,19 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hero prototype — living gradient + optical circle</title>
 
-<!-- thelab design tokens. ORDER MATTERS and is fixed:
-       1. thelab-tokens.css      the live site's tokens, stepped at 1023 / 767
-       2. thelab-type-fluid.css  overrides the TYPE tokens with clamp()s above 767
-       3. thelab-space-fluid.css overrides the SPACER tokens the same way
-     Both fluid files use a doubled :root so they win over the stepped values
-     regardless of order, but the order is kept honest anyway. Everything in all
-     three is variable-only -- no element rules -- so loading them changes nothing
-     until a component actually asks for a token.
+<!-- thelab design tokens — STEPPED ONLY, the live site's own system.
+     The two fluid override files (thelab-type-fluid.css, thelab-space-fluid.css) are
+     NOT loaded. Every token therefore takes its stepped value, switching at 1023 and
+     767 exactly as it does on www.thelab.co. No clamp(), no vw, anywhere.
+     The two files are still in the folder, unlinked: the fluid build they belong to is
+     in _archive/2026-10-16/v3-c, and linking them here turns this into it.
      Beausite and Recife load from thelab.co's CDN, so the real faces need a
      connection; without one the page falls back to the stack in --font. -->
 <link rel="stylesheet" href="thelab-tokens.css">
-<link rel="stylesheet" href="thelab-type-fluid.css">
-<link rel="stylesheet" href="thelab-space-fluid.css">
 
 <style>
   :root {
@@ -1530,7 +1526,7 @@
      min-width, not max: every other breakpoint in this sheet is a max-width stepping
      DOWN from the 1440 artboard, so this is the only rule that reads upward. 1440 is the
      artboard's own width, which is also where both type systems stop scaling -- the
-     clamp in v3/c caps there and the stepped value in v3/d is flat above 1024 -- so the
+     fluid build's clamp caps there and this one's stepped value is flat above 1024 -- so the
      token resolves to a clean 32 on both sides of the switch.
 
      Nothing below needs adjusting: the titles' size changes the row's height, and
@@ -2440,11 +2436,16 @@
 
      28 both sides -- the margin plus the inset, so the bar's type lands on the same
      line as the body copy under it. 16 top and bottom, the table's value for 24. */
-  @media (max-width: 1023px) {
+  /* 767, not 1023. This was written for the phone -- "the 22 the old clamp's floor
+     gave it" -- but at 1023 it took the tablet with it, so the bar carried a 22px
+     wordmark beside a 30px mark at every width below desktop. Tablet takes the rule
+     above instead, at the size desktop sets. */
+  @media (max-width: 767px) {
     /* No padding-block override any more: --spacer-24 IS 16 on mobile, so the desktop
        rule already resolves to the 16 this used to hard-code. Only the sides are still
        written here, and only because they are margin + inset rather than a spacer. */
-    /* .logo's gap is --spacer-12, which is 8 on mobile by itself -- nothing to write. */
+    /* .logo's gap is --spacer-12, which is 8 on mobile by itself -- nothing to write.
+       The wordmark takes the 22 the old clamp's floor gave it. */
   }
 
   @media (max-width: 1023px) {
@@ -2600,12 +2601,6 @@
        bar's content runs well inside its own padding -- which is why there is no
        burger and no second nav to keep in step with this one. */
     .nav { display: flex; }
-
-    /* The wordmark at desktop's size. .logo is outside the type system in both builds
-       (it is v3/b's face, pinned), and in this one that means a vw clamp -- which by
-       construction cannot reach its 1440 value at a tablet width: it lands at 26 at 900.
-       42 is what the clamp resolves to at the reference, written flat here because
-       matching desktop is the thing being asked for. */
 
     /* ---- HERO: TWO UP, across the whole grid. The headline takes vline 1 to vline 3
        and the body + CTA vline 3 to vline 5, so the band spans all four columns and

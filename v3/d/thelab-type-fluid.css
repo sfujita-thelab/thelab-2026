@@ -1,0 +1,42 @@
+/* ==========================================================================
+   thelab FLUID type: PROPOSAL (not on the live site yet)
+   Load AFTER thelab-tokens.css. Same token names; only the values change.
+
+   MOBILE (up to 767px): unchanged. Static sizes, exactly the live mobile (-sm) values.
+   TABLET + DESKTOP (768px and up): every type token scales smoothly from its mobile
+   size at 768px wide to its desktop size at 1440px wide, then stays at the desktop size.
+   Sizes use rem + vw so text still grows when someone zooms the browser.
+
+   Replaces the stepped @media switching for type only; spacing stays stepped.
+   The -lg / -md / -sm tokens are untouched, so anything using them still works.
+   Line height is the desktop (-lg) value at every width.
+   Generated from thelab-tokens.css (-sm → -lg values).
+   ========================================================================== */
+@media (min-width: 768px) {
+  :root:root {   /* doubled :root so these win over the stepped @media values in thelab-tokens.css, whatever the load order */
+    --font-h-128: 400 clamp(4rem, -0.5714rem + 9.5238vw, 8rem) / 100% Beausite;                     /* 64px @768 → 128px @1440+ */
+    --font-h-128-i: italic 400 clamp(4rem, -0.5714rem + 9.5238vw, 8rem) / 100% Recife;              /* 64px @768 → 128px @1440+ */
+    --font-h-104: 400 clamp(3.5rem, 0.0714rem + 7.1429vw, 6.5rem) / 100% Beausite;                  /* 56px @768 → 104px @1440+ */
+    --font-h-104-i: italic 400 clamp(3.5rem, 0.0714rem + 7.1429vw, 6.5rem) / 100% Recife;           /* 56px @768 → 104px @1440+ */
+    --font-h-80: 400 clamp(3rem, 0.7143rem + 4.7619vw, 5rem) / 110% Beausite;                       /* 48px @768 → 80px @1440+ */
+    --font-h-80-i: italic 400 clamp(3rem, 0.7143rem + 4.7619vw, 5rem) / 110% Recife;                /* 48px @768 → 80px @1440+ */
+    --font-h-64: 400 clamp(2.5rem, 0.7857rem + 3.5714vw, 4rem) / 110% Beausite;                     /* 40px @768 → 64px @1440+ */
+    --font-h-64-i: italic 400 clamp(2.5rem, 0.7857rem + 3.5714vw, 4rem) / 110% Recife;              /* 40px @768 → 64px @1440+ */
+    --font-h-56: 400 clamp(2.5rem, 1.3571rem + 2.381vw, 3.5rem) / 110% Beausite;                    /* 40px @768 → 56px @1440+ */
+    --font-h-56-i: italic 400 clamp(2.5rem, 1.3571rem + 2.381vw, 3.5rem) / 110% Recife;             /* 40px @768 → 56px @1440+ */
+    --font-h-40: 400 clamp(2rem, 1.4286rem + 1.1905vw, 2.5rem) / 110% Beausite;                     /* 32px @768 → 40px @1440+ */
+    --font-h-40-i: italic 400 clamp(2rem, 1.4286rem + 1.1905vw, 2.5rem) / 110% Recife;              /* 32px @768 → 40px @1440+ */
+    --font-h-32: 400 clamp(1.5rem, 0.9286rem + 1.1905vw, 2rem) / 110% Beausite;                     /* 24px @768 → 32px @1440+ */
+    --font-h-32-i: italic 400 clamp(1.5rem, 0.9286rem + 1.1905vw, 2rem) / 110% Recife;              /* 24px @768 → 32px @1440+ */
+    --font-h-24: 400 clamp(1.25rem, 0.9643rem + 0.5952vw, 1.5rem) / 110% Beausite;                  /* 20px @768 → 24px @1440+ */
+    --font-h-24-i: italic 400 clamp(1.25rem, 0.9643rem + 0.5952vw, 1.5rem) / 110% Recife;           /* 20px @768 → 24px @1440+ */
+    --font-p-24: 400 clamp(1.25rem, 0.9643rem + 0.5952vw, 1.5rem) / 170% Beausite;                  /* 20px @768 → 24px @1440+ */
+    --font-p-20: 400 clamp(1.125rem, 0.9821rem + 0.2976vw, 1.25rem) / 150% Beausite;                /* 18px @768 → 20px @1440+ */
+    --font-p-18: 400 clamp(1rem, 0.8571rem + 0.2976vw, 1.125rem) / 150% Beausite;                   /* 16px @768 → 18px @1440+ */
+    --font-p-16: 400 clamp(0.875rem, 0.7321rem + 0.2976vw, 1rem) / 150% Beausite;                   /* 14px @768 → 16px @1440+ */
+    --font-button-1: 400 clamp(0.875rem, 0.7321rem + 0.2976vw, 1rem) / 120% Beausite;                /* 14px @768 → 16px @1440+ */
+    --font-button-2: 400 clamp(0.75rem, 0.6071rem + 0.2976vw, 0.875rem) / 120% Beausite;             /* 12px @768 → 14px @1440+ */
+    --font-eyebrow: 400 clamp(0.875rem, 0.7321rem + 0.2976vw, 1rem) / 120% Beausite;                 /* 14px @768 → 16px @1440+ */
+    --font-tag: 400 0.75rem / 120% Beausite;                                                        /* 12px, flat */
+  }
+}

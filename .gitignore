@@ -6,3 +6,6 @@
 v1/
 v2/
 _archive/
+
+# Measurement screenshots from the build sessions. 54MB of PNGs, none of it source.
+_review/

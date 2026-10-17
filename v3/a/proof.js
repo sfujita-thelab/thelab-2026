@@ -20,7 +20,7 @@
     ['[data-pv="2"]', 180],   // body
     ['[data-pv="3"]', 280]    // CTA
   ];
-  const head  = section.querySelector('.sec-head__title');
+  const head  = section.querySelector('.proof__head');
   const stats = [...section.querySelectorAll('.stat')];
   const rows  = [0, 1].map(r => stats.filter(s => +s.dataset.row === r));
 

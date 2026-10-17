@@ -269,9 +269,9 @@
      whole section off the moment its top edge appears. That is what lets you actually
      watch each piece animate in while scrolling. */
 
-  // NB: .featuredwork .sec-head has absolutely-positioned children, so its own box is zero
+  // NB: .featuredwork__header has absolutely-positioned children, so its own box is zero
   // height and can never satisfy an intersection test. Watch the headline instead.
-  const header = section.querySelector('.sec-head__title');
+  const header = section.querySelector('.featuredwork h2');
   const cards  = [...section.querySelectorAll('[data-card]')];
   const ticker = section.querySelector('.ticker');
 

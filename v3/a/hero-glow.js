@@ -100,13 +100,6 @@
 
   /* The colour steps with the headline rather than on a clock of its own: the family
      advances on every PER_FAM-th pf:phrase, and the hand-over takes XFADE seconds. */
-  /* How far the masses are lifted toward the viewport's centre below 1024 -- see the
-     note in the draw loop. 0 above it: desktop already arrives where it should. */
-  const Y_LIFT_K = 0.355;
-  const yLift = () => (window.innerWidth <= 1023 && H
-                         ? Math.max(0, 0.5 - Y_LIFT_K * (W / H))
-                         : 0);
-
   const PER_FAM = 3;         // word changes per colour family
   const XFADE   = 2.6;       // seconds the hand-over takes
 
@@ -334,25 +327,8 @@
          the group opens out toward it instead of sliding with it. The vertical
          pull is halved again: the masses belong to the bottom edge, and letting the
          cursor lift them off it would break the rise. */
-      /* LIFTED, in the stacked layout only. The three masses sit on or below the
-         canvas's bottom edge and their radii are fractions of its WIDTH, so how far
-         up the field reaches is set by the width while the thing it has to reach --
-         the viewport's middle -- is set by the height. On a 1440 x 1000 window those
-         agree and the field arrives just above centre; narrow the window and it falls
-         away fast. Measured: the top of the field landed at 469 of 1000 at 1440 (the
-         look this matches), 675 at 900 and 668 of 812 on a phone.
-
-         The canvas is the viewport plus 80 of bleed on every side, so its own centre
-         IS the viewport's centre and the target is simply 0.5. A mass at the bottom
-         edge reaches 1 - K * W/H, which leaves 0.5 - K * W/H to make up -- the lift
-         below. It is computed rather than tabulated because the shortfall depends on
-         the window's PROPORTIONS, not on which breakpoint it falls in: two phones of
-         the same width and different heights need different lifts. K is solved from the field
-         itself: at 0.40 the top landed 44 short of centre at 768-1023 and 25 short at
-         375, and the correction those imply agrees to three places -- 0.3585, 0.3533,
-         0.3526 -- so 0.355. */
       const x = (b.x + dx + (cx - (b.x + dx)) * b.pull)        * W;
-      const y = (b.y + dy + (cy - (b.y + dy)) * b.pull * 0.45 - yLift()) * H;
+      const y = (b.y + dy + (cy - (b.y + dy)) * b.pull * 0.45) * H;
 
       /* The mass BREATHES -- its radius swells and shrinks on a clock of its own, far
          slower than its drift. This is the term that makes the field read as fluid

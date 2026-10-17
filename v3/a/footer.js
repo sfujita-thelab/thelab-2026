@@ -110,14 +110,9 @@
        a rect off null threw on every frame, which took the nav inversion below it down
        with it. */
     if (mark) {
-      const r  = mark.getBoundingClientRect();
+      const m = mark.getBoundingClientRect().top;
       const vh = window.innerHeight;
-      /* IS IT ON SCREEN -- not "is its top inside a 40px band". The band test was the
-         bug behind the mark shrinking mid-view: the mark is 220 tall when stacked, so
-         scrolling it up past 40 took its TOP out of the band while the ring itself was
-         still fully visible, and the class came off. An intersection test only goes
-         false when the mark has actually left, which is where the reverse belongs. */
-      const inView = r.bottom > 0 && r.top < vh;
+      const inView = m > 40 && m < vh - 40;
       if (inView !== entered) { entered = inView; mark.classList.toggle('is-in', inView); }
     }
 

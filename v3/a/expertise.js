@@ -18,17 +18,6 @@
      circular surface swelling up over the Work section rather than a panel
      sliding in — and the curved edge stays visible the whole way. */
   const COVER_FROM = 0.26;   // radius at the start of the transition
-  /* The stacked layout does not use COVER_AT / COVER_PX at all -- it anchors the
-     scale to the SECTION's own position instead. See coverStep(). This is the only
-     slack left in that mapping: the minimum separation between its two anchors, so
-     the line between them can never invert. Everything else in it is measured. */
-  const COVER_EDGE_SM = 0.02;
-  /* ...and a plain pixel gap held off each anchor, so the arc passes CLEAR of the
-     header and the ticker rather than exactly along their edges. 12 was arithmetically
-     clear and read as touching: a logo is 56 tall, so a dozen px under it is a hairline
-     at the one moment the two are closest. One whole logo height is the gap that reads
-     as a gap. */
-  const COVER_GAP_SM  = 56;
   /* The growth distance, and the trigger below it, are a PAIR -- they are what keeps
      the arc off both the Expertise header on the way down and the logo ticker on the
      way up, and neither constraint can be satisfied by moving the trigger alone.
@@ -87,19 +76,7 @@
      unchanged — only the start point moves. */
   const COVER_LEAD = 0.12;
   const COVER_TOP  = -400;   // the element's top offset, in design units (matches the CSS)
-  /* Its radius at scale 1, in design units. A FUNCTION, not a constant, because the
-     tablet stylesheet doubles the circle: a wider dome sags less at the viewport's
-     edges, which is what stops the gradient showing in the corners either side of it.
-     This has to track the CSS exactly -- the apex maths below is what the first reveal
-     waits on, so a radius that disagrees with the drawn circle mistimes the gate. */
-  /* TWO INDEPENDENT RADII, not one and a multiplier. They were 1146 and 1146 * 2;
-     desktop is 1432.5 now (1.25x, for a flatter arc) and the stacked one is unchanged
-     at 2292, so the relationship between them is no longer a round number and writing
-     it as one would be a lie. Each must match its own rule in the stylesheet -- 2865
-     and 4584 across -- or the reveal gate fires at the wrong moment. */
-  const COVER_R    = 1432.5;   // desktop, matches .cover's 2865
-  const COVER_R_SM = 2292;     // 1024 and below, matches the stacked block's 4584
-  const coverR = () => (window.innerWidth <= 1023 ? COVER_R_SM : COVER_R);
+  const COVER_R    = 1146;   // its radius at scale 1, in design units
 
   let coverage = 0;          // how much of the viewport the cover now fills, 0..1
 
@@ -108,7 +85,6 @@
              .getPropertyValue('--u')) || 1;
   }
 
-  const svg = section.querySelector('.areas__svg');
   const ticker = document.querySelector('.ticker');
 
   function coverStep() {
@@ -116,83 +92,20 @@
     const r = section.getBoundingClientRect();
     const vh = window.innerHeight;
     const u = unit();
-    const R = coverR();
-    const A = (COVER_TOP + R) * u;   // the dome's apex at scale 0, below the section top
-    const B = R * u;                 // how far the apex rises per unit of scale
-    let s;
-
-    if (window.innerWidth <= 1023) {
-      /* STACKED: THE SCALE IS ANCHORED TO THE SECTION, NOT TO A SCROLL DISTANCE.
-
-         The dome's apex RISES as it grows, so the growth IS the arc sweeping up the
-         screen, and whatever it passes is half blue and half white while it does. It
-         has two things to get past, and they pull in opposite directions: the
-         Expertise header below it (the arc must be ABOVE the header before the header
-         can be seen, or it cuts the headline) and the logo ticker above it (the arc
-         must stay BELOW the ticker until the ticker has left the top of the screen).
-         A scroll-distance window cannot hold both, because where it lands depends on
-         the viewport height and on how tall the section happens to be -- which is why
-         a fixed distance put the arc through the headline, a higher floor parked it on
-         the logos, and an earlier window moved the whole sweep below the fold.
-
-         So the scale is solved from the geometry at every frame. With T the section's
-         top in the viewport, the apex is at  T + A - B * s, which gives the two scales
-         where the arc sits exactly on each thing:
-
-             sHead = (A - padTop) / B      arc on the header's top line
-             sTick = (A + tickOff) / B     arc on the ticker's top line
-
-         and the two moments they have to be true by:
-
-             T = vh - padTop   the header is arriving at the bottom of the screen
-             T = tickOff       the ticker is leaving the top of it
-
-         s is a straight line between those two anchors, clamped to COVER_FROM..1. The
-         sweep that falls out is the full height of the screen, bottom to top, and it
-         is the same sweep at every width and window height because every term in it is
-         measured rather than assumed. */
-      const hdr     = section.querySelector('.sec-head');
-      const padTop  = hdr ? hdr.getBoundingClientRect().top - r.top : 248;
-      const tickBot = ticker ? r.top - ticker.getBoundingClientRect().bottom : 54;
-
-      /* THE APEX IS NOT THE PART THAT GRAZES. A dome's arc SAGS away from its apex
-         toward the sides, by  rho - sqrt(rho^2 - d^2)  at d from the centre, so the
-         part of it that reaches a box first is whichever of the box's two top corners
-         is further out. That is ~30 under the three-column header and ~70 under the
-         full-bleed ticker, in opposite directions: it makes the header harder to clear
-         and the ticker easier. Both anchors carry their own sag, evaluated at the
-         scale the un-sagged anchor gives -- one pass, within a few px of the exact
-         answer, and no magic margin doing the same job less honestly. */
-      const cb  = cover.getBoundingClientRect();
-      const CX  = (cb.left + cb.right) / 2;
-      const dOf = el => { const b = el.getBoundingClientRect();
-                          return Math.max(Math.abs(b.left - CX), Math.abs(b.right - CX)); };
-      const sag = (d, rho) => (rho > d ? rho - Math.sqrt(rho * rho - d * d) : rho);
-
-      const S1 = Math.min((A - padTop  + COVER_GAP_SM + sag(hdr ? dOf(hdr) : 0, B * ((A - padTop)  / B))) / B, 1);
-      const S2 = Math.max((A + tickBot - COVER_GAP_SM + sag(ticker ? dOf(ticker) : 0, B * ((A + tickBot) / B))) / B,
-                          S1 + COVER_EDGE_SM);
-      const T1 = vh - padTop;
-      const T2 = tickBot;
-
-      s = S1 + (r.top - T1) * (S2 - S1) / (T2 - T1);
-      s = Math.max(COVER_FROM, Math.min(1, s));
-    } else {
-      // Progress is measured from the moment the ticker's top crosses COVER_AT of the
-      // viewport. Falls back to the section edge only if the ticker is missing.
-      const from = ticker
-        ? vh * COVER_AT - COVER_OFFSET * u - ticker.getBoundingClientRect().top
-        : vh * (1 + COVER_LEAD) - r.top;
-      const p = Math.max(0, Math.min(1, from / COVER_PX));
-      const e = p * p * (3 - 2 * p);
-      s = COVER_FROM + (1 - COVER_FROM) * e;
-    }
-
+    // Progress is measured from the moment the ticker's top crosses COVER_AT of the
+    // viewport. Falls back to the section edge only if the ticker is missing.
+    const from = ticker
+      ? vh * COVER_AT - COVER_OFFSET * u - ticker.getBoundingClientRect().top
+      : vh * (1 + COVER_LEAD) - r.top;
+    const p = Math.max(0, Math.min(1, from / COVER_PX));
+    const e = p * p * (3 - 2 * p);
+    const s = COVER_FROM + (1 - COVER_FROM) * e;
     cover.style.setProperty('--cover-s', s.toFixed(4));
 
-    // Where the circle's top arc actually is on screen. This -- not "the section
-    // has entered the viewport" -- is what the first reveal waits for.
-    const apex = r.top + A - B * s;
+    // Where the circle's top arc actually is on screen. This — not "the section
+    // has entered the viewport" — is what the first reveal waits for.
+    const centreY = r.top + (COVER_TOP + COVER_R) * u;
+    const apex    = centreY - COVER_R * u * s;
     coverage = Math.max(0, Math.min(1, (vh - apex) / vh));
   }
 
@@ -624,28 +537,23 @@
 
   /* ------------------------------------------------------------ reveal order */
   /* Four steps: the headline is one mask now, not one per line. */
-  /* THE CTA IS NOT IN HERE, and that is the fix for it vanishing. SEQ is driven by the
-     COPY gate, which switches off as soon as the headline leaves the top of the screen.
-     That was fine while the CTA was the header's fourth line. It is now grouped with the
-     four items, roughly 480u below the header, so the gate was putting `pre` back on it
-     at exactly the moment it came into view -- the same trap this file already documents
-     for the circles, which are also too far down to ride the headline's entrance.
-     It rides the CIRCLES gate instead; see ctaEl below. */
+  /* The CTA is no longer part of the header in this option -- it sits at the foot of
+     the graphic -- so it no longer arrives with it. 470 made it the fourth line of a
+     four-line header, which is exactly what it stopped being; 760 lands it after the
+     copy below has begun, so it reads as closing the section rather than as trailing
+     the heading. */
   const SEQ = [
     ['[data-xv="0"]',    0],   // eyebrow
     ['[data-xv="1"]',  110],   // headline
-    ['[data-xv="2"]',  330]    // body
+    ['[data-xv="2"]',  330],   // body
+    ['[data-xv="3"]',  760]    // CTA, at the foot of the graphic
   ];
-  /* Its own delay, measured from the circles' entrance rather than the copy's. */
-  const ctaEl = section.querySelector('[data-xv="3"]');
-  const CTA_IN = 760;
 
   const armed = [];
   SEQ.forEach(([sel]) => {
     const el = section.querySelector(sel);
     if (el) { el.classList.add('pre'); armed.push(el); }
   });
-  if (ctaEl) { ctaEl.classList.add('pre'); armed.push(ctaEl); }
   const areas = [...section.querySelectorAll('.area .mask')];
   areas.forEach(c => { c.classList.add('pre'); armed.push(c); });
 
@@ -669,7 +577,6 @@
   const stage = { copy: false, circles: false, copyAt: 0 };
   const areasEl = section.querySelector('.areas');
   let timers = [];
-  let ctaT = 0;                 // the CTA's own entrance timer, outside the copy gate's list
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
   const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
 
@@ -695,11 +602,7 @@
     stage.circles = on;
     if (on) {
       anim.t0 = now; anim.running = true; anim.done = false;
-      /* setTimeout rather than later(): the copy gate's clearTimers() empties that list,
-         and this one must survive the headline scrolling away. */
-      if (ctaEl) { clearTimeout(ctaT); ctaT = setTimeout(() => ctaEl.classList.remove('pre'), CTA_IN); }
     } else {
-      if (ctaEl) { clearTimeout(ctaT); ctaEl.classList.add('pre'); }
       anim.running = false; anim.done = false;
       setSettled(false);                    // and the halo goes back into hiding
       placeLoops(REST);                     // back to a single line on the axis
@@ -717,7 +620,7 @@
        what keeps the two apart now is distance, not timing — the content sits 200u
        further down the section than the arc, which is a fixed gap that holds in
        both scroll directions instead of only on the way in. */
-    const head = section.querySelector('.sec-head__title');
+    const head = section.querySelector('.exp__head');
     const vh0  = window.innerHeight;
     const hr   = head ? head.getBoundingClientRect() : null;
     const inCopy  = hr && hr.top < vh0 * 0.78 && hr.bottom > 0;
@@ -735,22 +638,9 @@
        the whole section and so is on screen almost always. */
     if (areasEl) {
       const u2  = unit();
-      /* .areas, not the section. CY is a coordinate in the svg's own viewBox, and that
-         box no longer starts at the section's top edge -- the graphic is in flow under
-         the header now and shifts down with it. Reading the graphic's own rect keeps
-         the band on the circles wherever the header puts them. */
-      /* THE SVG'S OWN RENDERED BOX, where it has one. CY and RY are viewBox
-         coordinates, and the viewBox is only drawn at the page unit while the graphic
-         is full bleed -- at tablet it is two columns wide, at its own scale, and
-         starts above .areas' top edge. Dividing the rendered width by the viewBox's
-         1440 gives that scale whatever it is, and the rect's own top is where the
-         viewBox starts. Falls back to the old reading when the svg is display:none,
-         which is the phone. */
-      const sv  = svg && svg.getBoundingClientRect();
-      const k   = sv && sv.width ? sv.width / 1440 : u2;
-      const top = sv && sv.width ? sv.top : areasEl.getBoundingClientRect().top;
-      const bandTop = top + (CY - RY) * k;
-      const bandBot = top + (CY + RY) * k;
+      const top = section.getBoundingClientRect().top;
+      const bandTop = top + (CY - RY) * u2;
+      const bandBot = top + (CY + RY) * u2;
       const inBand  = bandTop < vh0 * 0.92 && bandBot > 0;
       const outBand = bandTop > vh0 * 1.05;        // bottom exit only
       if (!stage.circles && inBand) setCircles(true, now);
@@ -830,25 +720,11 @@
   }
 
   function fit() {
-    /* NO WIDTH SETTING ANY MORE. This used to shrink-wrap each block to its widest line,
-       which made sense while the four were absolutely positioned and shrink-to-fit.
-       They are equal quarters of a flex row now, so a measured width would fight the
-       row -- the columns are the grid's, and the 5% padding holds the text off them. */
-
-    /* THE ROW'S HEIGHT, for the CSS to centre it on the band with. The four blocks are
-       top-aligned and absolutely positioned, so nothing in CSS can know how tall the
-       row is -- and its height moves with the type, the copy and the width. It used to
-       be a hand-read number baked into .area's `top` (785.2 - 149.6 / 2, for a 28u
-       title over a three-line 16u description), which the type tokens made stale.
-       Measured AFTER the widths above, because those change the wrapping. */
-    /* The ROW's own height, not the tallest item. For a single flex row the two are
-       the same number; for the 2x2 grid at tablet they are not, and the centring reads
-       this to place the block on the band. */
-    const row = areas[0] && areas[0].closest('.areas__row');
-    const host = areas[0] && areas[0].closest('.areas');
-    const h = row ? row.getBoundingClientRect().height
-                  : Math.max(...areas.map(el => el.getBoundingClientRect().height));
-    if (host && h > 0) host.style.setProperty('--area-h', h.toFixed(2) + 'px');
+    // measure at the full measure, then shrink -- not the other way round
+    areas.forEach(el => { el.style.width = ''; });
+    void areas[0].offsetWidth;
+    const widths = areas.map(widestLine);
+    areas.forEach((el, i) => { if (widths[i] > 0) el.style.width = Math.ceil(widths[i]) + 'px'; });
   }
 
   fit();

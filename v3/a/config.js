@@ -32,21 +32,7 @@ const CONFIG = {
        the outer two sitting in the margins. Below this width the page drops to the
        three that mean something. */
     columnsMobile: 2,
-    /* 1023, the live site's tablet boundary -- NOT 767. The layout is drawn in design
-       units (--u = width/1440) so every box shrinks proportionally, while the type
-       tokens clamp toward a mobile floor that is a much higher fraction of their
-       desktop size: at 768 the artboard is 53% of itself but --font-p-18 is still 89%
-       of 18, so body copy occupies 30 design units where the layout budgeted 18. The
-       stacked layout has no fixed unit measure for type to outgrow, so it is the right
-       layout for that whole band. Must match the stylesheet or the grid changes column
-       count at a different width than the CSS. */
-    mobileAt:      1023,
-    /* The GRID's own breakpoint, deliberately not mobileAt. The layout stacks at 1023,
-       but the five vertical lines hold all the way down to 768 -- a tablet is wide
-       enough for four columns even though it is too narrow for the two-column
-       compositions. Below this the page drops to three lines: the two margins and the
-       centre. */
-    columnsMobileAt: 767,
+    mobileAt:      860,           // the same breakpoint the stylesheet uses
     marginVW:   2.78,             // side margin as % of viewport width (40/1440)
     marginMin:  20,               // px clamp
     marginMax:  72,               // px clamp
@@ -631,7 +617,7 @@ const HALO = {
   /* LOCKED. Measured off hp_modules.png: the mass is centred low and off the left
      edge, so what the section shows is its upper-right quadrant fading to white
      toward the right. The cursor does not move this -- see followX/followY below. */
-  offsetX: -0.90, offsetY: 0.34,
+  offsetX: -0.78, offsetY: 0.34,
 
   colorSpread: 1.05, colorFalloff: 1.95,
   falloff: 1.05, edgeGain: 1.60, edgeShape: 2.10,

@@ -120,10 +120,7 @@
          transform. */
     const sizeStroke = () => {
       const w = parseFloat(getComputedStyle(svg).width) || 0;
-      /* The CSS pins this now, with vector-effect: non-scaling-stroke and a 1px width,
-         which is exact where this computation only approximated one pixel. An inline
-         stroke-width here would beat the stylesheet, so it is no longer written. */
-      void w;
+      svg.style.setProperty('stroke-width', (w > 0 ? SPAN / w : 0.05).toFixed(5));
     };
     sizeStroke();
     addEventListener('resize', sizeStroke, { passive: true });
@@ -134,11 +131,11 @@
   /* The footer's list, unchanged. Kept short for the same reason it is short there:
      the headline is nowrap, so a long phrase cannot wrap -- it would simply run wide. */
   const PHRASES = [
-    'commerce platform.',
-    'growth channels.',
+    'e-comm platform.',
+    'digital presence.',
+    'audience funnel.',
     'AI capabilities.',
-    'evergreen campaign.',
-    'conversion strategy.'
+    'social campaign.'
   ];
 
   const T = {
@@ -229,16 +226,25 @@
      --roll is the travel: the box's full padded height, so a word that has rolled out
      has cleared its descenders rather than stopping with them still showing.
 
-     THE min-width IS GONE. It used to hold the box open to the widest phrase in the
-     list, because the h1 was shrink-to-fit and the incoming word -- absolutely
-     positioned -- was clipped by a box only as wide as the phrase still in flow. The h1
-     now has an explicit width (two grid columns less the inset), so every .mask in it
-     stretches to that full measure and there is nothing left to clip. Keeping the
-     min-width would actively break the new behaviour: it was measured with nowrap, so
-     at 1440 it held the line 672 wide inside a 664 box and the longest phrase would
-     overflow the third grid line rather than wrap. */
+     min-width is the FIX for the cut-off. The incoming word is absolutely positioned
+     inside a box whose width is set by the word still in flow, and that box clips. Any
+     phrase wider than the one on screen was therefore truncated the moment it arrived.
+     Holding the box open to the widest phrase in the list means the clip never has
+     anything to catch -- and because the box is a left-aligned flex item in an
+     absolutely positioned h1, widening it moves nothing. */
   function measure() {
     line.style.setProperty('--roll', boxFor(word) + 'px');
+
+    const probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0';
+    line.appendChild(probe);
+    let widest = 0;
+    for (const p of PHRASES) {
+      probe.textContent = p;
+      widest = Math.max(widest, probe.getBoundingClientRect().width);
+    }
+    probe.remove();
+    line.style.minWidth = Math.ceil(widest) + 'px';
   }
   measure();
   addEventListener('resize', measure, { passive: true });
@@ -264,7 +270,6 @@
     rolling = false;
     if (outgoing && outgoing.parentNode) outgoing.parentNode.removeChild(outgoing);
     incoming.classList.remove('hero__w--in');
-    line.style.height = '';                 // back to the landed word's own height
     incoming.style.transition = '';
     incoming.style.transform  = '';
     incoming.style.opacity    = '';
@@ -298,36 +303,6 @@
 
     const roll = boxFor(incoming);
     line.style.setProperty('--roll', roll + 'px');
-
-    /* THE BOX TAKES THE INCOMING WORD'S HEIGHT NOW, at the start of the swap, in both
-       directions. The outgoing word is in flow and sets the line's height; the
-       incoming one is absolutely positioned and does not -- so without this a one-line
-       phrase handing over to a two-line one left the box 109 tall against a 176
-       arrival and .mask's overflow:hidden cut the second line off for the whole
-       transition.
-
-       It used to be max(outgoing, incoming), which fixed that case but left the other
-       one: handing BACK to a shorter phrase, the box stayed tall for the whole roll
-       and only shrank in land() -- so the headline block settled after the new line
-       had already finished arriving. Taking the incoming height immediately moves the
-       box, and the block centred on it, DURING the swap rather than after it. The
-       outgoing word is translating down and fading as this happens, so the clip it
-       now meets on a shrink is behind its own fade.
-
-       FROM A LENGTH, NOT FROM `auto`, and this is what makes it an animation at all.
-       The stylesheet transitions this box's height, but the box has no height of its
-       own between swaps -- it is auto -- and a transition out of auto does not run.
-       Every swap so far has therefore SNAPPED, with the only smoothing coming from a
-       separate transition on the headline's `top` that started afterwards and ran its
-       own half second. So: write the outgoing height explicitly with transitions off,
-       force the resolution, hand the timing back, and only then write the target.
-       land() clears the inline height, which is now a no-op -- the box is already at
-       the landed word's own height. */
-    line.style.transition = 'none';
-    line.style.height = boxFor(outgoing) + 'px';
-    void line.offsetHeight;
-    line.style.transition = '';
-    line.style.height = roll + 'px';
     incoming.style.transform = 'translateY(' + roll + 'px)';
     incoming.style.opacity   = '0';         // it fades in on its own delayed beat
 

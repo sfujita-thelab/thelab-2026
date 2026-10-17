@@ -8,7 +8,6 @@
   'use strict';
 
   const canvas = document.getElementById('halogl');
-  const COARSE = matchMedia('(hover: none)').matches;
   // the canvas now spans the whole Expertise section (it sits behind the header
   // copy as well as the circles), so size and track against that box
   const host = canvas && canvas.parentElement;
@@ -168,11 +167,7 @@
     cur.y += (cur.ty - cur.y) * HALO.ease;
     cur.amt += (cur.want - cur.amt) * HALO.fade;
 
-    /* On a touch screen there is no pointer to raise `amt`, so the halo sat at
-       HALO.rest forever and read as far fainter than it does on a desktop where the
-       cursor lifts it. With no hover there is nothing to reveal, so it is simply
-       shown at full strength. */
-    const vis = COARSE ? 1 : HALO.rest + (1 - HALO.rest) * cur.amt;
+    const vis = HALO.rest + (1 - HALO.rest) * cur.amt;
     canvas.style.opacity = vis.toFixed(3);
 
     if (near && vis > 0.01) {
@@ -195,14 +190,7 @@
       /* followX/followY are 0, so these resolve to the fixed offsets -- the mass is
          locked where the reference puts it. The terms are kept so the behaviour is
          one number away if it is ever wanted back. */
-      /* FURTHER RIGHT in the stacked layout. -0.90 puts the mass off the left edge
-         so the section shows its upper-right quadrant -- which at 1440 is most of the
-         width, but at 900 the same offset in p-space is the same FRACTION of a much
-         narrower box, so nearly all of the colour is outside it and what is left
-         reads as a stain in the corner. -0.45 brings the mass back under the
-         section. Desktop keeps -0.90. */
-      const offX = (window.innerWidth <= 1023 ? -0.45 : H.offsetX);
-      gl.uniform1f(u.uOffX, offX + cur.x * H.followX * cur.amt);
+      gl.uniform1f(u.uOffX, H.offsetX + cur.x * H.followX * cur.amt);
       gl.uniform1f(u.uOffY, H.offsetY + cur.y * H.followY * cur.amt);
       const fl = Math.hypot(cur.x, cur.y) || 1e-5;
       gl.uniform2f(u.uStretchDir, cur.x / fl, cur.y / fl);

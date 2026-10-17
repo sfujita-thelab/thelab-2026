@@ -4,17 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hero prototype — living gradient + optical circle</title>
-
-<!-- thelab design tokens — STEPPED ONLY, the live site's own system.
-     The two fluid override files (thelab-type-fluid.css, thelab-space-fluid.css) are
-     NOT loaded. Every token therefore takes its stepped value, switching at 1023 and
-     767 exactly as it does on www.thelab.co. No clamp(), no vw, anywhere.
-     The two files are still in the folder, unlinked: the fluid build they belong to is
-     in _archive/2026-10-16/v3-c, and linking them here turns this into it.
-     Beausite and Recife load from thelab.co's CDN, so the real faces need a
-     connection; without one the page falls back to the stack in --font. -->
-<link rel="stylesheet" href="thelab-tokens.css">
-
 <style>
   :root {
     --bg: #f4f4f4;
@@ -26,23 +15,17 @@
     --col: 340px;
     --u: 1px;             /* design unit; app.js rewrites it from the real width */
     /* THE SHARED TEXT INSET. Every block of copy stands this far off its own box so
-       nothing sets flush on a grid line.
-
-       --spacer-8, which is a flat 8 at every width. It was calc(8 * var(--u)), a
-       hand-rolled 8 in design units -- which meant it was 8 only at the 1440 reference
-       and shrank with the window: 6.7 at 1200, 5.7 at 1024, and 2 on a phone, where a
-       mobile override had to put it back. The token is the same number written once,
-       and it needs no override. */
-    --inset: var(--spacer-8);
+       nothing sets flush on a grid line. It is a token rather than a literal because
+       mobile holds it at a flat 8px while everything around it shrinks: at 375 the
+       design unit is 0.26, so calc(8 * var(--u)) resolves to 2px and the inset would
+       quietly stop existing. See the mobile block. */
+    --inset: calc(8 * var(--u));
     --grain-a: .245;      /* grain layer opacity. Figma's value was .35; this is 30%
                              less, per request. Feeds .grain and .pf::after alike. */
     --pad-top: 32px;
     --pad-bottom: 66px;   /* app.js overwrites this in px from the real viewport */
     /* swap this one line for the real brand face */
-    /* Beausite, from thelab-tokens.css. The type TOKENS each name their own family, so
-       this stack only covers anything not yet tokenised and the fallback if the CDN is
-       unreachable. Helvetica Neue is gone, per the token brief. */
-    --font: Beausite, -apple-system, "Segoe UI", Arial, sans-serif;
+    --font: "Helvetica Neue", Inter, -apple-system, "Segoe UI", Arial, sans-serif;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; background: var(--bg); overflow: hidden; }
@@ -90,24 +73,22 @@
     display: flex; align-items: center; justify-content: space-between;
   }
 
-  /* One drawing: no gap, nothing to align, and the height is the only number. 30 is
-     what the old mark was, and the lockup's 599 x 120 makes that 149.75 across --
-     within 8px of the 158 the mark-plus-wordmark used to measure, so the bar's balance
-     is unchanged. width: auto so the aspect comes from the viewBox. */
-  .logo { display: flex; align-items: center; text-decoration: none; color: inherit; }
-  .logo svg { display: block; height: 30px; width: auto; flex: none; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+  .logo svg { display: block; width: 30px; height: 30px; flex: none; }
+  .logo span {
+    font-size: clamp(22px, 2.92vw, 52px);
+    line-height: 1; font-weight: 500; letter-spacing: -0.018em;
+  }
 
   /* A FLAT 16, not a clamp. It was clamp(14px, 2.222vw, 40px) -- 32 at the 1440
      reference -- and before that 3.22vw, which resolved to 46.4. A gap between nav items
      is a gap between words, and words do not get wider with the window; the clamp was
      making the nav spread out on a large screen for no reason the type asked for. */
-  .nav { display: flex; gap: var(--spacer-32); }
+  .nav { display: flex; gap: 32px; }
   .nav a {
     position: relative;
-    /* ONE TOKEN. Was clamp(11px, 1.0vw, 18px) with 0.045em: 11 at 375, 14.4 at 1440.
-       --font-button-1, which is a flat 16 now that both button tokens are single-size.
-       text-transform stays, the tracking does not. */
-    font: var(--font-button-1); text-transform: uppercase;
+    font-size: clamp(11px, 1.0vw, 18px);
+    letter-spacing: 0.045em; text-transform: uppercase;
     text-decoration: none; color: inherit; white-space: nowrap;
     opacity: .92;
   }
@@ -128,12 +109,12 @@
      something the reader just did, so it eases out; leaving should not ask for
      attention, so it eases in.
 
-     right: 0 now. It was .045em, cancelling the trailing letter-spacing -- tracking is
-     added after every letter including the last, so a rule at right: 0 overshot the ink
-     by one space. There is no tracking any more, so there is nothing to cancel. */
+     right: .045em cancels the trailing letter-spacing. Tracking is added AFTER every
+     letter including the last, so a rule at right: 0 overshoots the word's ink by one
+     space and sits visibly wider than it. */
   .nav a::after {
     content: ""; position: absolute;
-    left: 0; right: 0; bottom: calc(-7 * var(--u)); height: 1px;
+    left: 0; right: .045em; bottom: calc(-7 * var(--u)); height: 1px;
     background: currentColor;
     transform: scaleX(0); transform-origin: right;
     transition: transform .18s cubic-bezier(.5, 0, .78, .25);
@@ -150,83 +131,10 @@
     .nav a::after, .nav a:hover::after { transition: none; }
   }
 
-  /* ---- the phone's MENU trigger and panel ---------------------------------------
-     Hidden everywhere but the phone, where .nav itself is hidden instead. The trigger
-     takes the nav links' own type so the bar reads as one set of labels, and inherits
-     colour so the footer's inversion carries it like everything else in the bar. */
-  .navtoggle { display: none; background: none; border: 0; padding: 0; cursor: pointer;
-               font: var(--font-button-1); text-transform: uppercase; color: inherit;
-               letter-spacing: inherit; }
-
-  /* z-index 5, under .topbar's 6: the panel covers the page, the bar's own logo and
-     the trigger (now reading "Close") stay above it and stay live.
-
-     THE OPEN STATE IS thelab.co's, measured off it at 375 rather than eyeballed: the
-     rows are 84 tall with the label 32/110% uppercase on the left and an arrow on the
-     right, divided by a 1px rgba(34,34,34,.2) hairline BETWEEN rows only, and the
-     secondary links sit at the foot of the panel at 14. Two things are deliberately
-     ours and not theirs: the background is this page's own #f4f4f4 where the live
-     panel is #f0ece7, and the labels are this site's four. */
-  .menu { position: fixed; inset: 0; z-index: 5; display: none;
-          background: var(--bg, #f4f4f4); color: #222;
-          flex-direction: column; overflow-y: auto;
-          /* The bar floats over this, so the first row has to clear it: the bar is its
-             own --spacer-24 twice plus the 24 of its content, and --spacer-24 again is
-             the air under it. Written as that sum so it follows the bar rather than
-             restating a number the bar could change. */
-          padding: calc(2 * var(--spacer-24) + 24px + var(--spacer-24))
-                   calc(var(--m) + var(--inset))
-                   var(--spacer-40);
-          opacity: 0; pointer-events: none;
-          transition: opacity .32s cubic-bezier(.22,.61,.36,1); }
-  .menu.is-open { opacity: 1; pointer-events: auto; }
-
-  /* The hairline under the bar, full bleed where the rows are inset. Its top is the
-     bar's own height, the same sum the padding above opens with, less the air. */
-  .menu::before { content: ""; position: absolute; left: 0; right: 0;
-                  top: calc(2 * var(--spacer-24) + 24px);
-                  height: 1px; background: rgba(34, 34, 34, .2); }
-
-  .menu__nav { display: flex; flex-direction: column; }
-  /* FULL BLEED dividers. The panel is inset by margin + inset, so a border on the row
-     would stop where that padding does. The row is pulled out to the viewport's edges
-     by a negative margin and given the same amount back as padding, which leaves its
-     CONTENT exactly where it was and runs the border edge to edge. */
-  .menu__nav a { display: flex; align-items: center;
-                 padding: var(--spacer-32) 0;
-                 margin-left:  calc(-1 * (var(--m) + var(--inset)));
-                 margin-right: calc(-1 * (var(--m) + var(--inset)));
-                 padding-left:  calc(var(--m) + var(--inset));
-                 padding-right: calc(var(--m) + var(--inset));
-                 color: #222; text-decoration: none;
-                 font: var(--font-h-32); text-transform: uppercase; }
-  /* BETWEEN rows only -- no line above the first or below the last. */
-  .menu__nav a + a { border-top: 1px solid rgba(34, 34, 34, .2); }
-
-  /* Pushed to the foot of the panel by the auto margin, so the block sits on the
-     bottom edge however tall the list above it is. */
-  /* ONE ROW: the copyright on the left, the two glyphs on the right. */
-  .menu__foot { margin-top: auto; padding-top: var(--spacer-56);
-                display: flex; align-items: center; justify-content: space-between;
-                gap: var(--spacer-24); }
-  /* 24, where the footer's are 21 -- these sit beside a line of 14 copy rather than
-     under a stacked legal block, and the glyphs do not fill their 24-unit viewBox. */
-  .menu__social { display: flex; align-items: center; gap: var(--spacer-12); }
-  .menu__icon { display: grid; place-items: center; flex: none; color: #222; }
-  .menu__icon svg { width: 24px; height: 24px; display: block; }
-  .menu__foot p { color: #222; font: var(--font-p-14); margin: 0; }
-  /* The link inherits the line it sits in -- colour, size and all -- so it reads as
-     part of the sentence rather than as a separate thing. Underlined on hover only,
-     which is what tells you it IS one. */
-  .menu__foot p a { color: inherit; text-decoration: none; }
-  .menu__foot p a:hover { text-decoration: underline; }
-  @media (prefers-reduced-motion: reduce) { .menu { transition: none; } }
-
-
   /* The hero's two text blocks in one box, so the page's 8u inset is written once
      here instead of on the headline and the body separately.
 
-     left/right rather than padding, for the reason .pf__band and .featuredwork .sec-head carry
+     left/right rather than padding, for the reason .pf__band and .featuredwork__header carry
      it that way: an absolutely positioned child resolves its left/right against the
      containing block's PADDING box, which includes the padding, so padding on this
      box would inset nothing. Its own edges are the inset edges.
@@ -243,27 +151,9 @@
   /* Top-positioned, like the headline. Anchoring from the bottom makes the block
      depend on how the browser resolves the viewport height, which is one more
      thing that can move the type off the grid; app.js writes an explicit top. */
-  /* ONE BOX, not two. There used to be a wrapper around this whose only job was
-     `display: flex; justify-content: flex-end` -- a flex container holding a single
-     fixed-width child, to push it to the right end of the band. A block box with
-     `margin-left: auto` does the same thing with nothing around it, so the wrapper is
-     gone and everything it carried is here.
-
-     relative, and the difference is only z-index: a static box IGNORES z-index, so the
-     mark -- positioned at z-index 0 -- painted over the body and the CTA, because
-     positioned elements paint above in-flow content whatever their z-index says.
-
-     The box is A GRID COLUMN, 1060..1400, with the inset as padding inside it so the
-     copy stands 8 off both lines. The negative right margin cancels the BAND's own
-     inset for this child alone; without it the column would sit at 1044..1384.
-
-     app.js writes margin-top here to align the block with the headline's ink -- margin,
-     not `top`, because this is in flow. */
-  .hero__aside {
-    position: relative; z-index: 1;
-    width: var(--col); margin-left: auto;
-    margin-right: calc(-1 * var(--inset));
-    padding: 0 var(--inset);
+  .hero__foot {
+    position: absolute; right: 0; top: 0;
+    display: flex; justify-content: flex-end;
   }
 
   /* The headline is positioned on its own and aligned by INK, not by box — its
@@ -274,25 +164,7 @@
   }
 
   h1 {
-    /* MEASURED, not shrink-to-fit. The headline is held to the span between the first
-       and third vertical lines: the band already starts it on line one plus the inset,
-       so the width is two grid columns less the inset at each end, which lands its right
-       edge 8 inside the third line at every viewport.
-
-       white-space is normal now, where it was nowrap -- that is what lets a long keyword
-       take a second line instead of running past the third line. "Build your" is 366 of
-       ink at 80px against a 664 box, so only the rotating line can ever wrap.
-
-       Nothing downstream needs changing for that: app.js re-centres the block on the
-       mark whenever its height changes (watchHeadline's ResizeObserver), and
-       hero-type.js measures the roll from the INCOMING word's own box on every swap, so
-       a two-line phrase travels two lines. */
-    white-space: normal;
-    width: calc(2 * var(--col) - 2 * var(--inset));
-    /* --spacer-80 of measure held back on the right. box-sizing is border-box, so the
-       box still ends 8 inside the third grid line and only the type's measure narrows
-       -- which means a keyword wraps sooner than the box's own edge would make it. */
-    padding-right: var(--spacer-80);
+    white-space: nowrap;
 
     /* 72px on the 1440 reference: 72 / 1440 = 5vw. The vw term is what renders at
        normal widths, so that is the value that sets the size; the cap just stops it
@@ -302,12 +174,8 @@
        Nothing downstream needs touching. app.js measures the headline's real box every
        time it places it, so the block re-centres on the mark by itself, and hero-type.js
        re-measures the roller's widest phrase on load and on resize. */
-    /* ONE TOKEN. Was clamp(32px, 5vw, 90px) at line-height 1.1 with -0.028em of
-       tracking: 32 / 72 / 90 at 375 / 1440 / wide. --font-h-80 is 48 / 80, fluid between
-       768 and 1440, and carries its own 110% line height -- the same ratio this had. The
-       tracking is GONE; thelab.co sets none. */
-    font: var(--font-h-80);
-    /* line-height came with the token. 110%, as before.                              (
+    font-size: clamp(32px, 5vw, 90px);
+    line-height: 1.1;                   /* 110%, per the Figma file. It has been 1 (100%)
                                            and 0.963 before that -- an 88px line box at
                                            the measured cap height.
 
@@ -317,11 +185,9 @@
                                            itself on the mark; the masks' clip padding is
                                            in em, so it follows the type; and the rolling
                                            line's travel is measured at runtime, not
-                                           declared.) */
-    /* No optical nudge. It was margin-left: -0.012em -- about -0.96px at 80 -- pulling
-       the B's side bearing back onto the margin, which left the ink on 47.2 against a
-       48 inset. The headline sits on the inset itself now: one --spacer-8 from its box,
-       the same as every other block of copy on the page. */
+                                           declared. */
+    font-weight: 400; letter-spacing: -0.028em;
+    margin-left: -0.012em;              /* optical: pull the W onto the margin */
   }
 
   /* ---- the hero mark: the centre circle's replacement ----------------------
@@ -439,23 +305,16 @@
      THE FILL STAYS AT 1. It was .5, the circle's half-strength veil; opaque is what gives
      the mark a body for the hairline to sit on, and it is the fill rather than the stroke
      that was making it read as a watermark. */
-  /* non-scaling-stroke, so the ring's outline is exactly 1 device pixel at any size --
-     the same weight as the grid lines it sits among. hero-type.js used to write
-     stroke-width in USER units, computed as the viewBox span over the rendered width,
-     which only approximates one pixel and drifts with rounding. */
   .hero__dot {
-    vector-effect: non-scaling-stroke;
-    stroke-width: 1px;
     fill: rgba(244, 244, 244, 1);
     stroke: rgba(0, 0, 0, var(--grid-a, .130));
   }
   /* The type sits over the mark. Both are absolute inside .hero, and the mark is
      first in the DOM, but these are explicit so re-ordering the markup cannot
      silently drop the headline behind the dots. */
-  .hero h1 { z-index: 1; }
+  .hero h1, .hero__foot { z-index: 1; }
 
   @media (prefers-reduced-motion: reduce) {
-    h1, .hero__head-dyn { transition: none; }
     .hero__mark { opacity: 1; --enter-rot: 0deg; transition: none; }
   }
 
@@ -473,13 +332,7 @@
 
      The clip padding is h1 .mask's own .16em / .10em -- this element is both the
      intro mask and the roller, so the box it needs already exists. */
-  /* height is transitioned for the same reason h1's top is: hero-type.js holds this box
-     open to the taller of the two words for the duration of a swap, so a one-line phrase
-     handing over to a two-line one grows the box rather than clipping the arriving word.
-     Same curve and duration as the block's own move, so the two read as one gesture. */
-  .hero__head-dyn { position: relative; --roll: 1.26em;
-                    transition: height .5s cubic-bezier(.22, .61, .36, 1); }
-  h1:not(.is-placed) .hero__head-dyn { transition: none; }
+  .hero__head-dyn { position: relative; --roll: 1.26em; }
   /* The intro reveal keeps the page's .82s; the hand-over runs at the footer's own
      faster pair. is-live is added by hero-type.js at the first swap, which is long
      after the intro has landed, so the two never contend for the same transition. */
@@ -501,11 +354,7 @@
      out at its natural width now, and hero-type.js holds the box open to the widest
      phrase so there is nothing for the clip to catch. */
   .hero__head-dyn > span.hero__w--in {
-    /* right: 0 and white-space: normal, both so the incoming word wraps on exactly the
-       measure the word in flow does. It was left-anchored and nowrap, which was correct
-       while the headline could not wrap at all; now it would set the arriving phrase on
-       one line and the landed phrase on two. */
-    position: absolute; left: 0; right: 0; white-space: normal; top: .16em;
+    position: absolute; left: 0; right: auto; white-space: nowrap; top: .16em;
     transition: transform .66s cubic-bezier(.16,1,.3,1) .23s,
                 opacity .33s ease .23s;
   }
@@ -513,16 +362,19 @@
   .hero__sr { position: absolute; width: 1px; height: 1px; overflow: hidden;
               clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
+  /* A column less the inset on each side. It was the full --col with 8u of padding
+     inside it; the inset moved to .hero__band, so the box has to come in by the same
+     16 to keep the copy measuring 324 and its left edge standing 8 off the 1060 line
+     rather than overhanging it. */
+  .hero__aside { width: calc(var(--col) - 16 * var(--u)); flex: none; }
   .hero__aside p {
     /* 18px on the 1440 reference: 18 / 1440 = 1.25vw. The vw term is what actually
        renders at normal widths -- the original 1.18vw resolved to 17px at 1440 and its
        21px ceiling was never reached below 1780 -- so the MIDDLE value is the one that
        matters, not the cap. The cap is 20, so it still has somewhere to grow. */
-    /* ONE TOKEN. Was clamp(13px, 1.25vw, 20px) / 1.76 with -0.004em: 13 at 375 and 18
-       at 1440. --font-p-18 is 16 / 18 and its line height is 150%, down from 176% --
-       the copy sets tighter. 22 -> --spacer-24 (16 mobile, 24 desktop). */
-    font: var(--font-p-18);
-    margin-bottom: var(--spacer-24);
+    font-size: clamp(13px, 1.25vw, 20px);
+    line-height: 1.76; font-weight: 400; margin-bottom: 22px;
+    letter-spacing: -0.004em;
   }
 
   .cta {
@@ -531,15 +383,9 @@
        pills are now one ink. It was #111, which was a third dark on a page that already
        had two. The token rather than the literal so the three cannot drift. */
     background: var(--dark, #222); color: #f4f4f4; border: 0; cursor: pointer;
-    /* ONE TOKEN. Was clamp(10px, 0.9vw, 16px) with 0.085em of tracking: 10 at 375, 13
-       at 1440. --font-button-2 is 14 / 16 and brings a 120% line height, which the roll
-       clip below is matched to. text-transform stays; the tracking does not.
-       Padding 10/50/9 -> --spacer-8 / --spacer-56. The sides are the one snap over 4px
-       in the whole page (50 -> 56), and the 1px top/bottom asymmetry is lost -- it was
-       optical centring for the uppercase, which align-items: center now does. */
-    font: var(--font-button-1); text-transform: uppercase;
-    padding: var(--spacer-8) var(--spacer-56);
-    border-radius: 999px; white-space: nowrap;
+    font-family: inherit; font-size: clamp(10px, 0.9vw, 16px);
+    letter-spacing: 0.085em; text-transform: uppercase;
+    padding: 10px 50px 9px; border-radius: 999px; white-space: nowrap;
     transition: background .25s ease, transform .25s ease;
   }
   /* ---- the label ROLL, shared by every CTA ------------------------------------
@@ -557,25 +403,24 @@
      cannot grow the button -- the height is pinned in ems off the button's own type,
      not left to the content. Leaving runs the move in reverse, which is the second
      roll the reference shows on exit. */
-  /* 1.2em, which is --font-button-2's own 120% line height.
-     It was 1.16em, reproducing the natural 15.0px line box at the old 12.96px type so
-     the roll cost nothing in height. Now that the label's line height is declared by the
-     token, the clip has to be that SAME ratio or the roll crops at a different height
-     than the line it is rolling -- so this number is not free to drift from the token. */
+  /* 1.16em, not a round 1.25: the buttons' natural line box is 15.0px at their 12.96px
+     type, and a taller clip grows them -- measured, 34.0 -> 35.2px. 1.16em reproduces
+     that 15.0px exactly, so the roll costs nothing in height. It also pins a value that
+     was previously `normal` and therefore font-dependent. */
   .cta__clip {
     display: block; overflow: hidden;
-    height: var(--cta-line, 1.2em); line-height: var(--cta-line, 1.2em);
+    height: var(--cta-line, 1.16em); line-height: var(--cta-line, 1.16em);
   }
   .cta__roll { display: block; will-change: transform;
                transition: transform .30s cubic-bezier(.22,.61,.36,1); }
-  .cta__roll > span { display: block; height: var(--cta-line, 1.2em); }
+  .cta__roll > span { display: block; height: var(--cta-line, 1.16em); }
   .cta:hover .cta__roll,
   .pf__cta:hover .cta__roll { transform: translateY(calc(-1 * var(--cta-line, 1.16em))); }
 
   .cta:active { transform: scale(.985); }
 
   /* narrow windows: the two-column footer stacks rather than colliding */
-  @media (max-width: 1023px) {
+  @media (max-width: 860px) {
     /* THE HERO STACKS. Both pieces are absolutely positioned on desktop with their tops
        written by alignHeadlineInk(), which centres each of them on the mark -- two
        independent blocks aimed at the same line, which is fine when they are side by
@@ -585,36 +430,20 @@
        .hero is position:fixed over the whole viewport, so the stack is a column centred
        in it; the two children go back into flow and the inline `top` alignHeadlineInk
        writes is simply ignored on a static box, so that function needs no mobile case. */
-    /* No --inset override any more: it is --spacer-8, which is already a flat 8 here.
-       It still feeds the topbar's 28 (the 20 margin plus that 8). */
+    /* THE INSET STAYS 8. Everything else on the page is written in design units and
+       shrinks with the viewport; the inset must not, or at 375 it resolves to 2px and
+       the copy sets effectively flush on the grid lines. A flat 8 here is what keeps
+       every block standing off its own box, and it feeds the topbar's 28 (20 + 8). */
+    :root { --inset: 8px; }
     .hero { display: flex; flex-direction: column; justify-content: center;
             padding: 0 var(--m); }
-    /* --spacer-24 joins the headline to the body+CTA below it. The two are one block
-       in the stacked layout, so this is the only thing holding them together. */
-    /* padding-right: 0 -- the desktop rule holds --spacer-80 of measure back on the
-       right, which is a decision about a 664-wide line of 80px type. Stacked, the
-       headline is the page width and that 80 (40 here) was simply 12% of the measure
-       spent on nothing. Tablet never saw it: its own `padding: 0 var(--inset)`
-       shorthand replaces both sides. This is what the phone needed. */
     .hero h1 { position: static; width: auto; white-space: normal;
-               padding: 0 var(--inset);
-               margin-bottom: var(--spacer-24); }
+               margin-bottom: 28px; }
     /* The band goes static with its children, so the column stacks inside .hero's
        own var(--m) padding and the desktop inset is not applied twice. */
-    /* No top override: the mark keeps the base rule's top: 50%, so its centre is the
-       viewport's centre. .hero is a centred flex column, so the copy is centred on the
-       same line -- the two share one axis rather than being hung off the top and the
-       bottom edge separately. */
     .hero__band { position: static; left: auto; right: auto; }
-    /* relative, not static -- same reason as the desktop rule it mirrors. A static box
-       ignores z-index, and the mark is positioned at z-index 0, so static put the body
-       and CTA behind it the moment the two overlapped. This rule is what was undoing
-       the desktop fix at these widths. */
-    /* Full width, and the desktop margins OFF. The negative right margin that cancels
-       the band's inset on desktop was never reset here, so the copy's box ran 8 past
-       the hero's own right edge -- 343 wide in a 335 band at 375. */
-    .hero__aside { width: 100%; max-width: none; margin-left: 0; margin-right: 0; }
-    /* Hidden on the PHONE only -- the tablet block below puts it back. */
+    .hero__foot { position: static; display: block; }
+    .hero__aside { width: 100%; max-width: none; }
     .nav { display: none; }
   }
 
@@ -765,7 +594,7 @@
        as the 48 it resolves to. The bar's type then lands on the same line as every other
        block of copy at any width, and mobile's 28 (20 + 8) falls out of the same
        expression instead of needing a second number. */
-    padding: var(--spacer-24) calc(var(--m) + var(--inset));
+    padding: 24px calc(var(--m) + var(--inset));
     /* Hides on the way down, comes back on the way up. The transform is the whole of it
        -- app.js only decides WHEN by toggling .is-away -- so the bar stays where it is
        in the layout and nothing below it reflows.
@@ -830,12 +659,7 @@
   @media (prefers-reduced-motion: reduce) {
     .topbar { transition: none; }
   }
-  /* a AND button. .topbar is pointer-events:none so the hero shows through it, and
-     this is what makes its own content live again -- but it named links only, and the
-     phone's MENU trigger is a <button>. Every real tap on it passed straight through
-     to the page underneath; only a synthetic .click(), which skips hit-testing
-     altogether, appeared to work. */
-  .topbar a, .topbar button { pointer-events: auto; }
+  .topbar a { pointer-events: auto; }
   .hero { position: fixed; inset: 0; pointer-events: none; z-index: 4;
           will-change: transform, opacity; }
   .hero-space { height: 100vh; }
@@ -844,7 +668,24 @@
                                     share the root stacking context so .page-grid can
                                     blend with the gradient canvases */
 
-  .featuredwork { position: relative; background: none; }
+  /* scroll-margin-top is what keeps the hero's "Start exploring" from parking this
+     section's top edge underneath the fixed topbar. It is declared HERE rather than
+     worked out in the click handler because that is what the property is for: the
+     browser applies it to any scroll that targets this element, so scrollIntoView stays
+     a one-liner and there is no offset arithmetic to get wrong or to re-derive if the
+     nav's height ever changes.
+
+     80px, flat, not design units: it is clearance for a fixed bar whose own height is
+     in px, so it should not scale with the artboard. It was 150, which cleared the bar
+     with room to spare and left the section's eyebrow sitting low on the screen; 80 puts
+     the top edge just under the bar instead.
+
+     It governs ANY scroll that targets this element, not just the hero's button: a
+     #featuredwork jump lands on the same line, verified. The nav's links are still href="#"
+     placeholders in this prototype, so nothing else uses it yet -- but when they are
+     wired up there is nothing to remember to keep in step, which is the point of
+     declaring it on the section rather than inside one handler. */
+  .featuredwork { position: relative; background: none; scroll-margin-top: 80px; }
   /* Runs past the section's bottom edge so the gradient never ends in a hard
      horizontal line - the cover circle's arc is what cuts it off. */
   #featuredworkgl { position: absolute; left: 0; top: 0; width: 100%;
@@ -884,74 +725,25 @@
      child resolves left/right against the containing block's PADDING box -- padding
      here insets nothing. The box itself moves in by 8 on each side instead, so it is
      664 across rather than 680 and its edges ARE the inset edges. */
-  /* IN FLOW NOW, like Expertise's and Proof's. Its four pieces were each pinned to a
-     hand-tuned absolute top -- 52.4 / 84 / 231.2 / 346.7 -- with the copy's line count
-     baked into every one of them. Tokenising the type proved the point: --font-p-18 in
-     Beausite with no tracking takes the body from three lines to four, and the CTA's
-     346.7 left it sitting 2px under the body instead of 24.
-
-     So the gaps are margins now and the box starts at 52.4, where the eyebrow did. The
-     block self-measures, the four numbers are gone from the layout-positions list, and
-     a copy change can no longer silently close a gap. */
-  /* THE LEFT COLUMN. Two grid columns wide, off the grid line at --m, holding the
-     header and the SKS card in flow. This is what makes the card move: its top used to
-     be a fixed 471u, which assumed a header height, and the header's height depends on
-     the type and the copy. At 1024 with stepped tokens the header is 492u tall and ran
-     52px INTO the card. Now the card simply follows it.
-
-     The box is NOT inset -- it sits flush on the grid line, because the SKS card has to
-     line up with the other two cards. The 8u inset goes back onto the header as PADDING,
-     which works now that its four children are in normal flow; it could not before,
-     because an absolutely positioned child resolves against the padding box. */
-  .featuredwork__col { position: absolute; top: calc(52.4 * var(--u));
-                       left: var(--m); width: calc(680 * var(--u)); }
-  /* ---- THE SECTION HEADER -------------------------------------------------------
-     ONE NAME FOR ALL THREE. Featured Work, Expertise and Proof each open with the same
-     block -- an eyebrow, a headline, a body and sometimes a CTA -- and each used to
-     carry a class of its own for it. Three names for one thing meant every shared
-     decision (the 8u inset, the measure, the order of the pieces) had to be written
-     three times and could drift twice.
-
-     .sec-head is that thing. What is genuinely common lives here; the ALIGNMENT is the
-     one real variation, so it is a modifier rather than a section's business -- Featured
-     Work and Proof are --left, Expertise is --center. Each section still scopes what is
-     only true of its own layout (the column Featured Work sits in, Proof's flex row,
-     Expertise's stacking) through `.<section> .sec-head`, which also keeps those rules
-     outranking this one wherever they disagree.
-
-     text-align, not three identical declarations on the children: the Expertise eyebrow,
-     headline and body each carried `text-align: center` of their own, which is the
-     modifier's job -- they inherit it now. */
-  .sec-head { padding: 0 var(--inset); }
-  .sec-head--left   { text-align: left; }
-  .sec-head--center { text-align: center; }
-
-  .featuredwork .sec-head { position: static; width: auto; }
-
-  /* The card's own top was 471u and the header's bottom lands on 375.4u at 1440, so the
-     gap this replaces is 95.6. --spacer-104 is the nearest token (104, against 80 the
-     other way), which puts the card on 479.4 -- 8 lower than the artboard's 471 -- and
-     moves it with the header at every other width. */
-  .featuredwork__col > .card--2 { position: relative; left: auto; top: auto;
-                                    margin-top: var(--spacer-120); }
+  .featuredwork__header { position: absolute; top: 0;
+                  left: calc(var(--m) + var(--inset));
+                  width: calc(680 * var(--u) - 2 * var(--inset)); }
   /* The section's eyebrow, in the same label type the CTAs and the Expertise eyebrow
      use. Anchored to the header's own left edge, 60u above the headline's cap line. */
-  /* Scoped through .featuredwork .sec-head so it outranks `.featuredwork .sec-head__body`, which also matches
+  /* Scoped through .featuredwork__header so it outranks `.featuredwork__header p`, which also matches
      this element and would otherwise drag it to the body's position and size — the two
      were landing on top of each other. */
   /* 52.4: a 13u eyebrow on a 1.2 line box is 15.6 tall, so from 52 its bottom fell on
      67.6 and the headline at 84 was 16.4 below it. 52.4 makes that exactly 16. The
      EYEBROW moves rather than the headline, because the body and the CTA are positioned
      from the top independently and moving the headline would carry into their gaps. */
-  /* No width of its own: the header's box is the measure, so this fills it and the
-     eyebrow's text column and the headline's are identical.
-
-     It used to come out 476 instead -- the body's width -- and not on purpose. The
-     eyebrow is a <p>, and the body's rule was written as `.featuredwork .sec-head p`,
-     so it caught both. Naming the body explicitly is what separated them. Nothing
-     moves: the eyebrow is one short line, so a wider box is the same ink. */
-  .featuredwork .sec-head .sec-head__eyebrow { position: static; margin: 0 0 var(--spacer-16);
-                   font: var(--font-eyebrow); text-transform: uppercase; }
+  .featuredwork__header .featuredwork__eyebrow { position: absolute; top: calc(52.4 * var(--u)); left: 0; right: 0;
+                   font-size: calc(13 * var(--u)); line-height: 1.2;
+                   letter-spacing: 0.085em; text-transform: uppercase; 
+    /* Same box as the headline below it: both 680u wide off the same left edge, so
+       the eyebrow's text column and the headline's are identical and any future
+       copy wraps on the same measure. It had no width at all before, so it was
+       shrink-to-fit and only happened to line up because it is one short line. */}
 
   /* ---- section headers, left-aligned (Work, Proof) ------------------------------
      The headline box runs from the FIRST vertical grid line to the THIRD: 40 -> 720,
@@ -959,13 +751,13 @@
      <span> per line, which means the break moves when the copy changes instead of
      having to be re-cut, and the reveal is one mask over the whole headline.
      The paragraph is 70% of that width: 476. */
-  .featuredwork .sec-head__title {
+  .featuredwork h2 {
     /* left and right, not a width: an absolutely positioned box with only `left` is
        shrink-to-fit, so it would hug its longest line instead of filling the header. */
-    position: static; width: auto;
-    margin: 0 0 var(--spacer-24);
-    /* No optical nudge -- see h1. The ink sits on the --spacer-8 inset exactly. */
-    font: var(--font-h-56);
+    position: absolute; top: calc(84 * var(--u)); left: 0; right: 0;
+    margin-left: -0.015em;        /* optical: pull the W onto the line */
+    font-size: calc(56 * var(--u)); line-height: 1.1;
+    font-weight: 400; letter-spacing: -0.024em;
   }
   /* ---- descender room under a line-height of 1 ---------------------------------
      At line-height 1 the line box is exactly the font size, but this face's own
@@ -979,24 +771,13 @@
 
      flex column for the same reason h1 does it -- it stops the negative margins
      collapsing with anything around them. */
-  .featuredwork .sec-head__title, .expertise .sec-head__title, .proof .sec-head__title { display: flex; flex-direction: column; }
-  .featuredwork .sec-head__title .mask,
-  .expertise .sec-head__title .mask,
-  .proof .sec-head__title .mask { overflow: hidden;
+  .featuredwork h2, .exp__head, .proof__head { display: flex; flex-direction: column; }
+  .featuredwork h2 .mask,
+  .exp__head .mask,
+  .proof__head .mask { overflow: hidden;
                        padding: .16em 0 .12em;
                        margin: -.16em 0 -.12em; }
-  /* THE BODY'S MEASURE, once for all three. It was 476u on Featured Work and Proof --
-     70% of their 680 box, written as a number -- and 80% on Expertise, written as a
-     percentage. A percentage resolves against the header's own content box, which is
-     the headline's measure at every width, so it is the form that survives the box
-     changing: 680 on desktop, three columns at tablet, the page on a phone. 80 is the
-     Expertise value, now the shared one.
-
-     The stacked blocks still take it to full width -- they are two classes inside a
-     media query and outrank this. */
-  .sec-head__body { width: 80%; }
-
-  .featuredwork .sec-head__body {
+  .featuredwork__header p {
     /* 231.2, back down a line. It was 169.6 for as long as "From ambition to execution"
        set on ONE line; the headline's 40u right inset narrows its measure to 632 and the
        line breaks again, so the h2's box grew 61.6 back to 207.2 and a body left at 169.6
@@ -1006,9 +787,10 @@
        this and the CTA both move by that one line. If the headline ever goes back to one
        line, these two are the pair to re-measure. Proof's header is built on exactly the
        same two numbers, for the same reason -- its headline is two lines as well. */
-    position: static;
-    margin: 0 0 var(--spacer-24);
-    font: var(--font-p-18);
+    position: absolute; top: calc(231.2 * var(--u)); left: 0;
+    width: calc(476 * var(--u));
+    font-size: calc(18 * var(--u)); line-height: calc(30.5 / 18);
+    letter-spacing: -0.004em;
   }
   /* 346.7: 24u from the body copy to the pill, measured to the BUTTON rather than to
      the mask, which sits 2 higher because of its own clip guard.
@@ -1027,20 +809,15 @@
      absolute top under a block whose height depends on where the copy breaks. Work's
      header is the last one not grouped -- Expertise's and Proof's are blocks with margins
      now, where this cannot happen. Grouping it is the fix, not another number. */
-  .featuredwork .sec-head__cta { position: static; }
+  .featuredwork__header > .mask--cta { position: absolute; top: calc(316.2 * var(--u)); left: 0; }
 
   /* ---- cards ---- */
   .card { position: absolute; width: calc(680 * var(--u)); height: calc(340 * var(--u)); }
-  .card--1    { left: calc(720 * var(--u)); top: calc(196 * var(--u)); }
+  .card--tula    { left: calc(720 * var(--u)); top: calc(196 * var(--u)); }
   /* The second and third cards come up 40 from the artboard's 511 and 719, which
      tightens the stagger against the first card without moving it. */
-  /* card 2 has no left/top of its own: it is in the left column's flow, under the
-     section header, and .featuredwork__col > .card--2 places it. */
-  /* 536 is card 1's bottom -- its own top of 196 plus the 340 every card is tall -- and
-     the gap below it is the token, so the pair reads as a declared space rather than as
-     the difference between two absolute tops. 688 at 1440, where it used to be 679. */
-  .card--3 { left: calc(720 * var(--u));
-                   top: calc((196 + 340) * var(--u) + var(--spacer-120)); }
+  .card--sks     { left: calc( 40 * var(--u)); top: calc(471 * var(--u)); }
+  .card--elliman { left: calc(720 * var(--u)); top: calc(679 * var(--u)); }
 
   .card__img {
     position: absolute; left: 0; top: 0;
@@ -1066,17 +843,13 @@
      edge by 24, and saying that directly is also what fixes the 4 it used to overhang
      by -- left 364 plus width 320 came to 684 against a 680 card. The content column
      is now 364..656, 292 wide. */
-  /* 340 is the image's width, and the gap beside it is the token -- so the space
-     between the image and the text block is a declared 24 rather than the difference
-     between a 364 and a 340. right: 24 is the card's own right inset, not this gap. */
-  .card__meta { position: absolute;
-                left: calc(340 * var(--u) + var(--spacer-24));
-                right: calc(24 * var(--u));
+  .card__meta { position: absolute; left: calc(364 * var(--u)); right: calc(24 * var(--u));
                 bottom: 0; }
   /* 16 under the client name, 24 under the title: the same two gaps the section
      headers run, so a card's internal rhythm matches the header above it. */
-  .card__client { font: var(--font-p-16); margin-bottom: var(--spacer-16); }
-  .card__title  { font: var(--font-h-24); margin-bottom: var(--spacer-24); }
+  .card__client { font-size: calc(14 * var(--u)); line-height: 1.2; margin-bottom: calc(16 * var(--u)); }
+  .card__title  { font-size: calc(28 * var(--u)); line-height: 1.1;
+                  font-weight: 400; letter-spacing: -0.012em; margin-bottom: calc(24 * var(--u)); }
   /* No padding or margin on the mask. It carried 2px of padding with a matching -2px
      margin so the pills' 1px border could not be caught by the mask's own overflow:hidden
      during the reveal -- the same bleed the CTA masks use. Removed on request; watch the
@@ -1090,36 +863,17 @@
      declared further down the sheet at equal specificity, so a single-class selector here
      loses to it on source order and the flex -- and therefore the gap -- silently does
      nothing. Two classes win wherever either rule happens to sit. */
-  /* WRAPS AS A ROW. The pills are a flex row and the row is allowed to break, so when
-     the pair is wider than the card's text column the second pill drops to its own line
-     instead of the labels breaking inside the pills. The gap is already set both ways,
-     so a wrapped row gets the same 4 between lines as between pills. */
-  .mask.mask--pill > span { display: flex; flex-wrap: wrap; gap: var(--spacer-4); }
+  .mask.mask--pill > span { display: flex; gap: 4px; }
   .pill {
     display: inline-block; border: 1px solid rgba(0,0,0,.42); border-radius: 999px;
-    /* the LABEL never breaks -- a pill is one word-shape. Without this, "Performance
-       Marketing" set on two lines inside its own outline at narrow desktop. */
-    white-space: nowrap;
-    /* --font-tag is a flat 12 at every width, so the pill no longer needs its own
-       mobile override. It was --font-eyebrow while that token was 12; the eyebrow is
-       the SECTION label now, at 16 / 14, which is not what a card tag wants. Padding was 6/14/7 by hand, then --spacer-8 all round; it is
-       --spacer-4 vertical and --spacer-8 horizontal now. The 1px top/bottom difference
-       the hand-set version carried was optical and is gone with it. */
-    font: var(--font-tag);
-    padding: var(--spacer-4) var(--spacer-8);
+    font-size: calc(12 * var(--u)); line-height: 1;
+    padding: calc(6 * var(--u)) calc(14 * var(--u)) calc(7 * var(--u));
   }
 
   /* ---- logo ticker ---- */
   .ticker {
-    /* A --spacer-104 under the last card. Elliman's bottom is now itself a token
-       expression -- 536 of artboard plus --spacer-152 plus its own 340 -- so this
-       follows it rather than restating a number that would go stale the next time the
-       card pair moves.
-
-       Card 3 and not card 2, because SKS is in the left column's flow and its
-       bottom depends on the header's height; it stays clear of this at every width. */
-    position: absolute; z-index: 2; left: 0;
-    top: calc((536 + 340) * var(--u) + var(--spacer-120) + var(--spacer-104));
+    /* 1150: 80 closer to the tiles than the 1274 it was, then 30 closer again. */
+    position: absolute; z-index: 2; left: 0; top: calc(1150 * var(--u));
     width: 100%; overflow: hidden;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
             mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
@@ -1127,15 +881,11 @@
   .ticker__track { display: flex; width: max-content; will-change: transform; }
   .ticker__row { display: flex; align-items: center; flex: none; }
   .ticker__row img {
-    /* A flat 56. It was 66 design units, so the logos grew and shrank with the window
-       -- 47 at 1024, 88 at 1920 -- which made sense for a raster at a fixed pixel size
-       and does not for a vector. One height everywhere, and the mobile override that
-       used to pin 46 is gone with it. */
-    height: 56px; width: auto; display: block;
+    height: calc(66 * var(--u)); width: auto; display: block;
     /* 80, from 78. It is a margin rather than the row's gap on purpose: the track is
        two identical rows and the loop is seamless only if the space after the LAST logo
        of a row is the same as the space between any two, which a gap would not give. */
-    margin-right: var(--spacer-80); object-fit: contain;
+    margin-right: calc(80 * var(--u)); object-fit: contain;
   }
 
   /* ---- reveal: fade in + up, one language for everything ----
@@ -1163,22 +913,6 @@
   /* flex column so the masks' negative margins cannot collapse into each other,
      which would otherwise add ~9px of leading per line */
   h1 { display: flex; flex-direction: column; }
-
-  /* THE BLOCK SLIDES when its line count changes. app.js writes h1's `top` to keep the
-     headline centred on the mark, and a keyword that wraps changes the height by a whole
-     line -- 176 to 264 at 1440 -- which used to re-centre in one frame.
-
-     Gated on .is-placed, which app.js adds once after the first layout has settled and
-     takes off again around a resize. Without that gate the headline would animate into
-     position on load and slide across the screen while a window is being dragged, both
-     of which should be instant. */
-  /* NO TRANSITION ON `top`. There used to be one, matching the line box's own .5s,
-     and the two ran in SERIES: the box grew over .5s, the observer below re-measured
-     and started a fresh .5s on `top` from wherever the box had got to, and the block
-     was still settling long after the new line had finished arriving. The box's
-     height transition is the only animation now, and `top` is recomputed from it
-     every frame -- so the block moves WITH the line rather than after it. */
-  h1:not(.is-placed) { transition: none; }
   h1 .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
   h1 .mask > span { will-change: transform; }
   .mask.pre > span, .mask.hpre > span { opacity: 0; }
@@ -1212,41 +946,7 @@
 
      Shortening this is how Proof and the footer move up: every section below is in flow,
      so the Expertise section's height IS the offset of everything after it. */
-  /* A FLOW STACK now, where it was a fixed 1194.2u box with both children absolutely
-     positioned. The header's top is still 156.4 -- that is this padding -- but its
-     HEIGHT varies with the type and the copy, and the graphic below was pinned at 0, so
-     the overlap between them drifted: 54u of the loops covered at 1440, 213u at 1024
-     with stepped tokens. In flow the graphic keeps whatever distance it has from the
-     header's bottom at every width.
-
-     The height is content-driven for the same reason: padding + header + whatever the
-     graphic contributes below its negative margin.
-
-     padding-top is --spacer-152, where it was the artboard's own 156.4 in design units.
-     A token rather than a position, so it is a flat 152 across desktop instead of
-     shrinking with the window -- 111 at 1024, which is what it used to resolve to. */
-  .exp__inner { position: relative; z-index: 4; padding-top: var(--spacer-200); }
-
-  /* THE DOME STOPS GROWING THE PAGE. .cover is a circle of 2865 design units on
-     desktop and 4584 below 1024, absolutely positioned in this section -- and absolute
-     overflow still counts toward the document's scroll height, so its lower half hung
-     past the footer: 301px at 900 before the stacked fix, and 86 at 1440 / 576 at 1920
-     once the desktop circle went to 1.25x.
-
-     overflow: clip, not hidden -- hidden would make this a scroll container.
-
-     A FLAT 800, and it has to be a literal: this property does not accept calc() here.
-     `calc(400 * var(--u) + 8px)` -- the margin that tracks the dome's own overhang --
-     computes to 0px, so the clip fell back to the padding box and cut the dome off
-     FLAT along the section's top edge as it rose. A plain 408px computes fine; the
-     calc is what it rejects.
-
-     800 covers the overhang (400 * --u, so 400 at 1440 and 533 at 1920) out to a 2880
-     window, and at the other end it cuts the circle at this section's bottom + 800 --
-     past where the Work gradient ends, which is the only thing the dome exists to
-     cover, and still well above the document's own bottom at every width, so the tail
-     this rule exists to remove stays removed. */
-  .expertise { overflow: clip; overflow-clip-margin: 800px; }
+  .exp__inner { position: relative; z-index: 4; height: calc(1194.2 * var(--u)); }
 
   /* The covering surface. Its centre is pinned; only its radius grows with
      scroll, so the curved top edge sweeps up over the Work gradient and the
@@ -1258,14 +958,9 @@
     /* -400, not -900: 500u lower, which is what puts 500px more blue between the
        ticker and the circle's resting arc. Must stay in step with COVER_TOP in
        expertise.js, which uses it to work out where the arc is on screen. */
-    /* 2865, not 2292 -- a radius of 1432.5 where it was 1146, which is 1.25x. The
-       circle's apex at full scale does not move (it is top + R - R, i.e. the -400
-       above), so the arc is in the same place and simply FLATTER across the width.
-       coverR() in expertise.js carries the same number; the two must not drift or the
-       reveal gate fires at the wrong moment. */
     position: absolute; left: 50%; top: calc(-400 * var(--u));
-    width: calc(2865 * var(--u)); height: calc(2865 * var(--u));
-    margin-left: calc(-1432.5 * var(--u));
+    width: calc(2292 * var(--u)); height: calc(2292 * var(--u));
+    margin-left: calc(-1146 * var(--u));
     border-radius: 50%; background: var(--bg);
     transform-origin: 50% 50%;
     transform: scale(var(--cover-s, 1));
@@ -1275,9 +970,11 @@
   /* The section's eyebrow. Set in the same label type the CTAs use -- small, uppercase,
      widely tracked -- so the two read as one family rather than two small-type styles.
      Sits 66u above the headline's cap line. */
-  .expertise .sec-head__eyebrow {
-    position: static; width: auto; margin: 0 0 var(--spacer-16);
-    font: var(--font-eyebrow); text-transform: uppercase;
+  .exp__eyebrow {
+    position: static; width: auto; margin: 0 0 calc(16 * var(--u));
+    text-align: center;
+    font-size: calc(13 * var(--u)); line-height: 1.2;
+    letter-spacing: 0.085em; text-transform: uppercase;
   
     /* Same box as the headline below it: both 680u wide off the same left edge, so
        the eyebrow's text column and the headline's are identical and any future
@@ -1310,81 +1007,50 @@
 
      680 wide from the second grid line, which is what the headline had -- the body is
      narrower (80%) and centres itself inside it rather than being positioned at 448. */
-  .expertise .sec-head {
-    /* In flow, centred by auto margins -- 380 + 680 = 1060 against 1440 was already
-       dead centre, so this is the same place written as a relationship. .exp__inner's
-       padding-top carries the 156.4 the `top` used to. */
-    position: relative; z-index: 2;
-    width: calc(680 * var(--u)); margin: 0 auto;
+  .exp__header {
+    position: absolute; z-index: 2; left: calc(380 * var(--u)); right: auto;
+    width: calc(680 * var(--u)); top: calc(156.4 * var(--u));
+    padding: 0 var(--inset);
   }
-  .expertise .sec-head__title {
+  .exp__head {
     position: static; width: auto;
-    margin: 0 0 var(--spacer-24);
-    font: var(--font-h-56);
+    margin: 0 0 calc(24 * var(--u));
+    text-align: center;
+    font-size: calc(56 * var(--u)); line-height: 1.1;
+    font-weight: 400; letter-spacing: -0.024em;
   }
-  .expertise .sec-head__body {
+  .exp__body {
     /* +18: the headline went 56 -> 64 and grew by that much, and these are the
        numbers that keep the 32 under it. */
     /* 24 under the headline, not 32. The CTA follows it up so its own 32 holds. */
     /* 80% of the 680 group, centred inside it by auto margins rather than by being
        positioned at 448 -- the group owns the left edge now. */
-    /* 80% of the headline's measure, as a percentage rather than a number: the header
-       is 680u on desktop and three columns at tablet, and 544/680 only happened to be
-       80% of the first. A percentage resolves against the header's content box, which
-       is exactly what the headline fills. */
-    position: static; margin: 0 auto;
-    font: var(--font-p-18);
+    position: static; width: calc(544 * var(--u)); margin: 0 auto;
+    text-align: center;
+    font-size: calc(18 * var(--u)); line-height: calc(30 / 18);
+    letter-spacing: -0.004em;
   }
-  .expertise .sec-head__cta {
-    /* BELOW THE FOUR ITEMS, centred on the axis.
+  .exp__cta {
+    /* SEPARATED FROM THE HEADER, and put at the foot of the graphic. In the other two
+       options this sits 24u under the body copy as the last line of the section header.
+       Here it is cut loose and placed INSIDE the foot of the graphic: 971.2 puts the
+       pill at 991.2 -> 1025.2 against a band that closes at 1135.2, so it sits wholly
+       within the loops rather than straddling their bottom edge, with 100 of graphic
+       still below it.
 
-       ONE GROUP WITH THE FOUR ITEMS: two rows, and the gap between them is 10% of the
-       graphic's height.
+       That is the point of this option. The header already overlaps the top of the
+       graphic; putting the CTA across the bottom of it means the section reads as one
+       figure with the type threaded through it, rather than as a header, then a picture,
+       then a button.
 
-       It is written as a relationship rather than as a wrapper element, because the two
-       rows anchor to different things and a wrapper could not hold both: the items are
-       centred on the band (740.2, less half their measured height), and the 10% has to
-       resolve against the GRAPHIC's height, which it does here because .areas is this
-       element's containing block. Inside a wrapper the percentage would resolve against
-       the wrapper instead.
-
-       So: the items' row bottom, plus 10%. --area-h is the row's height, measured by
-       expertise.js -- the same value .area centres itself with, so the two rows cannot
-       drift apart.
-
-       z-index 2 keeps it above the loops and the halo, below the copy at 3. */
-    position: absolute; z-index: 2; left: 50%;
-    top: calc(740.2 * var(--u) + var(--area-h, 0px) / 2 + 10%);
-    bottom: auto;
+       z-index 2 keeps it above the loops and the halo, and below the copy at 3. */
+    position: absolute; z-index: 2; left: 50%; top: calc(951.2 * var(--u));
     transform: translateX(-50%);
   }
   /* the CTA mask must not fight the centring transform */
-  .expertise .sec-head__cta > span { display: block; }
+  .exp__cta > span { display: block; }
 
-  /* 16 FROM THE HEADER, measured to the LOOPS rather than to this box.
-
-     The box is not the graphic: it is the whole 1440 x 1194.2 svg, and the loops are
-     drawn inside it starting at CY - RY = 740.2 - 340 = 400.2. So the gap asked for is
-     --spacer-8 LESS that 400.2, which puts the box above the header's bottom and the
-     loops exactly 8 below it. Those two numbers live in expertise.js; if the band's
-     centre or radius changes there, the 400.2 here changes with them.
-
-     As a margin rather than a top, so the whole graphic -- loops, halo, the four items
-     and the CTA inside it -- travels with the header instead of assuming its height.
-
-     Explicit height rather than 100%, because .exp__inner is content-driven now and the
-     svg's viewBox is 1440 x 1194.2: the two have to agree or a
-     preserveAspectRatio="none" svg stretches silently. */
-  /* The row itself: margin to margin, and it carries the centring on the band that
-     each card used to carry individually. --area-h is still measured by expertise.js. */
-  .areas__row { position: absolute; z-index: 3;
-                left: var(--m); right: var(--m);
-                top: calc(740.2 * var(--u) - var(--area-h, 0px) / 2);
-                display: flex; align-items: flex-start; }
-
-  .areas { position: relative; z-index: 1;
-           margin-top: calc(var(--spacer-8) - 400.2 * var(--u));
-           height: calc(1194.2 * var(--u)); }
+  .areas { position: absolute; left: 0; right: 0; top: 0; height: 100%; z-index: 1; }
   /* pointer-events:none, and it is not cosmetic. The halo inside this svg is painted
      into a rect far larger than the section -- 2240 by 1940, so the gradient's tail
      finishes inside the shape instead of being clipped by it -- and overflow is visible,
@@ -1421,14 +1087,7 @@
   /* The lines are solid throughout; hover only darkens one of them. The same transition
      drives both directions, so leaving reverses it. */
   /* Hover only changes the line's weight, so the stroke colour is all that moves. */
-  /* non-scaling-stroke, so the loops stay a true 1px at any width. The svg is a
-     1440 x 1194.2 viewBox stretched to the section, so a stroke-width of 1 user unit
-     renders at 1 x --u px: correct at the 1440 reference, but 1.33 at 1920 and 1.78 at
-     2560 -- visibly heavier than the page's grid lines, which are a flat 1px and do not
-     scale. With this the declared width IS the device width, so the two agree
-     everywhere. It also keeps the stroke even: preserveAspectRatio="none" means x and y
-     scale independently, which would otherwise weight the curve unequally. */
-  .cc .wire { transition: stroke .4s ease; vector-effect: non-scaling-stroke; }
+  .cc .wire { transition: stroke .4s ease; }
   /* It swells up rather than switching on, when the section arrives. */
   .exp-halo { transition: opacity .9s ease; }
   .dot { transition: opacity .7s ease; }
@@ -1443,22 +1102,7 @@
        bounding box is one block and this is simply 785.2 (the band's centre, CY in
        expertise.js) - 149.6 / 2. It follows CY by hand: the band is drawn in JS and the
        blocks are placed in CSS, so moving the graphic means moving both. */
-    /* V-CENTRED ON THE BAND. 740.2 is CY, the band's centre, less half the row's own
-       height -- which expertise.js measures into --area-h on every fit(), because the
-       blocks are absolutely positioned and CSS cannot know it. The 0px fallback only
-       applies for the frame before fit() runs, and fit() runs synchronously at the end
-       of the script. 740.2 follows CY by hand: the band is drawn in JS and the blocks
-       are placed in CSS, so moving the graphic means moving both. */
-    position: static; z-index: 3;
-    /* ONE ROW. Each card is an equal quarter of it, so the four sit on the grid's own
-       columns -- 40/380, 380/720, 720/1060, 1060/1400 -- without a per-item `left`.
-
-       4% flat. Note this resolves against the ROW, not against the card -- a
-       percentage padding on a flex item always does -- so it is 54.4 a side at 1440,
-       not the 13.6 that 4% of a 340 column would be. Asked for as written. */
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 0 4%;
+    position: absolute; z-index: 3; top: calc(670.4 * var(--u));
     /* THE BOX IS NOW THE COLUMN, and the inset is padding inside it. 340 wide on a
        -170 margin puts each block's edges exactly on the grid lines either side of its
        column -- 40/380, 380/720, 720/1060, 1060/1400 -- and the padding then holds the
@@ -1509,97 +1153,48 @@
 
        Padding would now be wrong twice over: it would add to the width, and it would
        push the type off the box's own left edge. */
-    /* No width, no max-width, no centring transform. All three belonged to the old
-       absolutely-positioned block: it shrank to its longest line, was capped at 228,
-       and was pulled back half its width to sit on its column's centre. In a flex row
-       the column IS the quarter, so the card fills it and the transform would drag it
-       74 off the left edge. */
-    width: auto; transform: none;
+    width: max-content; max-width: calc(228 * var(--u));
+    margin-left: 0; transform: translateX(-50%);
     text-align: left;
-    font: var(--font-h-24);
+    font-size: calc(28 * var(--u)); line-height: 1.1;
+    letter-spacing: -0.012em;
   }
   /* Nested inside .area so it inherits that translate instead of needing its own. */
-  /* THE ONE EXCEPTION IN THE PAGE. The four titles are --font-h-24 everywhere -- 24 on
-     desktop, 20 on mobile -- and step up to --font-h-32 only at the 1440 reference width
-     and wider, where there is room for it.
-
-     min-width, not max: every other breakpoint in this sheet is a max-width stepping
-     DOWN from the 1440 artboard, so this is the only rule that reads upward. 1440 is the
-     artboard's own width, which is also where both type systems stop scaling -- the
-     fluid build's clamp caps there and this one's stepped value is flat above 1024 -- so the
-     token resolves to a clean 32 on both sides of the switch.
-
-     Nothing below needs adjusting: the titles' size changes the row's height, and
-     expertise.js re-measures --area-h on resize, so the row re-centres on the band and
-     the CTA's 10% gap follows it. */
-  @media (min-width: 1440px) {
-    .area { font: var(--font-h-32); }
-  }
-
   .area__desc {
-    margin-top: var(--spacer-16);
-    /* --font-p-16 carries 150% of its own, which is the 1.5 this block always had. */
-    font: var(--font-p-18);
+    margin-top: calc(16 * var(--u));
+    /* 16u. The line-height keeps the 1.5 the block has always had, written as the line
+       over the type so the relationship stays readable rather than collapsing to a
+       bare 1.5. */
+    font-size: calc(16 * var(--u)); line-height: calc(24 / 16);
+    letter-spacing: -0.004em;
   }
 
-  @media (max-width: 1023px) {
-    /* 90 -> --spacer-200 (80 here), 60 -> --spacer-152 (64 here). Both picked by the
-       mobile column; neither has a desktop counterpart. */
-    .exp__inner { height: auto; padding: var(--spacer-200) 0 var(--spacer-152); }
+  @media (max-width: 860px) {
+    .exp__inner { height: auto; padding: 90px 0 60px; }
     /* Same fix as Featured Work's: the box keeps a design-unit width on desktop, so
        without this it was 177px across at 375 and its copy was measuring 133. The CTA
        is a sibling of the header, not a child, so it is reset on its own. */
-    .expertise .sec-head { position: static; left: auto; top: auto; width: auto;
+    .exp__header { position: static; left: auto; top: auto; width: auto;
                    margin: 0 var(--m); padding: 0 var(--inset); }
-    /* No `margin: 0` here any more -- it was wiping the spacer margins the desktop
-       rules set, which is why the eyebrow, headline and body were sitting flush on a
-       phone. Only position, width and transform need resetting. */
-    .expertise .sec-head__eyebrow, .expertise .sec-head__title, .expertise .sec-head__body { position: static; width: auto;
-                                            transform: none; }
-    /* In flow after the item row, centred by its own auto margins -- .exp__inner is not
-       a centring context. --spacer-56 above it, less the 2px of clip guard .mask--cta
-       cancels with its own margin, which setting margin here replaces. */
-    .expertise .sec-head__cta { position: static; display: block; width: fit-content; transform: none;
-                margin: calc(var(--spacer-56) - 2px) auto 0; }
-    /* All four values are in the desktop rules' tokens now: --spacer-16 is 8 here,
-       --spacer-24 is 16, h-56 is 32, p-18 is 16. Only .expertise .sec-head__body's bottom margin is
-       mobile-only -- on desktop it is centred with no margin under it. */
-    /* No bottom margin on .expertise .sec-head__body any more -- the CTA's own margin-top is the gap,
-       on mobile exactly as on desktop. */
-    .areas { position: static; height: auto; margin-top: var(--spacer-80); }
-
+    .exp__eyebrow, .exp__head, .exp__body { position: static; width: auto;
+                                            margin: 0; transform: none; }
+    .exp__cta { position: static; width: auto; margin: 0 var(--m); transform: none; }
+    /* the table: 16 -> 12, 24 -> 16, 24 -> 16 */
+    .exp__eyebrow { margin-bottom: 12px; }
+    .exp__head { font-size: 32px; line-height: 1.14; margin-bottom: 16px; }
+    .exp__body { font-size: 16px; line-height: 1.7; margin-bottom: 16px; }
+    .areas { position: static; height: auto; margin-top: 40px; }
     .areas__svg { display: none; }
-    /* 26 -> --spacer-40 (24 here). The sizes come from h-24 (20) and p-16 (14), and
-       the description's top margin from --spacer-16 (8, down from the 10 it was). */
-    /* the row stacks on mobile, and the cards give back their 5% */
-    .areas__row { position: static; left: auto; right: auto; top: auto;
-                  flex-direction: column; }
-    .area { position: static; width: auto; margin: 0 0 var(--spacer-40);
-           padding: 0; transform: none !important; }
+    .area { position: static; width: auto; margin: 0 0 26px; font-size: 17px;
+           transform: none !important; }
+    .area__desc { margin-top: 10px; font-size: 14px; line-height: 1.6; }
   }
 
 
   /* ==================================================================== PROOF */
   /* Design units off proof.png: headline cap 128, CTA 292, stat columns at the
      grid lines 720 and 1060, rows at 337 and 618 (a 281 pitch). */
-  /* No margin above and none below: this section butts straight onto Expertise and
-     onto the footer, and its own padding-top is the only space at the top.
-
-     --spacer-80 of padding, which is what brings the GRADIENT up. #halogl is inset: 0
-     on this box, so the green starts where the section does, not where the copy does --
-     padding here opens 80 of field above the headline rather than empty page. */
-  /* --spacer-80 above and --spacer-120 below, on the SECTION rather than on the inner
-     box. The bottom space used to live on .proof__inner; it is the section's own air
-     now, which is where the top one already was. #halogl is inset: 0 on this box, so
-     the field still fills the padded section -- the green starts where the section
-     does, not where the copy does. */
-  .proof { position: relative;      /* the containing block for #halogl */
-           padding: var(--spacer-80) 0 var(--spacer-120); }
-  /* --spacer-152 under it on DESKTOP only. Written as an override rather than by
-     changing the token above, because the stacked widths keep the 120 -- which steps
-     to 104 at tablet and 56 on a phone -- and raising the shared value would take
-     them with it. */
-  @media (min-width: 1024px) { .proof { padding-bottom: var(--spacer-152); } }
+  .proof { position: relative; }   /* the containing block for #halogl */
   /* 900u, not 1000u. The lower stat row sits at 601u and a stat block measures
      201u, so the section's ink ends at 802u -- the rest was an empty tail before
      the footer. Halved it: 198u of dead space down to 98u. Any lower and the stats
@@ -1616,28 +1211,9 @@
      need dark-free air under them so the footer does not crowd them, and everything
      above is positioned from the TOP, so shortening this moves nothing inside the
      section -- it only closes the tail. */
-  /* No padding-top: the header starts at this box's own top edge. The height is
-     content-driven now that the stats are in flow too -- there is nothing left in this
-     section positioned out of it, so the box can measure itself. */
-  /* A TWO-COLUMN ROW. Both children are in flow now, and flow stacks -- so the row is
-     what puts them side by side again without either one being positioned out of the
-     section. align-items: flex-start so they hang from the same top edge instead of
-     stretching to match each other's height.
+  .proof__inner { position: relative; z-index: 3; height: calc(562.7 * var(--u)); }
 
-     padding-bottom rather than a min-height. The floor was 562.7, which left 249.9 of
-     slack under the content at 1440 -- that slack is the section's bottom space, and
-     halving it is what was asked for. Declaring it as padding means it is the SAME
-     space whatever the copy does, where a min-height's slack was whatever was left over
-     after the content. #halogl is inset: 0 on .proof, so the gradient still runs to the
-     bottom of it.
-
-     No padding-bottom any more: the space under the stats is .proof's own, declared
-     once on the section for every width instead of here for desktop and again in the
-     stacked block. */
-  .proof__inner { position: relative; z-index: 3;
-                  display: flex; align-items: flex-start; }
-
-  .proof .sec-head__body {
+  .proof__body {
     /* 231.2, one line of the headline below where it was. "We deeply value long-term
        partnerships" wraps to TWO lines at 56u in a 680 box, where "Proven in practice"
        was one, so the headline's box grew 61.6 and ran straight through this -- measured,
@@ -1647,68 +1223,42 @@
        this and the CTA both move by that one line and the 24 under the headline holds.
        If the headline ever goes back to one line, or to three, these two numbers are the
        pair to re-measure. */
-    position: static;
-    margin: 0;
-    font: var(--font-p-18);
+    position: static; width: calc(476 * var(--u));
+    margin: 0 0 calc(24 * var(--u));
+    font-size: calc(18 * var(--u)); line-height: calc(30.5 / 18);
+    letter-spacing: -0.004em;
   }
   /* THE GROUP, placed once at 84 -- where the headline already began, so nothing moved
      on screen. Everything inside is margins from there. 680 wide, two grid columns, the
      measure the headline was already set on; the body is narrower and keeps its own. */
-  /* IN FLOW, like Expertise's and Featured Work's. The 84 it used to carry as `top`
-     is .proof__inner's padding-top now, and the margin places it off the grid line
-     where `left` did -- so it sits exactly where it did, but the section can measure it.
-     .proof__stats is unaffected: it is absolutely positioned against .proof__inner,
-     which is still the positioned ancestor. */
-  .proof .sec-head {
-    position: static;
-    flex: none;                       /* two grid columns, and it does not shrink */
-    margin-left: var(--m);
+  .proof__header {
+    position: absolute; left: var(--m); top: calc(84 * var(--u));
     width: calc(680 * var(--u));
+    padding: 0 var(--inset);
   }
-  .proof .sec-head__title {
+  .proof__head {
     position: static; width: auto;
-    margin: 0 0 var(--spacer-24);
-    /* No optical nudge -- see h1. The ink sits on the --spacer-8 inset exactly. */
-    font: var(--font-h-56);
+    margin: 0 0 calc(24 * var(--u));
+    margin-left: -0.015em;
+    font-size: calc(56 * var(--u)); line-height: 1.1;
+    font-weight: 400; letter-spacing: -0.024em;
   }
   /* HIDDEN. The section makes its case with the stats on the right; a pill under the
      body was a third thing asking to be read in a block that is already headline + body.
      Left in the markup, and its top kept, so it is one line to bring back -- and the
      body above it does not move either way, because everything in this header is placed
      from the TOP. */
-  .proof .sec-head__cta { position: static; display: none; }
+  .proof__cta { position: static; display: none; }
 
   /* Two columns of 320 twenty apart, which is where the four used to be written
      individually: 722 and 1062, each 320 wide. 32 between the rows. The grid places
      both axes, so a caption that wraps to a third line pushes its row down by the
      leading it added and nothing else moves. */
   .proof__stats {
-    position: static; z-index: 3;
-    /* ON THE THIRD GRID LINE, written as the line itself rather than as a number: the
-       margin plus two columns, which is 720 at 1440 and tracks the grid at any width.
-       The stats' content then stands 8 off it, because each .stat carries the shared
-       inset -- that 8 is the "8 from the third vline".
-
-       This replaces 746, which was 722 (the artboard's own 2-off-the-line) plus a 24
-       that was asked for and then superseded by this.
-
-       The RIGHT edge is anchored and the tracks share what is left, where they used to
-       be two fixed 320s -- a fixed-width block could not stay inside the page once its
-       left edge moved. Right is the page's inset edge, so the block spans 720..1392. */
-    /* No left margin: the header beside it is exactly two grid columns wide off the
-       margin, so this track already begins on the third grid line. flex: 1 takes it from
-       there to the page's inset edge. */
-    flex: 1;
-    margin-right: calc(var(--m) + var(--inset));
-    /* --spacer-8 of air above, measured from the top of the header beside it. Tablet
-       keeps the --spacer-40 this was, in its own block below. */
-    margin-top: var(--spacer-8);
-    /* No padding-left here. The 8 asked for is already in place one level down: each
-       .stat carries the shared --inset, so the stats' content stands exactly 8 in from
-       this block's left edge. Adding a second 8 on the block stacked the two and put the
-       digits on 762 instead of 754. */
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    column-gap: 0; row-gap: var(--spacer-32);
+    position: absolute; z-index: 3;
+    left: calc(722 * var(--u)); top: calc(83.2 * var(--u));
+    display: grid; grid-template-columns: repeat(2, calc(320 * var(--u)));
+    column-gap: calc(16 * var(--u)); row-gap: calc(32 * var(--u));
   }
   /* The page's 8u text inset, on the CARD rather than on the number and the caption
      separately. box-sizing is border-box and the track is a fixed 320, so the card does
@@ -1716,76 +1266,60 @@
      what they measured when each carried the 8 itself. Both children are in normal flow,
      so padding is the right tool here, where the bands whose children are absolutely
      positioned have to use their own edges instead. */
-  /* 8 in from the left, 16 from the right. The left is the page's shared text inset;
-     the right is wider so the caption has somewhere to break before the next column. */
   .stat { position: static; width: auto;
-          padding-left: var(--inset); padding-right: var(--spacer-16); }
+          padding-left: var(--inset); padding-right: var(--inset); }
   .stat__num {
-    /* --font-h-64. It was 72u with -0.035em, and the suffix beside it was 64u, so the
-       two now resolve to the SAME size. Flagged: if the suffix should stay smaller it
-       needs a token of its own. */
-    font: var(--font-h-64);
+    font-size: calc(72 * var(--u)); line-height: 1;
+    font-weight: 400; letter-spacing: -0.035em;
     font-variant-numeric: tabular-nums;   /* so the width does not jitter while counting */
   }
   .stat__suffix {
-    font: var(--font-h-40);
+    font-size: calc(64 * var(--u)); letter-spacing: -0.035em;
     /* 8, down from 10. Measured ink to ink as well as box to box -- the suffix sits on
        the same baseline with no side bearing worth speaking of, so the two agree. */
-    margin-left: var(--spacer-8);
+    margin-left: calc(8 * var(--u));
   }
   .stat__sub {
-    font: var(--font-p-18);
+    font-size: calc(16 * var(--u)); line-height: calc(22 / 16);
     /* 22, down from 36. The 36 was measured to the number's BOX, and a 72u line box at
        line-height 1 sits well below the digits' baseline -- so the gap you read was
        always bigger than the number said. Tightening it to 22 brings the caption up
        under its own number instead of floating between two of them. */
-    margin-top: var(--spacer-8);
+    margin-top: calc(22 * var(--u));
   }
   .stat__num > span { display: inline-block; transition: opacity .5s ease,
                       transform .6s cubic-bezier(.22,.61,.36,1); }
   .stat.pre .stat__num > span { opacity: 0; transform: translateY(calc(16 * var(--u))); }
 
-  @media (max-width: 1023px) {
-    /* Both exact on the mobile column: 80 -> --spacer-200, 40 -> --spacer-80. */
-    .proof__inner { height: auto; padding: var(--spacer-104) 0 0; }
+  @media (max-width: 860px) {
+    .proof__inner { height: auto; padding: 80px 0 40px; }
     /* Same fix again: a 177px box at 375, with its copy measuring 133. */
-    /* back to a stack: one column, each block full width */
-    /* row-gap, not a margin on the stats -- the same construction Featured Work uses
-       at this width. .proof__inner IS the thing that stacks the header and the stats,
-       so the space between them belongs to it; written on the child it was a number
-       that only meant "below the header" as long as the column order never changed,
-       and it had to be re-stated at every breakpoint that touched the stats' margin. */
-    .proof__inner { flex-direction: column; row-gap: var(--spacer-56); }
-    .proof .sec-head { position: static; left: auto; top: auto; width: auto;
+    .proof__header { position: static; left: auto; top: auto; width: auto;
                      margin: 0 var(--m); padding: 0 var(--inset); }
-    /* Same as Expertise: no `margin: 0`, or it cancels the spacer margins above. */
-    .proof .sec-head__title, .proof .sec-head__body, .proof .sec-head__cta { position: static; width: auto;
-                                              white-space: normal; }
-    /* Nothing left to write: h-56 is 32 here, --spacer-24 is 16 and --spacer-40 is 24,
-       which is exactly what these three lines hard-coded. */
+    .proof__head, .proof__body, .proof__cta { position: static; width: auto;
+                                              margin: 0; white-space: normal; }
+    /* the table: 24 -> 16, and the headline's 40 of measure -> 24 */
+    .proof__head { font-size: 32px; line-height: 1.14; margin-bottom: 16px;
+                   padding-right: 24px; }
+    .proof__body { margin-bottom: 16px; }
     /* THE STATS AS A 2x2. They were absolutely positioned at a design-unit left and
        width, which at 375 put them in a 171px column off the right of the header with
        each card 43px wide. In flow, margin to margin, two equal tracks.
        The table: column 16 -> 12, row 32 -> 24. The cards keep the shared inset. */
-    /* 32 -> --spacer-56 (32 here, exact). The two gaps come from the desktop rule's
-       --spacer-16 (8 here) and --spacer-32 (24 here). */
-    /* margin: 0 var(--m) -- no top any more. The gap is .proof__inner's row-gap, and
-       the 0 is what cancels the desktop rule's --spacer-8. */
-    .proof__stats { position: static; width: auto; margin: 0 var(--m);
-                    grid-template-columns: repeat(2, 1fr); }
+    .proof__stats { position: static; width: auto; margin: 32px var(--m) 0;
+                    grid-template-columns: repeat(2, 1fr);
+                    column-gap: 12px; row-gap: 24px; }
     .stat { position: static; width: auto; margin: 0;
-            padding-left: var(--inset); padding-right: var(--spacer-16); }
-    /* --font-h-64 is 40 here and --font-p-16 is 14; both were hard-coded at 62 and 15. */
+            padding-left: var(--inset); padding-right: var(--inset); }
+    .stat__num { font-size: 62px; }
+    .stat__sub { font-size: 15px; }
   }
 
   /* ---- the case-study cursor: the hero circle, reborn ---- */
   .cs-cursor {
     position: fixed; left: 0; top: 0; z-index: 8; pointer-events: none;
-    /* A STATIC 116. It was 116 design units, so the disc grew and shrank with the
-       window -- 82 at 1024, 155 at 1920 -- while the label inside it is now a flat
-       token. A cursor is chrome, not artwork: it should be one size everywhere. */
-    width: 116px; height: 116px;
-    margin-left: -58px; margin-top: -58px;
+    width: calc(116 * var(--u)); height: calc(116 * var(--u));   /* 15%, then 10% again */
+    margin-left: calc(-58 * var(--u)); margin-top: calc(-58 * var(--u));
     border-radius: 50%;
     display: grid; place-items: center; text-align: center;
     /* DARK. It was a near-white disc at .80 over a backdrop blur -- the hero circle it
@@ -1813,16 +1347,13 @@
   }
   .cs-cursor.on { opacity: 1; }
   .cs-cursor span {
-    /* --font-button-2, a flat 14. It was 11.7u -- 10% under the CTA labels -- which
-       resolved to 3.0px on a phone, then --font-eyebrow's flat 12. */
-    font: var(--font-button-2); text-transform: uppercase; color: var(--bg, #f4f4f4);
+    font-size: calc(11.7 * var(--u)); line-height: 1.45;   /* 10% under the CTA labels */
+    letter-spacing: .1em; text-transform: uppercase; color: var(--bg, #f4f4f4);
   }
   @media (hover: none) { .cs-cursor { display: none; } }
 
-  @media (max-width: 1023px) {
-    /* Section rhythm has no desktop counterpart -- desktop sets an explicit height --
-       so these are picked by the MOBILE column: 72 -> --spacer-152 (64), 40 -> exact. */
-    .featuredwork__inner { height: auto; padding: var(--spacer-152) 0 var(--spacer-80); }
+  @media (max-width: 860px) {
+    .featuredwork__inner { height: auto; padding: 72px 0 40px; }
     /* THE HEADER GOES INTO FLOW, box and children both.
 
        It was only half converted and the half that was missing is what made it look
@@ -1831,48 +1362,39 @@
        Resetting position alone does not help while an absolute width is still set.
 
        The children were the other half. Two of them lost their desktop rules on
-       specificity rather than on the breakpoint -- the desktop eyebrow rule is three
-       classes and a shorter override cannot beat it, and the CTA's absolute
-       positioning is on its MASK, where the old rule named
+       specificity rather than on the breakpoint -- .featuredwork__header
+       .featuredwork__eyebrow is two classes and a single-class override cannot beat
+       it, and the CTA's absolute positioning is on its MASK, where the old rule named
        the button inside it. So the eyebrow stayed pinned full-width above the header
        and the CTA stayed pinned on top of the headline. Both selectors are matched to
        their desktop counterparts here, which is the only thing that moves them.
 
        Order in the markup is eyebrow, headline, body, CTA, so in flow the CTA lands
        under the body with no rule needed. */
-    /* The column goes static and passes through; the header and the card each carry
-       their own page margin here, as they did before the column existed. */
-    .featuredwork__col { position: static; left: auto; top: auto; width: auto; }
-    .featuredwork__col > .card--2 { position: static; margin-top: 0; }
-    .featuredwork .sec-head { position: static; left: auto; top: auto; width: auto;
+    .featuredwork__header { position: static; left: auto; top: auto; width: auto;
                             margin: 0 var(--m); padding: 0 var(--inset); }
-    .featuredwork .sec-head .sec-head__eyebrow,
-    .featuredwork .sec-head__title,
-    .featuredwork .sec-head__body,
-    .featuredwork .sec-head__cta {
+    .featuredwork__header .featuredwork__eyebrow,
+    .featuredwork h2,
+    .featuredwork__header p,
+    .featuredwork__header > .mask--cta {
       position: static; left: auto; right: auto; top: auto; width: auto;
       white-space: normal; }
     /* the table: 16 -> 12, 24 -> 16, 24 -> 16, and the headline's 40 of measure -> 24 */
-    /* The eyebrow's gap, the headline's size and measure and the body's size are all
-       carried by their tokens now -- --spacer-16 is 8 here, --spacer-40 is 24, h-56 is
-       32 and p-18 is 16, which is what these lines hard-coded. Only the two margins
-       that exist on mobile alone are left, and both are --spacer-24 (16 here). */
-    .featuredwork .sec-head .sec-head__eyebrow { margin-bottom: var(--spacer-16); }
-    .featuredwork .sec-head__title { margin-bottom: var(--spacer-24); }
-    .featuredwork .sec-head__body { margin-bottom: var(--spacer-24); }
-    /* 44 -> --spacer-80, which is 40 on mobile. Picked by the mobile column. */
-    .card { position: static; width: auto; height: auto; margin: var(--spacer-80) var(--m) 0; }
+    .featuredwork__header .featuredwork__eyebrow { margin-bottom: 12px; }
+    .featuredwork h2 { font-size: 34px; line-height: 1.12; margin-bottom: 16px;
+                       padding-right: 24px; }
+    .featuredwork__header p { font-size: 16px; line-height: 1.7; margin-bottom: 16px; }
+    .card { position: static; width: auto; height: auto; margin: 44px var(--m) 0; }
     .card__img { position: static; width: 100%; height: auto; aspect-ratio: 1; }
-    /* Everything the card used to re-declare here now comes from its tokens: p-16 is
-       14, h-24 is 20, eyebrow is a flat 12, and the two margins are --spacer-16 (8)
-       and --spacer-24 (16) by themselves. Only the image -> text gap is left, and it
-       is the same --spacer-24. */
-    .card__meta { position: static; width: auto; margin-top: var(--spacer-24); }
-    /* 56 -> --spacer-120, whose mobile value is exactly 56. The logo gap comes from
-       --spacer-80 on the desktop rule, which is 40 here, down from the 54 it was. The
-       image HEIGHT is not a spacing token and stays. */
-    .ticker { position: static; margin-top: var(--spacer-120); }
-    /* no img height override: the logos are a flat 56 at every width now */
+    /* the table, on the card: image -> text 24 -> 16, client -> title 16 -> 12,
+       title -> pills 24 -> 16 */
+    .card__meta { position: static; width: auto; margin-top: 16px; }
+    .card__client, .card__title, .pill { font-size: unset; }
+    .card__client { font-size: 13px; margin-bottom: 12px; }
+    .card__title { font-size: 21px; line-height: 1.3; margin-bottom: 16px; }
+    .pill { font-size: 12px; padding: 6px 13px 7px; }
+    .ticker { position: static; margin-top: 56px; }
+    .ticker__row img { height: 46px; margin-right: 54px; }
   }
 
 
@@ -2092,17 +1614,8 @@
      its edges, and its edges are what the absolutely positioned children range off --
      padding would sit inside the containing block they resolve against and inset nothing.
      The mark is unaffected: it is on left: 50% and the inset is symmetric. */
-  /* 387 tall, which is where the office row used to be pinned. It was height: 0 so it
-     could not intercept the pointer -- the ghost-button shape -- and that guard is kept
-     a better way: the band itself is pointer-transparent and only its three children
-     answer. Having a real height is what lets the two rows below it be IN FLOW, which is
-     the whole fix: their absolute 387 / bottom 37 could not know that an office card is
-     131 design units tall at 1440 and 207 at 1024, so the row grew straight through the
-     legal line at every width below about 1430. */
-  .pf__band { position: relative; z-index: 1; height: calc(387 * var(--u));
-              margin: 0 calc(var(--m) + var(--inset));
-              pointer-events: none; }
-  .pf__band > * { pointer-events: auto; }
+  .pf__band { position: relative; z-index: 1; height: 0;
+              margin: 0 calc(var(--m) + var(--inset)); }
 
   /* footer.png, measured: a 532u field.
 
@@ -2129,18 +1642,8 @@
      middle row at 160-213 and the CTA at 170-202 -- centres of 186.5 and 186, one line,
      which is the point. 240 is unchanged: the middle row's dots are 53 across on a ring
      of radius 93, and 2 x 93 + 53 is 239. */
-  /* No margin-top. The 120 between this and Proof is Proof's own padding-bottom, so
-     the gap carries its field rather than showing page between the two. */
-  /* --pf-mark is a FLAT 240 -- the value the design unit gave it at the 1440 artboard,
-     now held at every desktop width. It was 240 * --u, so the mark grew and shrank with
-     the window: 171 at 1024 and 320 at 1920 for the same drawing. It is a logo, not
-     artwork placed on the grid, and the topbar's reads at one size too.
-
-     --pf-mark-y stays in units. That is the mark's centre LINE, not its size, and the
-     headline and the CTA both hang off it -- it has to keep tracking the band it
-     divides. Only the drawing on that line is fixed. */
   .pf { min-height: calc(583 * var(--u));
-        --pf-mark:   240px;
+        --pf-mark:   calc(240 * var(--u));
         --pf-mark-y: calc(186.5 * var(--u)); }
 
   /* FLUSH at the margin, where every other block of text on the page carries the shared
@@ -2177,13 +1680,13 @@
      wrapper around a single element is not a job. The positioning moved onto the h2.
 
      Centred on the mark's line and ranged off .pf__band's left edge, which is where the
-     shared inset lives. ONE COLUMN less the inset at each end -- so the headline lives
-     between the first and second grid lines, 48..372, standing 8 off both. It was 440,
-     which ran it 108 past the second line. */
+     shared 8u inset lives. 440 wide: it has to break into two lines and clear the mark,
+     whose left edge is at 599.5 now that it is 240 across. */
   .pf__head { position: absolute; left: 0;
               top: var(--pf-mark-y); transform: translateY(-50%);
-              width: calc(var(--col) - 2 * var(--inset));
-              font: var(--font-h-40); margin: 0; }
+              width: calc(440 * var(--u));
+              font-size: calc(40 * var(--u)); line-height: 1.08; font-weight: 400;
+              letter-spacing: -.018em; margin: 0; }
 
   /* ---- the mark, back and centred -------------------------------------------------
      The nine dots return in this reference, set large on the middle grid line between the
@@ -2258,8 +1761,9 @@
                 just over half strength it read as a disabled control rather than as
                 the quiet one of the page's two CTA treatments. */
              border: 1px solid var(--pf-ink); border-radius: 999px;
-             font: var(--font-button-1); text-transform: uppercase;
-             padding: var(--spacer-8) var(--spacer-56);
+             font-family: inherit; font-size: clamp(10px, 0.9vw, 16px);
+             letter-spacing: .085em; text-transform: uppercase;
+             padding: calc(8 * var(--u)) calc(53 * var(--u));
              cursor: pointer; white-space: nowrap; }
   /* NO HOVER STYLING OF ITS OWN. Three were tried and all three are out: a fill, a
      colour inversion, and a doubled ring. What is left is the label roll every CTA on
@@ -2315,19 +1819,13 @@
   /* z-index 1 of its own now that it is a sibling of .pf__band rather than a child of
      it -- it used to inherit the band wrapper's layer. It is still positioned off .pf,
      which .pf__band is too, so 387 means what it always meant. */
-  .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
+  .pf__locations { position: absolute; z-index: 1; left: var(--m); right: var(--m); width: auto;
+                   top: calc(387 * var(--u));
                    display: grid; grid-template-columns: repeat(4, 1fr);
                    grid-auto-flow: row; column-gap: 0; row-gap: 0; }
-  /* The shared 8u inset on the left, --spacer-24 on the right -- the same asymmetry
-     .stat carries. These are columns of ragged-right copy with no gutter between the
-     tracks, so the inset alone left each address running to within 8 of the next
-     column's text; the wider right-hand pad is what reads as the gutter.
-
-     It costs no wrapping. At a 340 track the measure goes 324 -> 316, and set on one
-     line the four addresses ink 330 / 302 / 302 / 380: New York and Sydney were over
-     324 already, London and Istanbul are still under 316. Measured, the line counts at
-     1440 are the same on both sides of the change. */
-  .pf__office { padding-left: var(--inset); padding-right: var(--spacer-16); }
+  /* The shared 8u inset both sides. At a 340 track that leaves 324 of measure, and every
+     address in this set sets on one line in it -- the longest, Sydney's, inks 279. */
+  .pf__office { padding-left: var(--inset); padding-right: var(--inset); }
 
   /* The legal line is pinned to the FOOT of the footer, margin to margin: the copyright
      at the left end, the links at the right.
@@ -2350,17 +1848,11 @@
 
      There is no lockup to hold the left any more: this reference has no wordmark at the
      foot, so the centred line is the only thing on that band. */
-  /* In flow under the offices rather than pinned to bottom: 37. The 37 was measured
-     against a footer whose content happened to end at 518, which stopped being true the
-     moment the address type changed size. --spacer-56 above and --spacer-40 below give
-     it its own air and let .pf size itself; min-height: 583 stays as the floor, so at
-     1440 the footer is the same height it always was. */
-  .pf__legal { position: static; z-index: 1;
-               margin: var(--spacer-56) var(--m) var(--spacer-40);
+  .pf__legal { position: absolute; left: var(--m); right: var(--m);
+               bottom: calc(37 * var(--u)); z-index: 1;
                display: flex; justify-content: center; align-items: center;
-               gap: var(--spacer-24);
-               /* --font-p-14, as the office lines above. */
-               font: var(--font-p-14); color: var(--pf-dim); }
+               gap: calc(26 * var(--u));
+               font-size: calc(14 * var(--u)); color: var(--pf-dim); }
 
   /* ---- the socials and the lockup -----------------------------------------
      The socials sit in the legal row here, grouped with the links as its right-hand
@@ -2372,8 +1864,8 @@
 
      BARE GLYPHS, no ring. The reference draws two 14u marks on the dark with nothing
      around them; the 26u bordered circles this had were the previous footer's. */
-  .pf__end { display: flex; align-items: center; gap: var(--spacer-24); }
-  .pf__social { display: flex; align-items: center; gap: var(--spacer-12); }
+  .pf__end { display: flex; align-items: center; gap: calc(24 * var(--u)); }
+  .pf__social { display: flex; align-items: center; gap: calc(12 * var(--u)); }
   .pf__icon { display: grid; place-items: center; flex: none;
               color: var(--pf-dim); transition: color .25s ease; }
   .pf__icon:hover { color: var(--pf-ink); }
@@ -2399,16 +1891,16 @@
      19 of leading, not the 16 the reference uses. 16 was 1.33 of a 12 body; holding the
      RATIO rather than the number keeps the address block's texture, where keeping 16
      would have squeezed it to 1.14 and closed the lines up. */
-  .pf__city { font: var(--font-h-24); color: var(--pf-ink); margin: 0 0 var(--spacer-12); }
-  /* --font-p-16: 16 desktop, 14 mobile. --font-p-14 (the flat 14 added for this block)
-     is now used by the legal row alone. */
-  .pf__addr, .pf__tel { font: var(--font-p-16); color: var(--pf-sub); margin: 0; }
+  .pf__city { font-size: calc(20 * var(--u)); line-height: 1; letter-spacing: -.01em;
+              color: var(--pf-ink); margin: 0 0 calc(12 * var(--u)); }
+  .pf__addr, .pf__tel { font-size: calc(14 * var(--u)); line-height: calc(19 * var(--u));
+                        color: var(--pf-sub); margin: 0; }
   /* 8 between the address box and the phone, asked for directly. It was 7, itself down
      from a 10 that had been solved against an earlier reference whose address line box
      was 16 rather than 19 -- three of that 10 had quietly become leading. */
-  .pf__tel { margin-top: var(--spacer-8); }
+  .pf__tel { margin-top: calc(8 * var(--u)); }
 
-  .pf__legal nav { display: flex; gap: var(--spacer-16); flex-wrap: wrap; }
+  .pf__legal nav { display: flex; gap: calc(16 * var(--u)); flex-wrap: wrap; }
   .pf__legal a { color: inherit; text-decoration: none; }
   .pf__legal a:hover { color: var(--pf-ink); }
 
@@ -2424,10 +1916,6 @@
      and this handles the links. */
   .topbar a { transition: color .22s ease; }
   .topbar.on-dark, .topbar.on-dark a { color: var(--bg); }
-  /* ...EXCEPT while the menu is open. The bar inverts over the footer's dark band, and
-     the panel is light -- so a bar left inverted would put white type on it. Same
-     specificity as the rule above and later in the sheet, which is what takes it. */
-  .topbar.is-menu, .topbar.is-menu a, .topbar.is-menu .navtoggle { color: #222; }
 
   /* THE BAR ON MOBILE. Down here rather than in the hero's mobile block because the
      desktop .topbar rule is declared further down the sheet than that block is: same
@@ -2436,453 +1924,50 @@
 
      28 both sides -- the margin plus the inset, so the bar's type lands on the same
      line as the body copy under it. 16 top and bottom, the table's value for 24. */
-  /* 767, not 1023. This was written for the phone -- "the 22 the old clamp's floor
-     gave it" -- but at 1023 it took the tablet with it, so the bar carried a 22px
-     wordmark beside a 30px mark at every width below desktop. Tablet takes the rule
-     above instead, at the size desktop sets. */
-  @media (max-width: 767px) {
-    /* No padding-block override any more: --spacer-24 IS 16 on mobile, so the desktop
-       rule already resolves to the 16 this used to hard-code. Only the sides are still
-       written here, and only because they are margin + inset rather than a spacer. */
-    /* .logo's gap is --spacer-12, which is 8 on mobile by itself -- nothing to write.
-       The wordmark takes the 22 the old clamp's floor gave it. */
+  @media (max-width: 860px) {
+    .topbar { padding: 16px calc(var(--m) + var(--inset)); }
+    /* the table: the logo lockup's 12 -> 8 */
+    .logo { gap: 8px; }
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 900px) {
     /* The band's three absolutely-positioned pieces cannot survive a narrow window
        side by side, so they stack and the band gives up its fixed height -- and its
        inset margin with it, since the pieces carry their own var(--m) here. */
-    /* --spacer-56 top and bottom, the same at both stacked widths -- which is why it
-       is written here rather than once here and again in the tablet block. It was
-       120/80 (56/40 on a phone), then 40/56 at tablet only. */
-    .pf__band { height: auto; margin: 0; padding: var(--spacer-56) 0; }
-    /* --font-h-40 is 32 here, which is what the 34 approximated. */
+    .pf__band { height: auto; margin: 0; padding: 56px 0 44px; }
     .pf__head { position: static; transform: none; width: auto;
-                padding: 0 calc(var(--m) + var(--inset)); }
-    /* 200 at tablet. The phone's block below takes it to 120; nothing else reads this
-       value, so the stacked default IS the tablet one rather than a third number. */
+                padding: 0 calc(var(--m) + var(--inset));
+                font-size: 34px; line-height: 1.14; }
     .pf__mark { position: static; left: auto; top: auto;
-                --pf-mark: 200px;
+                --pf-mark: 220px;
                 width: var(--pf-mark); height: var(--pf-mark);
-                margin: var(--spacer-80) auto; }
-    /* 50% LESS half a dot. The base rule is left/top: calc(var(--D) / -2), because on
-       desktop .pf__mark is a 0x0 point and each dot is pulled back half its own size so
-       its CENTRE sits on that point. Here the mark is a 220 box, so the anchor becomes
-       50% -- but a bare 50% puts the dot's top-left corner on the centre, which shifted
-       the whole ring right and down by half a dot: the ink measured 365..585 inside a
-       box of 340..560. */
-    .pf__dot { left: calc(50% - var(--D) / 2); top: calc(50% - var(--D) / 2); }
+                margin: 40px auto; }
+    .pf__dot { left: 50%; top: 50%; }
     /* Margin + inset, so the pill's box stands where the headline's text does. That is
        the desktop relationship too: there the pill's right edge IS the inset edge. */
-    /* transform: none, and it is a FIX. The desktop rule centres this on the mark's
-       line with translateY(-50%); going static dropped the positioning but left the
-       transform, so the pill was pulled up half its own height -- 22px -- straight
-       through the headline above it. */
-    .pf__cta { position: static; display: flex; transform: none;
+    .pf__cta { position: static; display: flex;
                width: calc(100% - 2 * (var(--m) + var(--inset)));
-               /* no fixed height: the other CTAs are sized by their own padding and
-                  line box, and a 44 here made this one visibly taller than them. */
-               margin: 0 calc(var(--m) + var(--inset)); }
+               height: 44px; margin: 0 calc(var(--m) + var(--inset)); font-size: 12px; }
     .pf__grid { display: none; }
-    /* 28 -> --spacer-40 (24 here). */
-    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: var(--spacer-40) 0; }
+    .pf__body { padding: 44px var(--m) 32px; }
+    .pf__offices { grid-template-columns: 1fr; gap: 28px 0; }
+    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: 28px 0; }
     /* The eyebrows are set in design units like the headlines, so they would keep
        shrinking past legibility here -- the clamp they replaced had a 10px floor.
-       Matched to the specificity of the desktop rule: .featuredwork .sec-head .sec-head__eyebrow is
+       Matched to the specificity of the desktop rule: .featuredwork__header .featuredwork__eyebrow is
        two classes, so a single-class override loses to it and only Expertise would take
        the floor. */
-    /* The eyebrow floor this used to provide is now the token itself: --font-eyebrow
-       is a flat 12 at every width, so there is nothing to clamp. */
-    /* Every one of these is now its desktop token's own mobile value: --spacer-12 is
-       8, --spacer-8 is 8, --spacer-24 is 16, --spacer-16 is 8. Two COLLISIONS come with
-       that and are flagged: city->address and address->phone are both 8 here where
-       desktop has 12 and 8, and the legal nav's gap and the socials' gap are both 8
-       where desktop has 16 and 12. 44 -> --spacer-80 (40 here). */
-    .pf__legal { padding-left: 0; margin-top: var(--spacer-80); }
+    .featuredwork__header .featuredwork__eyebrow,
+    .exp__eyebrow { font-size: 12px; }
+    /* the table, in the footer: city -> address 12 -> 8, address -> phone 8 -> 8,
+       the legal cluster's 24 -> 16, its nav's 16 -> 12, the socials' 12 -> 8 */
+    .pf__city { margin-bottom: 8px; }
+    .pf__tel { margin-top: 8px; }
+    .pf__end { gap: 16px; }
+    .pf__legal nav { gap: 12px; }
+    .pf__social { gap: 8px; }
+    .pf__legal { padding-left: 0; margin-top: 44px; }
   }
-
-
-  /* ============================================ TABLET, 768 to 1023 ================
-     The stacked layout above is built for a phone. A tablet is wide enough for the
-     grid's four columns -- config.js keeps five vertical lines down to 768 -- so these
-     put back the compositions that need that width, and only those. Everything else
-     stays as the stacked block left it. */
-
-  /* =================================================================== STACKED, BOTH
-     What the tablet and the phone BOTH do. These rules lived in the tablet block and
-     the phone either went without them or had a weaker version of its own; the phone
-     now mirrors the tablet's layout, so they belong to the whole stacked range.
-
-     It sits immediately before the tablet block, which is where these rules already
-     were in the cascade -- so what tablet resolves to is unchanged, and the phone
-     simply starts seeing them. Anything that depends on there being four columns
-     stays in the tablet block below; anything the phone does differently is in the
-     767 block after it. */
-  @media (max-width: 1023px) {
-    /* ---- HERO: the copy hangs off the BOTTOM edge with --spacer-64 under it, at
-       both stacked widths, and the mark sits --spacer-104 ABOVE the viewport's centre
-       rather than on it. The two are no longer concentric: the mark leads and the copy
-       answers from the bottom edge, with the 104 opening the air between them. */
-    .hero { justify-content: flex-end; padding-bottom: var(--spacer-64); }
-    .hero__mark { top: calc(50% - var(--spacer-104)); }
-
-    /* ---- THE COVER, twice the radius it has on desktop. A circle always curves away
-       at the viewport's edges, and at this width the shallow dome left a 266px band at
-       each side where its arc had not arrived -- the two blue wedges. Doubling it
-       halves that. expertise.js reads the same doubling through coverR(); the two must
-       not drift, or the reveal gate fires at the wrong moment. */
-    .cover { width: calc(4584 * var(--u)); height: calc(4584 * var(--u));
-             margin-left: calc(-2292 * var(--u)); }
-
-    /* ---- WORK: reading order. Card 2 lives inside the header's column, because that
-       is what hangs it off the header on desktop -- which also makes it render BEFORE
-       card 1 here. display: contents dissolves the column box at this width only, so
-       its two children become items of .featuredwork__inner and `order` can put them
-       in reading order. The desktop structure is untouched. */
-    /* row-gap, not per-card margins. The margins ALMOST worked -- header to card 1 and
-       card 2 to card 3 both measured 40 -- but card 1 to card 2 came out 56, because
-       card 2 reaches this flex container through the display: contents column and
-       something in that chain eats 16 of its margin. The gap belongs to the row anyway:
-       declared once, it cannot differ between pairs. */
-    .featuredwork__inner { display: flex; flex-direction: column;
-                           row-gap: var(--spacer-40); }
-    .featuredwork__col { display: contents; }
-    .featuredwork .sec-head { order: 1; }
-    .card--1 { order: 2; }
-    .card--2 { order: 3; }
-    .card--3 { order: 4; }
-    .ticker  { order: 5; }
-    /* --spacer-40 under the header and between every card. The second selector is
-       needed to beat the desktop rule that hangs card 2 off the header at 120. */
-    .card,
-    .featuredwork__col > .card--2 { margin: 0 var(--m); }
-    /* the ticker keeps its own larger gap: the row's 40 plus this makes --spacer-120,
-       which is what it had before. */
-    .ticker { margin-top: calc(var(--spacer-120) - var(--spacer-40)); }
-
-    /* ---- FOOTER: the page's five lines run through the dark again, as they do on
-       desktop. footer.js builds .pf__grid by copying each line's x off .page-grid, so
-       they are literally the same lines across the boundary -- the stacked block only
-       switched the overlay off, and this switches it back on. */
-    .pf__grid { display: block; }
-
-    .pf__mark { margin: 0 auto var(--spacer-24); }
-    .pf__head { text-align: center; margin: 0 auto var(--spacer-24); }
-    .pf__cta  { width: fit-content; margin: 0 auto; }
-
-    /* The legal row stacks: copyright, then links, then socials. .pf__end holds the
-       first two and .pf__social the third, so both boxes go to a column. */
-    .pf__legal { flex-direction: column; align-items: center; }
-    .pf__end   { flex-direction: column; align-items: center; }
-    /* the icons keep their desktop size rather than scaling with the artboard --
-       21 design units resolves to 13 at this width. */
-    .pf__icon svg { width: 21px; height: 21px; }
-  }
-
-  @media (min-width: 768px) and (max-width: 1023px) {
-
-
-    /* ---- HERO: the mark spans vline 2 to vline 4 -- the middle two columns -- less
-       --spacer-8 of air inside each side. The padding is taken OFF THE DIAMETER rather
-       than written as padding: the mark is a ring of round dots, and padding its box
-       would squash the circle on one axis where a smaller diameter keeps every dot
-       round and gives the same 8 at the left and right edges. */
-    .hero__mark { --hero-mark: calc(2 * var(--col) - 2 * var(--spacer-8)); }
-
-    /* ---- SECTION HEADERS, three columns wide: vline 1 to vline 4.
-       The left-aligned ones (Work, Proof) start on the first line; the centred one
-       (Expertise) keeps its auto margins, so the same width sits mid-section. */
-    .featuredwork .sec-head,
-    .proof .sec-head { width: calc(3 * var(--col)); }
-
-    /* ---- NAV: all four links, at the size and spacing desktop uses. The stacked
-       block hides .nav because four links plus the wordmark do not fit a phone; at
-       768 they do -- measured, the logo ends at 187 and the nav starts at 300, so the
-       bar's content runs well inside its own padding -- which is why there is no
-       burger and no second nav to keep in step with this one. */
-    .nav { display: flex; }
-
-    /* ---- HERO: TWO UP, across the whole grid. The headline takes vline 1 to vline 3
-       and the body + CTA vline 3 to vline 5, so the band spans all four columns and
-       splits down the middle line.
-
-       The inset moves OFF the band and onto each half, which is the only way the
-       middle line gets it on both sides: one padding on the band would stand the
-       headline 8 off vline 1 and the copy hard against vline 3. Each half is
-       border-box, so its 2 columns are the column width, inset included -- the copy
-       lines up with vline 1, vline 3 and vline 5 plus the page's 8 exactly as it does
-       everywhere else.
-
-       align-items: flex-end: the two halves are different heights and the block hangs
-       off the bottom of the hero, so they sit on a common BASELINE EDGE -- the
-       headline's last line and the CTA's underside finish on the same line. */
-    .hero__band { width: calc(4 * var(--col)); padding: 0;
-                  display: flex; align-items: flex-end; }
-    .hero h1 { width: calc(2 * var(--col)); flex: none;
-               padding: 0 var(--inset); margin-bottom: 0; }
-    .hero__aside { width: calc(2 * var(--col)); flex: none;
-                   margin-left: 0; margin-right: 0; }
-
-
-
-
-    /* ---- FOOTER, stacked and centred. The band's padding is in the shared stacked
-       block: tablet and the phone carry the same --spacer-56 top and bottom. The mark,
-       the headline and the pill are the band's three in-flow children, so the 24s
-       between them are the first two's bottom margins. The pill shrinks to its label
-       and centres, rather than running the full measure. */
-
-    /* four offices across, where the phone stacks them two by two */
-    .pf__locations { gap: var(--spacer-24) 0; grid-template-columns: repeat(4, 1fr); }
-    .pf__end       { gap: var(--spacer-12); }
-    .pf__legal     { margin-top: var(--spacer-40); }
-
-    /* ---- PROOF: --spacer-40 between the header and the stats, and four across
-       rather than the phone's 2x2. */
-    .proof__inner { row-gap: var(--spacer-40); }
-    .proof__stats { grid-template-columns: repeat(4, 1fr); }
-
-    /* ---- WORK: each card is a full-width row. Image on the first two columns, text
-       on the last two, so they meet on the third vertical line. */
-    .card { display: flex; align-items: flex-start; }
-    .card__img  { width: calc(2 * var(--col)); flex: none; aspect-ratio: 1; }
-    .card__meta { width: calc(2 * var(--col)); flex: none; margin-top: 0;
-                  align-self: flex-end;          /* sits on the card's bottom edge */
-                  padding: 0 var(--spacer-24); }
-
-    /* ---- WORK's gradient: the TOP only, pushed down to card 3's top edge.
-       The canvas runs 0..145% of .featuredwork__inner, so it starts behind the whole
-       column here. Measured with the cards revealed, card 3's top is 47.2% of the
-       canvas -- so the mask is transparent to 47 and solid by 53, a short fade rather
-       than a hard edge. Nothing is masked at the bottom: that end should read exactly
-       as it does on desktop. */
-    /* ---- WORK's gradient: NO OVERHANG here. The canvas is 100% + 1450u, and that
-       1450 exists so the circle's arc, not the canvas edge, is what ends the blue --
-       there is no cover or arc at this width, so the overhang has no job and simply
-       carries the gradient down through Expertise and into Proof. Capping it at the
-       section keeps the blue inside the section it belongs to. */
-    /* 800 down, and the fade moved to where the cover hides it. The canvas keeps its
-       full height so the gradient is not squashed, it simply starts lower.
-
-       The mask now runs 78% to 90% rather than 55% to 80%: at 800 down, the cover's
-       dome spans roughly 74% to 93% of the canvas, so a fade inside that band happens
-       behind an opaque element and the washed-out end is never on screen. Fading
-       earlier, as it did, put the pale part out in the open above the arc. */
-    #featuredworkgl {
-      height: 100%; top: 800px;
-      /* NO FADE. Every version of this that faded -- 55/80, 78/90, 48/62 -- put a
-         washed-out band at the bottom, which is the "clear part". The gradient now
-         runs at full strength and the dome's arc is what ends it, exactly as on
-         desktop. That only works because the dome above is twice as wide here; with
-         the old radius its edges sagged far enough to leave blue in the corners. */
-    }
-
-    /* ---- EXPERTISE: the graphic comes back, and with it the desktop composition.
-       The phone hides the svg and stacks the four items; at this width there is room
-       for the band and the row, so these restore them rather than inventing a third
-       arrangement. */
-    /* --spacer-320: 248 of padding here. Doubling the dome's radius flattened its
-       arc, which brought it CLOSER to the header's top corners rather than further --
-       clearance fell from 116 to 61 at 768, 46 at 900 and 32 at 1023, nearly touching.
-       The padding is what buys that back, and it has to be generous because the arc
-       rises as the dome scales in: a gap that merely clears the settled position can
-       still be crossed mid-scroll. */
-    .exp__inner  { height: auto; padding: var(--spacer-320) 0 0; }
-    /* Three columns like the other two headers, but centred on the section rather
-       than ranged left -- the auto margins do that. */
-    .expertise .sec-head { position: relative; width: calc(3 * var(--col));
-                   margin: 0 auto; padding: 0 var(--inset); }
-    /* No bottom margin: it would collapse with .areas' own --spacer-8 and win, so the
-       header stood 24 off the graphic instead of the 8 this layout asks for. The CTA
-       is no longer the next thing after the body at this width, so nothing else wanted
-       that 24. */
-    /* The 80 restated: the stacked block's `width: auto` is two classes inside a
-       media query, so it beats the shared .sec-head__body rule. Work and Proof take
-       the full width here, as they did before; Expertise keeps its measure. */
-    .expertise .sec-head__body   { width: 80%; margin: 0 auto; }
-    /* ---- EXPERTISE: the graphic is TWO COLUMNS WIDE and the copy is UNDER it.
-
-       The four loops used to be full bleed with the item row sitting inside them, both
-       absolutely placed on a band at 740.2 design units. Everything here is in flow
-       instead: graphic, then the row, then the CTA, each one after the last, so no two
-       can overlap whatever the copy does. */
-    .areas { position: relative; height: auto; margin-top: var(--spacer-32); }
-
-    /* THE INK, not the viewBox, is what lands on the vertical lines. The svg is a
-       1440 x 1194.2 box whose drawing occupies 40..1400 across and 400..1080 down --
-       so fitting the BOX between two grid lines would leave the loops short of them,
-       which is the mistake the full-bleed rule above was written to avoid.
-
-       --area-k is the scale that makes the drawing the WHOLE grid's width -- vline 1
-       to vline 5, which is all four columns (4 * col / 1360). Everything else is that
-       scale applied: the box is 1440 wide at it, pushed right so the drawing's left
-       edge (40) lands on vline 1, and its empty
-       bands -- 400 above the loops, 114.2 below -- are taken back as negative margins.
-       What is left in flow is the ink and nothing else, from vline 1 to vline 5.
-
-       preserveAspectRatio is "none", so both axes take --area-k and the loops keep
-       their shape. expertise.js reads the rendered box rather than --u for the reveal
-       band, since the graphic is no longer drawn at the page's own unit. */
-    .areas__svg { --area-k: calc(4 * var(--col) / 1360);
-                  display: block; position: relative;
-                  width:  calc(1440 * var(--area-k));
-                  height: calc(1194.2 * var(--area-k));
-                  margin: calc(-400 * var(--area-k)) 0
-                          calc(var(--spacer-32) - 114.2 * var(--area-k))
-                          calc(var(--m) - 40 * var(--area-k)); }
-
-    /* Four across, in flow directly under the graphic. */
-    .areas__row { position: static; left: auto; right: auto; top: auto;
-                  margin: 0 var(--m);
-                  display: grid; grid-template-columns: repeat(4, 1fr);
-                  column-gap: 0; }
-    .area { position: static; flex: 1 1 0; min-width: 0; width: auto;
-            margin: 0; transform: none;
-            padding-left: var(--inset); padding-right: var(--spacer-16); }
-    /* --spacer-40 under the graphic block -- which ends at the item row, since .areas
-       holds the loops and the four items together -- less the 2px of clip guard
-       .mask--cta cancels with its own margin, the same correction the phone rule makes. */
-    .expertise .sec-head__cta { position: static; display: block; width: fit-content; left: auto;
-                bottom: auto; top: auto; transform: none;
-                margin: calc(var(--spacer-40) - 2px) auto 0; }
-  }
-
-  /* ===================================================================== PHONE ONLY
-     The stacked layout above, at two columns instead of four. Everything structural --
-     the reading order, the gaps, the dome, the footer's centring -- comes from the
-     shared block; this is only what two columns cannot do the same way. */
-  @media (max-width: 767px) {
-
-
-    /* ---- NAV: the links move into the panel, and the bar carries "Menu" instead.
-       .nav is already display:none from the stacked block; this is the trigger and the
-       panel coming on. */
-    /* ---- THE BAR, 24 tall on both sides. The lockup drops from 30 to 24 (120 across
-       at the artwork's 599 x 120), and the trigger -- which is type with no box of its
-       own, so its height was whatever the line box came to, about 19 -- is given the
-       same 24 with the label centred in it. The two then sit on one midline. */
-    .logo svg { height: 24px; }
-    .navtoggle { display: flex; align-items: center; height: 24px; }
-    .menu { display: flex; }
-
-    /* ---- HERO: the mark is 80% of the grid's width. There are two columns here, so
-       vline 1 to vline 3 IS the grid, and 80% of it is 1.6 columns. Nothing is taken
-       off it, the same as tablet. */
-    /* The mark spans vline 1 to vline 3 -- which is the whole grid at two columns --
-       less --spacer-8 inside each side. Taken off the DIAMETER, not written as
-       padding: the mark is a ring of round dots and padding its box would squash the
-       circle on one axis. Same construction as tablet, at the grid it has here. */
-    .hero__mark { --hero-mark: calc(2 * var(--col) - 2 * var(--spacer-8));
-                  /* --spacer-120 up, where tablet lifts the mark by --spacer-104. The
-                     copy sits lower here (the headline wraps to three lines in two
-                     columns), so the mark has to clear further to keep the air
-                     between them. */
-                  top: calc(50% - var(--spacer-120)); }
-
-    /* ---- WORK: the card STACKS, image over text, where tablet puts them side by
-       side on the third vertical line. There is no third line here to meet on.
-       padding on the text block only: the image is full bleed inside the card's own
-       page margin, and the copy takes the page's 8 on the left with the wider 16 on
-       the right, the same pair every other card on the page carries. */
-    .card { display: flex; flex-direction: column; align-items: stretch; }
-    .card__img  { width: 100%; flex: none; aspect-ratio: 1; }
-    .card__meta { width: 100%; flex: none; align-self: auto;
-                  margin-top: var(--spacer-24);
-                  padding-left: var(--inset); padding-right: var(--spacer-16); }
-
-    .pf__glow {
-      /* ---- THE FOOTER'S GLOW, as a SHARE of the footer rather than a distance.
-         The desktop mask is written in design units up from the canvas's bottom edge,
-         deliberately: there it is a fixed skirt of light along the base. On a phone the
-         same 330 units is 86px, which against a footer four times that tall reads as a
-         sliver -- so here it reaches a third of the footer's height instead.
-
-         The arithmetic: percentages in this mask resolve against the GLOW's box, which
-         is the footer plus the 80 of bleed below it, so a third of the FOOTER is
-         (glow - 80) / 3 above the glow's bottom, plus the 80 to get back to the
-         footer's own edge -- 53.33px + 33.333%. The four stops below it keep the
-         desktop ladder's proportions (60/140/220/280 of 330), which is what eases the
-         falloff out instead of ending it on a line. */
-      -webkit-mask-image: linear-gradient(to top, #000 0,
-          rgba(0,0,0,.92) calc(75.15px +  6.061%),
-          rgba(0,0,0,.62) calc(68.69px + 14.141%),
-          rgba(0,0,0,.30) calc(62.22px + 22.222%),
-          rgba(0,0,0,.12) calc(57.37px + 28.283%),
-          transparent     calc(53.33px + 33.333%));
-              mask-image: linear-gradient(to top, #000 0,
-          rgba(0,0,0,.92) calc(75.15px +  6.061%),
-          rgba(0,0,0,.62) calc(68.69px + 14.141%),
-          rgba(0,0,0,.30) calc(62.22px + 22.222%),
-          rgba(0,0,0,.12) calc(57.37px + 28.283%),
-          transparent     calc(53.33px + 33.333%));
-    }
-
-    /* ---- THE FOOTER's mark, 120 rather than the 220 the stacked rule sets. Only the
-       overall size: --D (the dot) and --R (the ring) are both written off --pf-mark,
-       so the nine dots and their spacing scale with it and nothing else is touched. */
-    .pf__mark { --pf-mark: 120px; }
-
-    /* ---- THE TICKER's logos, 40 rather than the flat 56 the other widths use.
-       Height only: the gap between them is --spacer-80 on the base rule and steps
-       down on its own. */
-    .ticker__row img { height: 40px; }
-
-    /* ---- WORK's gradient, 1000 down -- 400, then 600 more. Tablet pushes it 800 and
-       caps its height at the section; here only the start moves. The canvas keeps the
-       base rule's 1450u of overhang, which runs past the section's bottom -- the
-       dome's arc is above that at this width, so the overhang is covered rather than
-       carried into Expertise. */
-    /* ---- WORK's gradient, 800 down and capped at the section -- the same pairing
-       tablet uses, and the pair is not optional.
-
-       The two are what keep the gradient's dark tail behind the dome. The canvas is
-       100% + 1450u tall by default and the dome is 4584u across, which on a phone
-       means the canvas is nearly twice the dome's height -- so pushing the canvas down
-       walks its bottom out from under the arc that hides it. At 1000 down with the
-       overhang still on, 288px of navy stood in the middle of Proof with a hard edge
-       across it; at 1000 down with the overhang off it still broke out by ~96 at 320.
-
-       So the TOP moves and the BOTTOM stays. 1100 down with 300 taken off the height
-       puts the canvas's end back exactly where 800/100% put it -- sectionBottom + 800,
-       which clears the dome's full-width reach by 104 at 320 and 260 at 375 -- while
-       the blue starts 300 lower, which is the thing being asked for. The cost is that
-       the gradient is 300 shorter and so slightly compressed: its geometry is
-       normalised to the canvas, so a shorter canvas is a tighter picture. Translating
-       it instead would walk the tail straight back out from under the arc. */
-    #featuredworkgl { top: 1100px; height: calc(100% - 300px); }
-
-    /* ---- EXPERTISE: the tablet composition at two columns. The header is the page
-       width rather than three columns, the graphic spans the WHOLE grid -- vline 1 to
-       vline 3, which is both columns, where tablet holds it to 70% -- and the four
-       items are a 2x2 grid rather than a row of four. */
-    .exp__inner { height: auto; padding: var(--spacer-400) 0 0; }
-    .expertise .sec-head { position: relative; width: auto;
-                           margin: 0 var(--m); padding: 0 var(--inset); }
-    /* Full width on a phone: 80% of two columns is a 268 measure at 375, which was
-       breaking a 16px line every four or five words. */
-    .expertise .sec-head__body { width: 100%; margin: 0 auto; }
-
-    .areas { position: relative; height: auto; margin-top: var(--spacer-32); }
-    .areas__svg { --area-k: calc(2 * var(--col) / 1360);
-                  display: block; position: relative;
-                  width:  calc(1440 * var(--area-k));
-                  height: calc(1194.2 * var(--area-k));
-                  margin: calc(-400 * var(--area-k)) 0
-                          calc(var(--spacer-32) - 114.2 * var(--area-k))
-                          calc(var(--m) - 40 * var(--area-k)); }
-
-    /* 2x2, with a row gap -- the row of four at tablet needs none. */
-    .areas__row { position: static; left: auto; right: auto; top: auto;
-                  margin: 0 var(--m);
-                  display: grid; grid-template-columns: repeat(2, 1fr);
-                  column-gap: 0; row-gap: var(--spacer-32); }
-    .area { position: static; width: auto; margin: 0; transform: none;
-            padding-left: var(--inset); padding-right: var(--spacer-16); }
-    .expertise .sec-head__cta { position: static; display: block; width: fit-content; left: auto;
-                bottom: auto; top: auto; transform: none;
-                margin: calc(var(--spacer-40) - 2px) auto 0; }
-  }
-
 
   /* ---- the universal 8u text inset ---------------------------------------------
      Every block of running text sits 8 units in from its own box on both sides, so
@@ -2897,19 +1982,19 @@
      next one. It lives on the CONTAINER of each block instead:
 
        .hero__band     headline + body + CTA
-       .featuredwork .sec-head   eyebrow + headline + body + CTA
-       .expertise .sec-head    eyebrow + headline + body + CTA
-       .proof .sec-head  headline + body
+       .featuredwork__header   eyebrow + headline + body + CTA
+       .exp__header    eyebrow + headline + body + CTA
+       .proof__header  headline + body
        .stat           number + caption, one per card
        .pf__band       headline + mark + CTA
        .pf__office     city + address + phone, one per card
 
      Two shapes, and which one a container uses is not a style choice. Where the children
-     are in normal flow it is padding (.expertise .sec-head, .proof .sec-head, .stat, .pf__office).
+     are in normal flow it is padding (.exp__header, .proof__header, .stat, .pf__office).
      Where they are absolutely positioned it has to be the container's own EDGES --
      margin or left/right -- because an absolute child resolves against its containing
      block's padding box, which includes the padding, so padding there insets nothing
-     (.hero__band, .featuredwork .sec-head, .pf__band).
+     (.hero__band, .featuredwork__header, .pf__band).
 
      The headlines' own padding-right: 40 stays where it is. It is not the page inset, it
      is a measure decision about that one line of type, so it belongs to the headline. */
@@ -2918,22 +2003,15 @@
      24u right padding is doing the gutter's job -- an 8u left inset on top of that would
      put the five columns on 48 / 320 / 592 / 864 / 1136 against the reference's 40 / 312
      / 584 / 856 / 1128. */
-  /* THE LEFT-ALIGNED HEADLINES, on desktop only: --spacer-80 held back on the right.
-     They are the only 56u type on the page set in a 680 box, so they are the only
-     place a line can run far enough to sit almost on the third grid line; 80 pulls the
-     ragged edge back and gives the wrap somewhere to break.
+  /* The two left-aligned section HEADLINES take a deeper inset on the right: 40, not 8.
+     They are the only 56u type on the page set in a 680 box, so they are the only place
+     a line can run far enough to sit almost on the third grid line. 40 pulls the ragged
+     edge back to a full margin's width and gives the wrap somewhere to break.
 
-     --left, not every .sec-head__title. Expertise's is CENTRED, and a right-only
-     padding on a centred line does not hold an edge back -- it moves the whole line
-     40 to the left. The modifier is what tells the two cases apart.
-
-     min-width: 1024px, because below it the headline is the page's width and there is
-     no third grid line for it to run into; the stacked blocks set no padding on it, so
-     without the query this would reach them. Right only -- the left edge still has to
-     align with the eyebrow, the body and the CTA under it, all of which keep the 8. */
-  @media (min-width: 1024px) {
-    .sec-head--left .sec-head__title { padding-right: var(--spacer-80); }
-  }
+     Right only -- the left edge still has to align with the eyebrow, the body and the
+     CTA under it, all of which keep the 8. */
+  .featuredwork h2,
+  .proof__head     { padding-right: calc(40 * var(--u)); }
   /* .area is deliberately NOT in that list. The four Expertise blocks are the one
      place the inset was doing harm rather than good: they are 236u boxes, box-sizing
      is border-box, so 8u a side was taking 16u off a measure that is already the
@@ -2942,7 +2020,7 @@
 
   /* The CTAs are NOT in this list, and no longer carry the inset themselves. Every one
      of them -- hero, Work, Expertise, Proof -- now sits inside a box that holds the 8
-     for the whole block (.hero__band, .featuredwork .sec-head, .expertise .sec-head, .proof .sec-head), so
+     for the whole block (.hero__band, .featuredwork__header, .exp__header, .proof__header), so
      the 8 they used to add on top of their own 2px guard was landing them at 16 and
      one notch right of the body copy above them. All that is left is the guard: a 2px
      bleed so the mask's overflow does not clip the pill's edge, cancelled by the
@@ -2964,22 +2042,27 @@
   </div>
 
   <header class="topbar">
-      <a class="logo" href="#" aria-label="thelab, home">
-        <!-- THE REAL LOCKUP, from assets/logo-thelab.svg. It replaces the hand-built
-             nine-dot mark plus a <span>thelab</span> set in Helvetica: the mark and the
-             wordmark are one drawing now, so their size and spacing come from the
-             artwork rather than from a gap token and a font-size that had to be matched
-             to it at every breakpoint.
-
-             INLINE rather than <img src="assets/logo-thelab.svg">, and that is the whole
-             reason it is pasted here: the bar INVERTS over the footer's dark band, and
-             it does that by setting `color` -- which only reaches the drawing if the
-             drawing is in the document. The file's own fill is #222222; the one change
-             made to it here is that fill becoming currentColor. The file is the source
-             and is kept beside this in both builds. -->
-        <svg viewBox="0 0 599 120" aria-hidden="true">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M59.2444 26.5463C66.5677 26.5463 72.5044 20.6037 72.5044 13.2732C72.5044 5.9426 66.5677 0 59.2444 0C51.9211 0 45.9844 5.9426 45.9844 13.2732C45.9844 20.6037 51.9211 26.5463 59.2444 26.5463ZM13.26 46.024C20.5815 46.024 26.52 51.9627 26.52 59.2971C26.52 66.6259 20.5815 72.5703 13.26 72.5703C5.93849 72.5703 0 66.6259 0 59.2971C0 51.9684 5.93849 46.024 13.26 46.024ZM118.482 59.2971C118.482 66.6277 112.545 72.5703 105.222 72.5703C97.8988 72.5703 91.9621 66.6277 91.9621 59.2971C91.9621 51.9666 97.8988 46.024 105.222 46.024C112.545 46.024 118.482 51.9666 118.482 59.2971ZM59.2444 72.5703C66.5677 72.5703 72.5044 66.6277 72.5044 59.2971C72.5044 51.9666 66.5677 46.024 59.2444 46.024C51.9211 46.024 45.9844 51.9666 45.9844 59.2971C45.9844 66.6277 51.9211 72.5703 59.2444 72.5703ZM72.5044 105.321C72.5044 112.651 66.5677 118.594 59.2444 118.594C51.9211 118.594 45.9844 112.651 45.9844 105.321C45.9844 97.99 51.9211 92.0474 59.2444 92.0474C66.5677 92.0474 72.5044 97.99 72.5044 105.321ZM104.911 26.8682C104.911 34.197 98.9783 40.1414 91.6511 40.1414C84.3296 40.1414 78.3911 34.197 78.3911 26.8682C78.3911 19.5394 84.3296 13.595 91.6511 13.595C98.9726 13.595 104.911 19.5394 104.911 26.8682ZM26.8752 13.6237C19.548 13.6237 13.6152 19.5681 13.6152 26.8969C13.6152 34.2257 19.5536 40.1701 26.8752 40.1701C34.1967 40.1701 40.1352 34.2257 40.1352 26.8969C40.1352 19.5681 34.1967 13.6237 26.8752 13.6237ZM104.906 91.7139C104.906 99.0445 98.9689 104.987 91.6456 104.987C84.3223 104.987 78.3856 99.0445 78.3856 91.7139C78.3856 84.3834 84.3223 78.4408 91.6456 78.4408C98.9689 78.4408 104.906 84.3834 104.906 91.7139ZM26.8189 104.982C34.1422 104.982 40.079 99.039 40.079 91.7084C40.079 84.3778 34.1422 78.4352 26.8189 78.4352C19.4956 78.4352 13.5589 84.3778 13.5589 91.7084C13.5589 99.039 19.4956 104.982 26.8189 104.982ZM256.248 27.5581C242.886 27.5581 235.3 33.6099 231.043 39.7803V1.76331H214.21V117.046H231.043V68.9711C231.043 52.8953 239.234 42.9051 252.421 42.9051C264.727 42.9051 270.97 49.488 270.97 62.473V117.046H287.803V60.3031C287.803 40.1024 275.712 27.5525 256.254 27.5525L256.248 27.5581ZM176.309 91.6299V42.7073H197.116V27.6033H176.309V1.76896H159.809V27.6033H145.329V42.7073H159.476V92.7996C159.476 109.344 167.068 117.052 183.371 117.052H197.444V101.869H186.029C179.12 101.869 176.303 98.9022 176.303 91.6299H176.309ZM301.825 73.1353C301.825 45.0237 317.106 27.5578 341.701 27.5578C364.913 27.5578 379.912 44.4021 379.912 70.4682V78.7237H319.347C319.827 94.0819 328.17 103.196 341.865 103.196C352.714 103.196 359.849 98.721 361.955 90.6012L362.232 89.5332H378.969L378.726 91.1719C376.327 107.293 361.17 118.549 341.865 118.549C317.54 118.549 301.825 101.247 301.825 73.1353ZM341.701 42.9104C335.441 42.9104 320.995 45.0237 319.573 64.2131H362.553C362.045 50.8438 354.329 42.9104 341.701 42.9104ZM413.386 1.76331H396.553V117.046H413.386V1.76331ZM433.477 56.144C433.477 39.3118 447.339 27.5589 467.191 27.5578C477.87 27.5584 486.794 30.6662 492.991 36.5479C498.738 42.0063 501.905 49.7306 501.905 58.3082V117.051H487.352L486.505 106.914C480.821 114.447 471.659 118.555 460.363 118.555C442.079 118.555 429.311 107.146 429.311 90.8046C429.311 84.216 431.947 62.7213 465.856 62.7213H485.405V58.6472C485.405 48.4819 478.597 42.4132 467.188 42.4132C454.577 42.4132 449.943 49.5216 449.807 56.1779L449.779 57.5736H433.477V56.144ZM462.87 104.033C475.718 104.033 485.41 94.8335 485.41 82.6339H485.416V76.729H465.867C452.895 76.729 446.319 81.4077 446.319 90.6294C446.319 99.1505 452.353 104.033 462.87 104.033ZM560.5 27.558C547.144 27.558 539.597 33.638 535.629 38.7009V1.76882H518.795V117.052H533.591L535.177 106.818C539.01 111.983 546.619 118.549 560.5 118.549C583.487 118.549 597.876 101.089 598.045 72.9603C597.859 44.9561 583.475 27.558 560.5 27.558ZM558.169 103.196C552.801 103.196 535.295 101.015 535.295 72.966C535.295 44.9166 552.806 42.9049 558.169 42.9049C578.818 42.9049 581.048 63.9307 581.048 72.966C581.048 99.2693 566.715 103.196 558.169 103.196Z" fill="currentColor"/>
+      <a class="logo" href="#">
+        <!-- The footer mark's geometry, at the nav's size. Same construction as
+             .pf__mark: eight equal dots at 45 degree steps from straight up on one
+             ring, plus the centre. Every number is the footer's ratio of the overall
+             span -- dot 0.225 (7.2 of 32, r 3.6), ring (32 - 7.2) / 2 = 12.4 -- so the
+             extremes land on 0 and 32 and the mark fills the box exactly. It used to
+             be an ELLIPSE with three different dot radii (3.6 / 3.9 / 4.1), which is
+             what made it read as a different mark. The rendered size is unchanged: 30px,
+             set on .logo svg. -->
+        <svg viewBox="0 0 32 32" aria-hidden="true" fill="currentColor">
+          <circle cx="16" cy="3.6" r="3.6"/>
+          <circle cx="24.768" cy="7.232" r="3.6"/>
+          <circle cx="28.4" cy="16" r="3.6"/>
+          <circle cx="24.768" cy="24.768" r="3.6"/>
+          <circle cx="16" cy="28.4" r="3.6"/>
+          <circle cx="7.232" cy="24.768" r="3.6"/>
+          <circle cx="3.6" cy="16" r="3.6"/>
+          <circle cx="7.232" cy="7.232" r="3.6"/>
+          <circle cx="16" cy="16" r="3.6"/>
         </svg>
+        <span>thelab</span>
       </a>
       <nav class="nav">
         <a href="#">Work</a>
@@ -2987,51 +2070,7 @@
         <a href="#">Careers</a>
         <a href="#">Get connected</a>
       </nav>
-      <!-- THE PHONE'S TRIGGER. Lives in the bar beside the logo, which is where
-           thelab.co puts it: wordmark left, "Menu" right. It is a button rather than a
-           link because it opens something on this page; .topbar is pointer-events:none
-           and re-enables a/button, so it is live without a rule of its own. -->
-      <button class="navtoggle" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
   </header>
-
-  <!-- THE PHONE'S MENU, a SIBLING of the bar rather than a child of it, and the four
-       labels are repeated here rather than shared with .nav. Both are forced: .topbar
-       is position:fixed AND transformed (that transform is how it hides on scroll), and
-       a transformed element becomes the containing block for its fixed descendants --
-       so a panel inside the bar would resolve inset:0 against the BAR's little box and
-       would slide away with it. Outside, it is fixed to the viewport and stays put.
-
-       Light, not dark: the live site's panel is dark and this page's whole surface is
-       #f4f4f4, so the menu takes the page's own background with #222 type on it. -->
-  <div class="menu" id="menu" aria-hidden="true">
-    <nav class="menu__nav">
-      <a href="#"><span>Work</span></a>
-      <a href="#"><span>Expertise</span></a>
-      <a href="#"><span>Careers</span></a>
-      <a href="#"><span>Get connected</span></a>
-    </nav>
-    <div class="menu__foot">
-      <!-- Only "the wellcom group" is the link, the same as the page footer's line:
-           the copyright and the "Part of" are statements, the group is the thing you
-           can go and read about. -->
-      <p>&copy;2026 thelab. Part of <a href="#">the wellcom group</a></p>
-      <!-- The same two glyphs the footer carries, at the footer's own geometry. -->
-      <div class="menu__social">
-        <a class="menu__icon" href="#" aria-label="thelab on Instagram">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
-            <rect x="4" y="4" width="16" height="16" rx="4.6"/>
-            <circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/>
-          </svg>
-        </a>
-        <a class="menu__icon" href="#" aria-label="thelab on LinkedIn">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-            <rect x="5.2" y="9.6" width="2.7" height="9"/><circle cx="6.55" cy="6.4" r="1.6"/>
-            <path d="M10.1 9.6h2.6v1.25a2.9 2.9 0 0 1 2.6-1.4c2 0 3.2 1.25 3.2 3.75v5.4h-2.7v-4.9c0-1.25-.45-2-1.55-2-.95 0-1.45.63-1.45 2v4.9h-2.7z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
 
   <div class="hero">
     <!-- The hero's centre object. It WAS an optical circle drawn in the fragment
@@ -3053,17 +2092,19 @@
            be read; the real list is in .hero__sr below. It is BOTH a .mask (the intro
            reveal, unchanged) and the roller box (the hand-over), which works because
            h1 .mask already carries exactly the clip padding the roller needs. -->
-      <span class="mask hero__head-dyn" data-hv="2" aria-hidden="true"><span>commerce platform.</span></span>
-      <span class="hero__sr">commerce platform., growth channels., AI capabilities., evergreen campaign., or conversion strategy.</span>
+      <span class="mask hero__head-dyn" data-hv="2" aria-hidden="true"><span>e-comm platform.</span></span>
+      <span class="hero__sr">e-comm platform., digital presence., audience funnel., AI capabilities., or social campaign.</span>
     </h1>
 
+    <div class="hero__foot">
       <div class="hero__aside">
         <p><span class="mask" data-hv="3"><span>Stronger digital experiences. New sources of
            growth. Innovation turned into competitive advantage.</span></span></p>
         <span class="mask mask--cta" data-hv="4"><span>
-          <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Work with us</span><span aria-hidden="true">Work with us</span></span></span></button>
+          <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start exploring</span><span aria-hidden="true">Start exploring</span></span></span></button>
         </span></span>
       </div>
+    </div>
     </div>
   </div>
 
@@ -3075,34 +2116,20 @@
       <canvas id="featuredworkgl" aria-hidden="true"></canvas>
 
       <div class="featuredwork__inner">
-        <!-- THE LEFT COLUMN: the section header with the SKS card under it, in flow,
-             so the card is PUSHED DOWN by however tall the header turns out to be.
-             The other two cards are in the right column and stay where they are. -->
-        <div class="featuredwork__col">
-        <div class="sec-head sec-head--left">
-          <p class="sec-head__eyebrow"><span class="mask" data-rv="0"><span>Featured work</span></span></p>
-          <h2 class="sec-head__title">
+        <div class="featuredwork__header">
+          <p class="featuredwork__eyebrow"><span class="mask" data-rv="0"><span>Featured work</span></span></p>
+          <h2>
             <span class="mask" data-rv="1"><span>From ambition to
               execution.</span></span>
           </h2>
-          <p class="sec-head__body"><span class="mask" data-rv="2"><span>Our work spans industries and audiences,
+          <p><span class="mask" data-rv="2"><span>Our work spans industries and audiences,
              delivering results and laying the groundwork for continued optimization.</span></span></p>
-          <span class="mask mask--cta sec-head__cta" data-rv="3"><span>
+          <span class="mask mask--cta" data-rv="3"><span>
             <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>View All Case Studies</span><span aria-hidden="true">View All Case Studies</span></span></span></button>
           </span></span>
         </div>
 
-        <article class="card card--2" data-card>
-          <div class="card__img"><img src="assets/card-sks.png" alt=""></div>
-          <div class="card__meta">
-            <p class="card__client"><span class="mask"><span>SKS</span></span></p>
-            <h3 class="card__title"><span class="mask"><span>Turning innovation into Technicurean desire</span></span></h3>
-            <span class="mask mask--pill"><span><span class="pill">Experience Design</span><span class="pill">Platform</span></span></span>
-          </div>
-        </article>
-        </div>
-
-        <article class="card card--1" data-card>
+        <article class="card card--tula" data-card>
           <!-- muted is not decoration: autoplay is only allowed without a user gesture
                while a video is muted. featuredwork.js pauses it when the card is off screen. -->
           <div class="card__img"><video src="assets/card-tula.mp4"
@@ -3113,7 +2140,15 @@
             <span class="mask mask--pill"><span><span class="pill">Performance Marketing</span><span class="pill">E-commerce</span></span></span>
           </div>
         </article>
-        <article class="card card--3" data-card>
+        <article class="card card--sks" data-card>
+          <div class="card__img"><img src="assets/card-sks.png" alt=""></div>
+          <div class="card__meta">
+            <p class="card__client"><span class="mask"><span>SKS</span></span></p>
+            <h3 class="card__title"><span class="mask"><span>Turning innovation into Technicurean desire</span></span></h3>
+            <span class="mask mask--pill"><span><span class="pill">Experience Design</span><span class="pill">Platform</span></span></span>
+          </div>
+        </article>
+        <article class="card card--elliman" data-card>
           <div class="card__img"><video src="assets/card-elliman.mp4"
                autoplay muted loop playsinline preload="auto" aria-hidden="true"></video></div>
           <div class="card__meta">
@@ -3125,8 +2160,8 @@
 
         <div class="ticker" data-rv="7" aria-hidden="true">
           <div class="ticker__track">
-            <div class="ticker__row"><img src="assets/logo-tempur.svg" alt=""><img src="assets/logo-hyundai.svg" alt=""><img src="assets/logo-pg.svg" alt=""><img src="assets/logo-fritolay.svg" alt=""><img src="assets/logo-douglaselliman.svg" alt=""><img src="assets/logo-assaabloy.svg" alt=""><img src="assets/logo-fortunebrands.svg" alt=""><img src="assets/logo-sks.svg" alt=""></div>
-            <div class="ticker__row"><img src="assets/logo-tempur.svg" alt=""><img src="assets/logo-hyundai.svg" alt=""><img src="assets/logo-pg.svg" alt=""><img src="assets/logo-fritolay.svg" alt=""><img src="assets/logo-douglaselliman.svg" alt=""><img src="assets/logo-assaabloy.svg" alt=""><img src="assets/logo-fortunebrands.svg" alt=""><img src="assets/logo-sks.svg" alt=""></div>
+            <div class="ticker__row"><img src="assets/logo-tempur.png" alt=""><img src="assets/logo-hyundai.png" alt=""><img src="assets/logo-pg.png" alt=""><img src="assets/logo-fritolay.png" alt=""><img src="assets/logo-elliman.png" alt=""><img src="assets/logo-assa.png" alt=""><img src="assets/logo-fortune.png" alt=""><img src="assets/logo-sks.png" alt=""></div>
+            <div class="ticker__row"><img src="assets/logo-tempur.png" alt=""><img src="assets/logo-hyundai.png" alt=""><img src="assets/logo-pg.png" alt=""><img src="assets/logo-fritolay.png" alt=""><img src="assets/logo-elliman.png" alt=""><img src="assets/logo-assa.png" alt=""><img src="assets/logo-fortune.png" alt=""><img src="assets/logo-sks.png" alt=""></div>
           </div>
         </div>
       </div>
@@ -3143,15 +2178,19 @@
              and both numbers below it had to be re-measured by hand, which is exactly
              what happened every time the copy moved. The group is placed once now and
              the gaps are margins. -->
-        <div class="sec-head sec-head--center">
-        <p class="sec-head__eyebrow"><span class="mask" data-xv="0"><span>Our expertise</span></span></p>
-        <h2 class="sec-head__title">
+        <div class="exp__header">
+        <p class="exp__eyebrow"><span class="mask" data-xv="0"><span>Our expertise</span></span></p>
+        <h2 class="exp__head">
           <span class="mask" data-xv="1"><span>Four ways we help brands
             grow and compete.</span></span>
         </h2>
-        <p class="sec-head__body"><span class="mask" data-xv="2"><span>Our breadth and depth allow us to work efficiently
+        <p class="exp__body"><span class="mask" data-xv="2"><span>Our breadth and depth allow us to work efficiently
            while holding ourselves to high standards and high accountability.</span></span></p>
         </div>
+
+        <span class="mask mask--cta exp__cta" data-xv="3"><span>
+          <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Explore What We Do</span><span aria-hidden="true">Explore What We Do</span></span></span></button>
+        </span></span>
 
         <div class="areas">
           <!-- Four loops, every one TANGENT to the same vertical line at x 720 — the
@@ -3236,33 +2275,27 @@
             <circle class="dot" r="4" opacity="0"/>
             <circle class="dot" r="4" opacity="0"/>
           </svg>
-          <div class="areas__row">
-          <p class="area" data-area="1">
-              <span class="mask"><span>Digital Experiences</span></span>
-              <span class="area__desc mask"><span>Platforms and systems that connect and
-                convert.</span></span>
-            </p>
-            <p class="area" data-area="2">
-              <span class="mask"><span>Performance Creative</span></span>
-              <span class="area__desc mask"><span>Strategy and optimization that drives
-                ad performance.</span></span>
-            </p>
-            <p class="area" data-area="3">
-              <span class="mask"><span>AI Workflows &amp; Automation</span></span>
-              <span class="area__desc mask"><span>Enterprise solutions that deliver
-                operational and creative ROI.</span></span>
-            </p>
-            <p class="area" data-area="4">
-              <span class="mask"><span>Content that Scales</span></span>
-              <span class="area__desc mask"><span>Creative built to work across channels,
-                formats, and moments.</span></span>
-            </p>
-          </div>
-        <span class="mask mask--cta sec-head__cta" data-xv="3"><span>
-          <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Explore What We Do</span><span aria-hidden="true">Explore What We Do</span></span></span></button>
-        </span></span>
+          <p class="area" style="left: calc(210 * var(--u))" data-area="1">
+            <span class="mask"><span>Digital<br>Experiences</span></span>
+            <span class="area__desc mask"><span>Platforms and systems that connect and
+              convert.</span></span>
+          </p>
+          <p class="area" style="left: calc(550 * var(--u))" data-area="2">
+            <span class="mask"><span>Performance<br>Creative</span></span>
+            <span class="area__desc mask"><span>Strategy and optimization that drives
+              ad performance.</span></span>
+          </p>
+          <p class="area" style="left: calc(890 * var(--u))" data-area="3">
+            <span class="mask"><span>AI Workflows<br>&amp; Automation</span></span>
+            <span class="area__desc mask"><span>Enterprise solutions that deliver
+              operational and creative ROI.</span></span>
+          </p>
+          <p class="area" style="left: calc(1230 * var(--u))" data-area="4">
+            <span class="mask"><span>Content that<br>Scales</span></span>
+            <span class="area__desc mask"><span>Creative built to work across channels,
+              formats, and moments.</span></span>
+          </p>
         </div>
-
       </div>
     </section>
 
@@ -3276,8 +2309,8 @@
              three separately positioned boxes at 84 / 231.2 / 316.2, so the gaps between
              them were differences between absolute tops and every copy change meant
              re-measuring the two numbers underneath by hand. -->
-        <div class="sec-head sec-head--left">
-        <h2 class="sec-head__title">
+        <div class="proof__header">
+        <h2 class="proof__head">
           <!-- "long-term" is held together. At the headline's new 632 measure the line
                broke straight through the hyphen -- "We deeply value long- / term
                partnerships" -- which splits the compound and reads as a hyphenation.
@@ -3285,9 +2318,9 @@
                lines and its box is still 123.2u, so nothing below it moves. -->
           <span class="mask" data-pv="1"><span>We deeply value <span style="white-space:nowrap">long-term</span> partnerships.</span></span>
         </h2>
-        <p class="sec-head__body"><span class="mask" data-pv="2"><span>Honest conversations, respect, and trust are the
+        <p class="proof__body"><span class="mask" data-pv="2"><span>Honest conversations, respect, and trust are the
            foundation of every relationship.</span></span></p>
-        <span class="mask mask--cta sec-head__cta" data-pv="3"><span>
+        <span class="mask mask--cta proof__cta" data-pv="3"><span>
           <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Get to Know Us</span><span aria-hidden="true">Get to Know Us</span></span></span></button>
         </span></span>
         </div>
@@ -3362,7 +2395,7 @@
     <div class="pf__band">
       <div class="pf__mark" aria-hidden="true"></div>
 
-      <h2 class="pf__head">Tell us what you want to build.</h2>
+      <h2 class="pf__head">Bring us your challenge.</h2>
 
       <button class="pf__cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start a conversation</span><span aria-hidden="true">Start a conversation</span></span></span></button>
     </div>

@@ -444,7 +444,7 @@ this section.
 headline, each card, and the ticker all have their own watcher — rather than firing the
 whole section off the moment its top edge appears. Each watcher uses an
 IntersectionObserver, a per-frame fallback, and a slow interval safety net, because no
-single one of those proved reliable. Two traps worth knowing: `.featuredwork .sec-head` has
+single one of those proved reliable. Two traps worth knowing: `.work__header` has
 absolutely-positioned children so its own box is zero height and can never satisfy an
 intersection test (watch the `h2` instead), and rAF callbacks run *before* paint, so
 pumping on the very first frame undoes the armed state before it is ever drawn.

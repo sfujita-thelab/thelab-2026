@@ -154,7 +154,7 @@
      variable, the <i> elements and the shader's own grid can never disagree about it
      -- they are three separate drawings of the same lines. */
   function gridCols() {
-    const n = (window.innerWidth <= CONFIG.grid.columnsMobileAt)
+    const n = (window.innerWidth <= CONFIG.grid.mobileAt)
             ? CONFIG.grid.columnsMobile : CONFIG.grid.columns;
     return Math.max(1, Math.round(n));
   }
@@ -212,14 +212,7 @@
     rs.setProperty('--pad-bottom', (cssH * 0.0815).toFixed(2) + 'px');
 
     buildGrid(col);
-    /* The headline's `top` is transitioned once .is-placed is on, and a resize must not
-       animate -- the block would slide around while the window is being dragged. Drop the
-       class for this pass and put it back on the next frame. */
-    const h1Now = document.querySelector('h1');
-    const wasPlaced = h1Now && h1Now.classList.contains('is-placed');
-    if (wasPlaced) h1Now.classList.remove('is-placed');
     alignHeadlineInk();
-    if (wasPlaced) requestAnimationFrame(() => h1Now.classList.add('is-placed'));
 
     const gw = Math.max(2, Math.round(w * CONFIG.render.gradScale));
     const gh = Math.max(2, Math.round(h * CONFIG.render.gradScale));
@@ -294,21 +287,6 @@
     const h1 = document.querySelector('h1');
     if (!h1) return;
 
-    /* NOTHING TO ALIGN IN THE STACKED LAYOUT. Below 1024 the hero is a flow column and
-       the two blocks follow each other; the centring below is for the side-by-side
-       composition only.
-
-       This has to clear what it wrote, not just skip: .hero__aside is static at every
-       width now, so the margin-top this used to set still applies when the layout
-       stacks -- which pushed the body and CTA 405px below the headline at 900. A plain
-       early return would leave that margin in place on the way down from desktop. */
-    if (window.innerWidth <= CONFIG.grid.mobileAt) {
-      h1.style.top = '';
-      const f = document.querySelector('.hero__aside');
-      if (f) f.style.marginTop = '';
-      return;
-    }
-
     /* Both blocks are centred on the MARK, and only ever upward.
 
        The mark replaced the circle at the same place, so its centre is still
@@ -326,15 +304,12 @@
     const markY = L.cssH * CONFIG.circle.centerY;
 
     // The right-hand column: its bottom edge used to be the shared baseline.
-    const foot = document.querySelector('.hero__aside');
+    const foot = document.querySelector('.hero__foot');
     const footBottom = L.cssH * FOOT_BOTTOM;
     if (foot) {
-      /* marginTop, not top: .hero__aside is static now and a static box ignores `top`.
-         Zeroed first for the same reason it always was -- the height has to be read
-         with the block at rest, not at wherever the last pass left it. */
-      foot.style.marginTop = '0px';
+      foot.style.top = '0px';
       const fh = foot.getBoundingClientRect().height;
-      foot.style.marginTop = Math.min(footBottom - fh, markY - fh / 2).toFixed(2) + 'px';
+      foot.style.top = Math.min(footBottom - fh, markY - fh / 2).toFixed(2) + 'px';
     }
 
     /* Measure a CLONE, not the live headline. The live one may be armed or
@@ -372,17 +347,11 @@
 
     if (!isFinite(baseline) || !isFinite(boxTop)) return;
 
-    /* ALWAYS CENTRED on the mark, with no floor. It used to be
-       Math.min(hung, markY - probeH / 2) -- the hung position, with its last line's
-       baseline on the column's bottom, kept as a floor so a short or wide viewport
-       would not push the block back down toward the fold.
-
-       The floor goes because the headline can now take a second line when a keyword is
-       too long for the measure, and the block has to stay centred on the mark through
-       that change rather than being held by a baseline that assumes a line count. The
-       probe's height already reflects the real wrapped height, so this re-centres on
-       every swap that changes it (watchHeadline observes the box). */
-    h1.style.top = (markY - probeH / 2).toFixed(2) + 'px';
+    // The headline used to hang so its LAST line's baseline landed on the column's
+    // bottom. That stays as the floor; the centred position is what it moves up to.
+    const lastBaseline = (baseline - boxTop) + Math.max(0, masks.length - 1) * adv;
+    const hung = footBottom - lastBaseline;
+    h1.style.top = Math.min(hung, markY - probeH / 2).toFixed(2) + 'px';
   }
 
   /* The offset above is only valid for the line count it was measured at. On first
@@ -396,31 +365,12 @@
       let last = 0;
       new ResizeObserver(() => {
         const h = h1.getBoundingClientRect().height;
-        /* 0.1, not 0.5: this now tracks a height TRANSITION frame by frame, and the
-           last frames of an ease move less than half a pixel each -- at 0.5 the block
-           stopped a little short of where the box ended up. */
-        if (Math.abs(h - last) < 0.1) return;
-        last = h;
-        /* THE FAST PATH, and it is the one that runs on every line-count change.
-           alignHeadlineInk measures a CLONE, which is right for a font settling or a
-           resize but is far too much work to do 30 times across a half-second
-           transition -- and it is not needed here: the clone exists to strip entrance
-           transforms, and by .is-placed there are none. The live box's height is the
-           same number the clone would report, so the centring is the same maths
-           against a reading that costs nothing. */
-        if (h1.classList.contains('is-placed') &&
-            window.innerWidth > CONFIG.grid.mobileAt) {
-          h1.style.top = (L.cssH * CONFIG.circle.centerY - h / 2).toFixed(2) + 'px';
-          return;
-        }
-        alignHeadlineInk();
+        if (Math.abs(h - last) > 0.5) { last = h; alignHeadlineInk(); }
       }).observe(h1);
     }
     // belt and braces for browsers that resolve system fonts after first paint
     requestAnimationFrame(() => requestAnimationFrame(alignHeadlineInk));
-    /* and only THEN is the block allowed to animate: everything up to here is the first
-       placement, which has to be instant. Every move after it is a line-count change. */
-    setTimeout(() => { alignHeadlineInk(); h1.classList.add('is-placed'); }, 250);
+    setTimeout(alignHeadlineInk, 250);
   }
 
   /* --------------------------------------------------------------- pointer */
@@ -923,46 +873,75 @@
     }, { passive: true });
   }
 
+  /* ------------------------------------------------- the hero CTA scrolls on */
+  /* It takes you to the next section rather than anywhere else. The hero is
+     position:fixed over a 100vh spacer, so there is no "scroll past the hero" to aim
+     at -- the thing to land on is the first section in the flow, which is Work.
 
-  /* ---- the phone's menu ------------------------------------------------------------
-     Open/close only: the panel's look is CSS, and everything here is state. The scroll
-     lock is on the root rather than the body because that is the element this page
-     actually scrolls, and leaving it locked is the one way this can break the page --
-     so every exit (the trigger, a link, Escape, growing past the breakpoint) goes
-     through the same setOpen. */
-  const navtoggle = document.querySelector('.navtoggle');
-  const menu      = document.getElementById('menu');
-  if (navtoggle && menu) {
-    const setOpen = (open) => {
-      menu.classList.toggle('is-open', open);
-      menu.setAttribute('aria-hidden', String(!open));
-      navtoggle.setAttribute('aria-expanded', String(open));
-      navtoggle.textContent = open ? 'Close' : 'Menu';
-      document.documentElement.style.overflow = open ? 'hidden' : '';
-      const bar = document.querySelector('.topbar');
-      if (bar) bar.classList.toggle('is-menu', open);
-    };
-    navtoggle.addEventListener('click', () => setOpen(!menu.classList.contains('is-open')));
-    /* A link closes it. They are placeholders on this page, so without this the panel
-       would simply stay over whatever the link did not navigate to. */
-    menu.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
-    addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-    addEventListener('resize', () => { if (window.innerWidth > 767) setOpen(false); });
+     scrollIntoView rather than a scrollTo with a computed offset: the sections are laid
+     out in design units that move with the viewport, so any number worked out here
+     would be wrong at the next width. The 150px of clearance that keeps Work's top edge
+     out from under the fixed topbar is scroll-margin-top on .featuredwork, which the browser
+     applies to this scroll for us -- so there is still nothing to compute.
+
+     Smooth EXCEPT under reduced motion, where a long animated scroll is exactly what
+     the setting is asking not to happen -- it jumps instead. The query is read at click
+     time, not cached, so turning the setting on mid-visit is respected. */
+  /* ---- "Start exploring" -> the Work section --------------------------------------
+     A HAND-ROLLED tween, where this used to be one scrollIntoView({behavior:'smooth'}).
+     The native smooth scroll has no speed control at all -- Chrome picks the duration
+     off the distance and nothing in the API can touch it, measured here at 820px in
+     491ms. Half that speed is the ask, so the move has to be driven frame by frame.
+
+     RATE is the measured native average, 820 / 491 = 1.67 px/ms, HALVED. Deriving the
+     duration from the distance rather than fixing it at ~980ms means the scroll keeps
+     the same PACE on a short viewport, where there is less ground to cover, instead of
+     taking the same time to go a shorter way. The clamp stops either extreme turning
+     into a crawl or a jump.
+
+     The target still comes from scroll-margin-top, read off the section, so the 80 is
+     written once in the CSS and this cannot drift out of step with it.
+
+     easeInOutCubic because that is the shape the native scroll has -- the brief is half
+     the speed, not a different move. */
+  const heroCta = document.querySelector('.hero__aside button.cta');
+  const nextSection = document.getElementById('featuredwork');
+  if (heroCta && nextSection) {
+    const RATE    = 1.67 / 2;          // px per ms
+    const DUR_MIN = 420, DUR_MAX = 1800;
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    heroCta.addEventListener('click', () => {
+      const margin = parseFloat(getComputedStyle(nextSection).scrollMarginTop) || 0;
+      const to     = nextSection.getBoundingClientRect().top + scrollY - margin;
+      const from   = scrollY;
+      const dist   = to - from;
+
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || Math.abs(dist) < 2) {
+        scrollTo(0, to);
+        return;
+      }
+
+      const dur = Math.min(DUR_MAX, Math.max(DUR_MIN, Math.abs(dist) / RATE));
+      const t0  = performance.now();
+      let cancelled = false;
+
+      /* Any real input hands control straight back. A tween that fights the wheel is
+         worse than no tween: the page would spring back to the target under the user's
+         own scroll. 'scroll' is NOT the event to watch -- this fires it every frame. */
+      const stop = () => { cancelled = true; };
+      ['wheel', 'touchstart', 'keydown'].forEach(ev =>
+        addEventListener(ev, stop, { passive: true, once: true }));
+
+      (function step(now) {
+        if (cancelled) return;
+        const k = Math.min(1, (now - t0) / dur);
+        scrollTo(0, from + dist * ease(k));
+        if (k < 1) requestAnimationFrame(step);
+        else ['wheel', 'touchstart', 'keydown'].forEach(ev => removeEventListener(ev, stop));
+      })(t0);
+    });
   }
-
-  /* ---- the hero CTA does NOT scroll ------------------------------------------------
-     It said "Start exploring" and ran a hand-rolled tween down to the Work section: a
-     frame-by-frame scroll at half the browser's native rate, because scrollIntoView has
-     no speed control at all. The label is "Work with us" now, which is a destination
-     rather than a direction, so the button takes no action here -- it is a placeholder
-     for a real link in the same way the nav's items are.
-
-     The whole tween is gone rather than left unattached, and so is the
-     scroll-margin-top it used to read: nothing scrolls to this section any more, so the
-     section carries no clearance for the fixed bar. If a scroll is ever wanted back,
-     both come back together -- the shape of the tween was: duration from distance at
-     0.835 px/ms (half the measured native 1.67), clamped to 420-1800ms, easeInOutCubic,
-     and a wheel/touch/key listener that cancels the moment the reader takes over. */
 
   /* --------------------------------------------------------------- page intro */
   /* Grid lines and circle draw TOGETHER -> halo fades up -> text reveals line by line.

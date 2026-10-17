@@ -1,6 +1,7 @@
-# v3/a — tokenised against thelab.co
+# v3/b — tokenised against thelab.co
 
-`v3/a` is the prototype with every font and spacing value tied to thelab's tokens.
+`v3/b` is the prototype with every font and spacing value tied to thelab's tokens,
+and its colours tied to them too (in progress). `v3/a` is the build before any of it.
 It is the STEPPED build; the fluid twin is in `_archive/2026-10-16/v3-c`.
 `v3/b` is untouched and is the "before".
 

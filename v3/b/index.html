@@ -2201,6 +2201,18 @@
        box is ignored -- which collapsed it to 230px and the glow vanished. */
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
+    /* PROMOTED, for the reason .hero-glow is -- and as a precaution here rather than a
+       cure, because this box is clipped differently and the symptom has not been seen on
+       it. The hero's glow is position: fixed, and WebKit rasterises a fixed element
+       clipped to the VIEWPORT before filtering, so its blur sampled transparency along
+       the bottom edge however far the box overhung; its own layer fixed that where more
+       bleed and a smaller blur both failed to. This one is absolutely positioned and the
+       clip it overhangs is .pf's own overflow: hidden -- a different clip, so not the
+       same bug by construction, but the same blur bleeding past the same kind of
+       boundary for the same reason, and the corners here are exactly what the overhang
+       exists to protect.
+       Measured in Chrome at a frozen frame: 0 pixels differ. */
+    transform: translateZ(0);
     filter: blur(44px);
     /* .5, down from .92 by way of .736. Taken off the LAYER rather than off the masses in
        footer-glow.js: ALPHA there is the peak of a single mass, and lowering it would

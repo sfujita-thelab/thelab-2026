@@ -1033,6 +1033,17 @@
   const atM = /[?&]introAt=(\d+)/.exec(location.search);
   const INTRO_AT = atM ? parseInt(atM[1], 10) : null;
   const intro = { t0: performance.now(), draw: 0, fill: 0, halo: 0, done: skipIntro };
+
+  /* A FLAG AS WELL AS AN EVENT, because the two paths out of the intro finish at very
+     different times. The timed one lands 2710ms in, by which point every script on the
+     page is listening. The SKIPPED one -- reduced motion, or ?intro=0 -- finishes inside
+     this file's own first pass, before hero-type.js has even run, so an event alone was
+     dispatched into an empty room and the headline never rolled again. The flag is what
+     a late listener can read; the event is what an early one gets told. */
+  function introIsDone() {
+    window.__hpIntroDone = true;
+    dispatchEvent(new CustomEvent('hp:intro-done'));
+  }
   const heroMasks = [...document.querySelectorAll('[data-hv]')];
 
   function armIntro() {
@@ -1077,6 +1088,7 @@
       markIn(false);
       glowIn(false);
       lockGrid();
+      introIsDone();                                     // see the note below
       return;
     }
     heroMasks.forEach(el => el.classList.add('hpre'));
@@ -1098,6 +1110,7 @@
           heroMasks[i].classList.remove('hpre');
         }
       });
+      introIsDone();
       return;
     }
 
@@ -1116,8 +1129,22 @@
       lockGrid();
       /* The entrance has landed; hand the transform back to --spin on its own curve,
          so the first phrase change does not turn the mark on the grid's easing. */
+  /* THE ENTRANCE IS OVER -- announced, because something else is waiting on it.
+
+     hero-type.js rolls the headline's second line on a hold it starts the moment the
+     page does, and its FIRST hold is the bare T.hold of 2133ms where every later one
+     adds per-character time. The reveal does not land until 1610 + its own .82s
+     transition, so the first swap began BEFORE the word had finished arriving: the
+     line rose into place and then slid straight back down and out, which reads as the
+     entrance playing in reverse. Filmed at 1440: in place at 1700, already swapped by
+     2500.
+
+     So the roller waits for this event instead of guessing, and it fires on every path
+     out of the intro -- including the skipped one, or a page with ?intro=0 would have a
+     headline that never changed at all. */
       if (mark) mark.classList.add('is-settled');
       intro.done = true;
+      introIsDone();
     }, INTRO.text[INTRO.text.length - 1] + 1100);
   }
 

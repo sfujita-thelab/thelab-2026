@@ -247,6 +247,26 @@
   let current = word.textContent.trim() || PHRASES[0];
   let rolling = false;
   let holdFor = T.hold;
+
+  /* THE FIRST SWAP WAITS FOR THE ENTRANCE TO LAND, and until this session it did not.
+
+     start() is called from an IntersectionObserver on .hero-space, which is on screen
+     the instant the page is, so the hold clock began at load. The first hold is the bare
+     T.hold -- 2133ms -- where every later one adds perChar on top, and the hero's reveal
+     does not finish until 1610 plus its own .82s transition. The first roll therefore
+     began while the word was still arriving: the line rose into place and slid straight
+     back down and out, reading as the entrance running backwards. Filmed at 1440: in
+     place at 1700, already swapped by 2500.
+
+     app.js fires hp:intro-done when the entrance has landed, on every path out of the
+     intro including the skipped one. The hold is simply not counted before then, and t0
+     is restarted when it arrives so the first phrase gets its whole hold from the moment
+     it is readable rather than from the moment the page started loading. */
+  let introDone = !!window.__hpIntroDone;   // already over before this file ran
+  addEventListener('hp:intro-done', () => {
+    introDone = true;
+    t0 = performance.now();
+  }, { once: true });
   let t0      = 0;
   let running = false;
   let raf     = 0;
@@ -359,7 +379,7 @@
     if (!running) return;
     if (rolling) {
       if (now - rollT0 >= T.roll) land(rollIn, rollOut);
-    } else if (now - t0 >= holdFor) {
+    } else if (introDone && now - t0 >= holdFor) {
       roll();
     }
     raf = requestAnimationFrame(step);

@@ -376,7 +376,22 @@ are all untouched.
 ## The tweak panel
 
 `T` opens it, and it is **the palettes only** — the six pole colours for each of the
-three halos, plus an opacity each.
+three gradients, plus an opacity each.
+
+**Which group is which section**, because one name is not what it looks like:
+
+| Panel group | Config object | Canvas | Section |
+|---|---|---|---|
+| Hero halo | `blob.*` | `#stage` | the hero |
+| Work halo | `featuredwork.*` | `#featuredworkgl` | Featured Work |
+| **Proof halo** | `halo.*` | `#halogl` | **Proof** |
+
+The third was labelled *Expertise halo* until now, and it never drove Expertise — the
+object is called `HALO` and routes through `halo.` because it began life there, but the
+canvas moved to Proof and the label did not follow. Renamed.
+
+Expertise's own glow is in neither the panel nor these objects: it is the orange radial
+inside the loops' svg, drawn by `expertise-halo.js` from gradient stops in the markup.
 
 Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
 the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.

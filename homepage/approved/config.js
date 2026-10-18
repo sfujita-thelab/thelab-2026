@@ -742,7 +742,7 @@ const SCHEMA = [
   ['Opacity \u00b7 all three halos', [
     ['blob.paletteWash',      0,    0.85, 0.005, 'hero halo'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work halo'],
-    ['halo.paletteWash',      0,    0.85, 0.005, 'expertise halo']
+    ['halo.paletteWash',      0,    0.85, 0.005, 'proof halo']
   ]],
   ['Hero halo \u00b7 palette', [
     ['poles.0.color', 'color', 'vermillion core'],
@@ -763,7 +763,15 @@ const SCHEMA = [
     ['featuredwork.poles.5.color', 'color', 'rich blue'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'opacity']
   ]],
-  ['Expertise halo \u00b7 palette', [
+  /* PROOF, not Expertise. The object is still called HALO and still routes through
+     `halo.`, because it began life as the Expertise halo -- but the canvas moved to
+     Proof (see the PROOF FIELD note above) and the label did not follow it. The six
+     wells below tint the green mass behind the stats.
+
+     The Expertise section's own glow is NOT here and never was: it is the orange radial
+     in the loops' svg, drawn by expertise-halo.js off the gradient stops in the markup,
+     with no entry in this panel. */
+  ['Proof halo \u00b7 palette', [
     ['halo.poles.0.color', 'color', 'highlight'],
     ['halo.poles.1.color', 'color', 'pale aqua'],
     ['halo.poles.2.color', 'color', 'mint'],

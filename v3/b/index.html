@@ -2809,7 +2809,26 @@
        both stacked widths, and the mark sits --spacer-104 ABOVE the viewport's centre
        rather than on it. The two are no longer concentric: the mark leads and the copy
        answers from the bottom edge, with the 104 opening the air between them. */
-    .hero { justify-content: flex-end; padding-bottom: var(--spacer-64); }
+    /* AND ITS HEIGHT IS THE SMALL VIEWPORT, so the browser's own chrome cannot move it.
+
+       .hero is position: fixed with inset: 0, which makes its box the VISUAL viewport --
+       and on a phone that grows by the height of the bottom bar the moment you scroll.
+       Everything in this block is measured against that box: the copy hangs off its
+       BOTTOM edge, and .hero__mark sits at 50% of it. So the headline, the body, the CTA
+       and the ring all jumped down together the instant the bar slid away, mid-gesture.
+
+       100svh is the viewport as if the chrome were always showing, so the box is the
+       same size whether it is or not and nothing inside it moves. The trade is at the
+       other end: with the bar hidden there is a strip of page below the CTA rather than
+       the composition filling the glass. That is the right way round -- a static margin
+       beats a moving one, and nothing is ever hidden behind the bar.
+
+       ADDITIVE ON PURPOSE. The base rule's inset: 0 still sets top and bottom; a height
+       alongside them over-constrains the box and bottom is the one dropped, so this is
+       top: 0 plus a fixed height. A browser without svh drops the line instead and keeps
+       exactly today's behaviour, which is why there is no @supports around it. */
+    .hero { justify-content: flex-end; padding-bottom: var(--spacer-64);
+            height: 100svh; }
     .hero__mark { top: calc(50% - var(--spacer-104)); }
 
 

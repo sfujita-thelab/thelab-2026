@@ -171,9 +171,22 @@
     return Math.max(1, Math.round(n));
   }
 
+  /* THE VIEWPORT'S HEIGHT, IGNORING THE BROWSER'S OWN CHROME.
+
+     innerHeight is the VISUAL viewport, and on a phone that number changes by the height
+     of the browser's bottom bar the moment the page is scrolled -- with no warning and in
+     the middle of a gesture. documentElement.clientHeight is the LAYOUT viewport, which
+     is what 100vh resolves against, and it does not move when the bar does.
+
+     Everything that is geometry rather than a live reading now comes off this: the
+     canvas's backing size, the aspect the shader is given, the circle's radius, and the
+     scroll curve the hero fades on. The page's scroll LENGTH was already stable -- the
+     spacer under the hero is 100vh -- so this is what makes the rest of it agree. */
+  const viewH = () => Math.max(1, document.documentElement.clientHeight || window.innerHeight);
+
   function layout() {
     const cssW = Math.max(1, window.innerWidth);
-    const cssH = Math.max(1, window.innerHeight);
+    const cssH = viewH();
     const dpr  = Math.min(window.devicePixelRatio || 1, CONFIG.render.dprMax);
 
     L.cssW = cssW; L.cssH = cssH; L.dpr = dpr;
@@ -838,7 +851,10 @@
   }
 
   function onScroll() {
-    const vh = Math.max(1, window.innerHeight);
+    /* viewH(), not innerHeight: this denominator is the whole shape of the hero's fade,
+       and read live it changed by the height of the browser's bottom bar mid-gesture --
+       so the copy's opacity walked backwards while Work was arriving. See viewH(). */
+    const vh = viewH();
     scrollT = Math.min(1, Math.max(0, window.scrollY / (vh * 0.80)));
     const ease = scrollT * scrollT * (3 - 2 * scrollT);
     if (heroEl) {
@@ -1116,10 +1132,32 @@
 
   /* ------------------------------------------------------------------ boot */
   let resizeTimer = null;
-  window.addEventListener('resize', () => {
+  /* A HEIGHT-ONLY CHANGE IS NOT A RELAYOUT, and on a phone it is most of them.
+
+     layout() is not cheap: it rewrites --u, --m and --col, re-aligns the headline's ink,
+     rebuilds every grid line as an element and reallocates three render targets. Running
+     it mid-scroll is a visible stall, and a phone asks for exactly that every time the
+     browser's bottom bar slides away -- a resize event whose only content is that the
+     visual viewport grew by the height of the bar.
+
+     Nothing in layout() needs it. Width is what the whole page is sized from, and the
+     height it does use is viewH(), which a disappearing bar does not change. So the
+     guard is simply: act on width, and on a height change large enough to be a rotation
+     or a desktop window being dragged -- a fifth of the viewport, far more than any
+     browser's chrome and far less than a 90-degree turn.
+
+     requestLayout is shared with the ResizeObserver below, so both go through the same
+     test and the same debounce. */
+  let lastW = window.innerWidth, lastH = viewH();
+  function requestLayout() {
+    const w = window.innerWidth, h = viewH();
+    const worthIt = w !== lastW || Math.abs(h - lastH) > lastH * 0.2;
+    lastW = w; lastH = h;
+    if (!worthIt) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(layout, 80);
-  });
+  }
+  window.addEventListener('resize', requestLayout);
 
   /* ---- and a WATCH on the element, not just the window ---------------------------
      layout() reads window.innerWidth, and on a phone that number is not final when
@@ -1141,8 +1179,7 @@
     let first = true;
     new ResizeObserver(() => {
       if (first) { first = false; return; }   // the initial callback IS the first layout
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(layout, 80);
+      requestLayout();                        // same width test, same debounce
     }).observe(document.documentElement);
   }
 

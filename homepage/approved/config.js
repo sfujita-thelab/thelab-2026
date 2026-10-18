@@ -631,6 +631,34 @@ const FEATUREDWORK = {
 
 
 /* ============================================================================
+   EXPERTISE GLOW — the warm radial behind the four loops.
+
+   NOT a WebGL field like the other three. It is a plain <radialGradient> in the
+   loops' svg, and until now its eleven stops were hand-written in index.html with
+   no way to reach them: the one coloured thing on the page with no entry in the
+   tweak panel, which is why the panel's three groups never added up to the four
+   fields you can see.
+
+   FOUR COLOURS AND A PEAK OPACITY, which is exactly what those eleven stops carry
+   between them -- the colour steps four times on the way out while the opacity
+   falls away continuously. The ramp's SHAPE is kept as a table of ratios in
+   expertise-halo.js, so `alpha` scales the whole thing without flattening it.
+
+   These are the hero's own oranges, and that is not a coincidence -- they were
+   copied from it by hand. Copied, though, not linked: changing the hero's palette
+   has never moved these, and still does not. If the two should track each other
+   that is a wiring job, not a value to set here.
+   ========================================================================= */
+const EXPERTISE = {
+  core:  '#f5381a',   // the centre, hottest and most red
+  warm:  '#f0421a',   // one step out
+  mid:   '#eb501b',   // the body of the glow -- three stops share it
+  tail:  '#e7521d',   // the long fade, six stops to transparent
+  alpha: 0.494        // peak opacity at the centre; the ramp scales off this
+};
+
+
+/* ============================================================================
    PROOF FIELD — the green/aqua mass behind the Proof section.
    It used to be the Expertise halo, hidden at rest and revealed by the cursor.
    HP modules.png has no gradient in Expertise and a green one here, so the canvas
@@ -739,7 +767,7 @@ const SCHEMA = [
      named and commented, and editing one there does exactly what dragging its slider
      did. This removes the UI, not the control -- and git has the rows if a round of
      retuning wants them back. */
-  ['Opacity \u00b7 all three halos', [
+  ['Opacity \u00b7 the three WebGL fields', [
     ['blob.paletteWash',      0,    0.85, 0.005, 'hero halo'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work halo'],
     ['halo.paletteWash',      0,    0.85, 0.005, 'proof halo']
@@ -771,6 +799,16 @@ const SCHEMA = [
      The Expertise section's own glow is NOT here and never was: it is the orange radial
      in the loops' svg, drawn by expertise-halo.js off the gradient stops in the markup,
      with no entry in this panel. */
+  /* The fourth field, and the first time it has been reachable. Not a WebGL blob:
+     four colours and a peak opacity, written into the loops' svg gradient by
+     expertise-halo.js. See the EXPERTISE object for what the four are. */
+  ['Expertise glow \u00b7 palette', [
+    ['expertise.core',  'color', 'core'],
+    ['expertise.warm',  'color', 'warm'],
+    ['expertise.mid',   'color', 'mid'],
+    ['expertise.tail',  'color', 'tail'],
+    ['expertise.alpha',      0,  1,  0.002, 'opacity']
+  ]],
   ['Proof halo \u00b7 palette', [
     ['halo.poles.0.color', 'color', 'highlight'],
     ['halo.poles.1.color', 'color', 'pale aqua'],

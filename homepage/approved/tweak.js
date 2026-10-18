@@ -23,7 +23,8 @@
      no key of the same name, so there is nothing to shadow. */
   const ROOTS = {
     featuredwork: typeof FEATUREDWORK !== 'undefined' ? FEATUREDWORK : null,
-    halo: typeof HALO !== 'undefined' ? HALO : null
+    halo: typeof HALO !== 'undefined' ? HALO : null,
+    expertise: typeof EXPERTISE !== 'undefined' ? EXPERTISE : null
   };
 
   const resolve = path => {

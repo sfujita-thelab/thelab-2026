@@ -380,18 +380,28 @@ three gradients, plus an opacity each.
 
 **Which group is which section**, because one name is not what it looks like:
 
-| Panel group | Config object | Canvas | Section |
+| Panel group | Config | Drawn into | Section |
 |---|---|---|---|
-| Hero halo | `blob.*` | `#stage` | the hero |
-| Work halo | `featuredwork.*` | `#featuredworkgl` | Featured Work |
-| **Proof halo** | `halo.*` | `#halogl` | **Proof** |
+| Hero halo | `CONFIG.poles` | `#stage` (WebGL) | the hero |
+| Work halo | `FEATUREDWORK` | `#featuredworkgl` (WebGL) | Featured Work |
+| Expertise glow | `EXPERTISE` | the loops' svg gradient | Expertise |
+| **Proof halo** | `HALO` | `#halogl` (WebGL) | **Proof** |
 
-The third was labelled *Expertise halo* until now, and it never drove Expertise — the
-object is called `HALO` and routes through `halo.` because it began life there, but the
-canvas moved to Proof and the label did not follow. Renamed.
+Two things that were confusing and are now not:
 
-Expertise's own glow is in neither the panel nor these objects: it is the orange radial
-inside the loops' svg, drawn by `expertise-halo.js` from gradient stops in the markup.
+**The Proof group was labelled *Expertise halo*** and never drove Expertise. The object is
+called `HALO` and routes through `halo.` because it began life there; the canvas moved to
+Proof and the label did not follow it.
+
+**Expertise had no controls at all** — the page has four coloured fields and the panel had
+three. Its glow is not a WebGL blob but a `<radialGradient>` in the loops' svg, eleven
+stops that were hand-written in the markup. `EXPERTISE` now holds the four colours and a
+peak opacity, and `expertise-halo.js` writes the stops from it. The stops stay in
+`index.html` so the glow is right on the first paint; the ramp's shape lives in a table of
+ratios in the JS, so `alpha` scales the whole fade without flattening it.
+
+Its oranges are the hero's, copied by hand when it was built. **Copied, not linked** —
+retuning the hero has never moved them and still does not.
 
 Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
 the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.

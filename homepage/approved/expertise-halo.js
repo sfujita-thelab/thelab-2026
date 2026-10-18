@@ -39,6 +39,40 @@
   const svg  = section.querySelector('.areas__svg');
   const halo = section.querySelector('.exp-halo');
   const grad = document.getElementById('exp-halo-grad');
+
+  /* ---- the stops, written from config rather than the markup --------------------
+     The eleven <stop> elements stay in index.html so the glow is right on the first
+     paint, before any of this runs. What follows re-writes them from EXPERTISE, which
+     is what puts this gradient in the tweak panel alongside the other three.
+
+     The RAMP IS A TABLE, not a formula: offset, which of the four colours that stop
+     takes, and its opacity as a FRACTION of the peak. Those fractions are the eleven
+     hand-tuned opacities divided by the 0.494 they were written at, so EXPERTISE.alpha
+     scales the whole fade without changing its shape -- halve it and every stop halves,
+     where a formula would have had to guess at the curve. */
+  const RAMP = [
+    [0.00, 'core', 1.0000], [0.13, 'warm', 0.9514], [0.26, 'mid',  0.8502],
+    [0.39, 'mid',  0.6883], [0.50, 'mid',  0.5263], [0.60, 'tail', 0.3846],
+    [0.70, 'tail', 0.2632], [0.80, 'tail', 0.1619], [0.88, 'tail', 0.0911],
+    [0.94, 'tail', 0.0405], [1.00, 'tail', 0.0000]
+  ];
+  const stops = grad ? [...grad.querySelectorAll('stop')] : [];
+  let painted = '';
+  /* Only touches the DOM when something actually changed -- this is called from the
+     rAF loop, and eleven attribute writes a frame for a gradient nobody is editing
+     would be eleven writes a frame wasted. */
+  function paintStops() {
+    const E = (typeof EXPERTISE !== 'undefined') ? EXPERTISE : null;
+    if (!E || stops.length !== RAMP.length) return;
+    const key = E.core + E.warm + E.mid + E.tail + E.alpha;
+    if (key === painted) return;
+    painted = key;
+    RAMP.forEach(([off, which, frac], i) => {
+      stops[i].setAttribute('stop-color', E[which]);
+      stops[i].setAttribute('stop-opacity', (frac * E.alpha).toFixed(3));
+    });
+  }
+  paintStops();
   if (!svg || !halo || !grad) return;
 
   /* The band the loops occupy, in the svg's own design units. AXIS and CY are
@@ -130,6 +164,8 @@
        all, and a halo that never lights would be the worse failure. The .9s fade is the
        CSS transition on .exp-halo; all that happens here is which end of it to be at,
        and the attribute is only written when it changes rather than every frame. */
+    paintStops();          // no-op unless the panel has moved something
+
     const gate = window.EXP_CIRCLES_SETTLED;
     const want = (gate === undefined || gate) ? '1' : '0';
     if (want !== shown) { shown = want; halo.setAttribute('opacity', want); }

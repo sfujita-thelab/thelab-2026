@@ -658,8 +658,28 @@
      z-index 1 puts it over #stage (0) and under .page-grid (2), so the grid lines stay
      on top of it exactly as they sit on top of the gradient everywhere else. */
   .hero-glow {
-    position: fixed; left: -80px; bottom: -80px; z-index: 1;
-    width: calc(100% + 160px); height: calc(100% + 160px);
+    /* 180 OF BLEED, NOT 80, BECAUSE blur(44px) REACHES FURTHER THAN 80.
+
+       The overhang exists so the blur never samples past its own content. A 44px
+       Gaussian draws on roughly 3 sigma of neighbourhood -- about 132px -- so at 80 the
+       last stretch of the box was mixing the gradient with transparency, and under
+       multiply a semi-transparent orange is a weaker orange. Blink hides it; WebKit does
+       not. On desktop Safari, mobile Safari and iOS Chrome the hero's orange washed out
+       over the bottom of the screen and finished on a pale band at the very edge, where
+       Chrome fills to the corner. Bisected in Safari over seven variants: remove the
+       blur and it fills; remove the mask, the blend, .grain or either canvas and it
+       still fades.
+
+       THIS NUMBER IS NOW FREE TO MOVE, which it was not before. hero-glow.js used to
+       solve the drawing against this very box, so widening it sild the field down and
+       out of view -- measured, 17 to 20 levels lighter at the bottom. It keeps its own
+       BLEED_REF of 80 for the drawing and treats anything beyond that as padding, so the
+       field lands in the same place at any bleed. Verified: 0 pixels differ.
+
+       It costs almost nothing. hero-glow.js renders at a sixth of layout size, so the
+       extra ring is a few pixels of real raster. */
+    position: fixed; left: -180px; bottom: -180px; z-index: 1;
+    width: calc(100% + 360px); height: calc(100% + 360px);
     display: block; pointer-events: none;
     mix-blend-mode: multiply;
     /* The footer's own 44px. It is what removes the last edges after the upscale from
@@ -682,8 +702,16 @@
        vertical gradient, and it was averaging the masses out into one. Holding opaque
        to 26% leaves the shapes intact where they live and spends the fade on the part
        that is nearly empty anyway. */
-    -webkit-mask-image: linear-gradient(to top, #000 0, #000 26%, transparent 50%);
-            mask-image: linear-gradient(to top, #000 0, #000 26%, transparent 50%);
+    /* THE STOPS HOLD THEIR OLD PLACES ON SCREEN, which is why 26% is now 26% + 48.
+       They are measured up from the ELEMENT's bottom edge, and that edge just moved
+       100px further below the viewport, so a bare percentage would have dragged the ramp
+       down with it. The old line sat at 0.74vh + 38.4 from the top; against a box of
+       vh + 360 that is 26% + 48, and it holds at any viewport height rather than only
+       the one it was solved at -- checked at 700, 900 and 1100. The transparent stop
+       needs no correction: the bleed is symmetric, so 50% of this element is still
+       exactly 50% of the viewport, which is the whole reason it is symmetric. */
+    -webkit-mask-image: linear-gradient(to top, #000 0, #000 calc(26% + 48px), transparent 50%);
+            mask-image: linear-gradient(to top, #000 0, #000 calc(26% + 48px), transparent 50%);
 
     /* NO opacity here, and no transition. This element's opacity has one writer, in
        app.js: the scroll hand-off already drives it (the gradient belongs to the hero,

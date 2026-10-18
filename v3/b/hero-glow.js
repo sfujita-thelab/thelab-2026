@@ -103,8 +103,8 @@
   /* How far the masses are lifted toward the viewport's centre below 1024 -- see the
      note in the draw loop. 0 above it: desktop already arrives where it should. */
   const Y_LIFT_K = 0.355;
-  const yLift = () => (window.innerWidth <= 1023 && H
-                         ? Math.max(0, 0.5 - Y_LIFT_K * (W / H))
+  const yLift = () => (window.innerWidth <= 1023 && RH
+                         ? Math.max(0, 0.5 - Y_LIFT_K * (RW / RH))
                          : 0);
 
   const PER_FAM = 3;         // word changes per colour family
@@ -183,7 +183,35 @@
   const ALPHA = 0.60;        // peak alpha of a mass at its centre
 
   /* ------------------------------------------------------------------ sizing */
-  let W = 0, H = 0;
+  /* TWO BOXES, AND THEY ARE NOT THE SAME BOX ANY MORE.
+
+     W/H are the BITMAP -- the element's whole rect, bleed and all, which is what has to
+     be painted. RW/RH are the REFERENCE the drawing is solved against: the viewport plus
+     BLEED_REF on every side, which is the box every constant in this file was tuned in.
+     OX/OY place the reference inside the bitmap.
+
+     They used to be one and the same, and that is what made the bleed untouchable. Every
+     position here is a fraction of the box (`b.x * W`) and every radius a fraction of its
+     width, and the notes below solve their constants against "the viewport plus 80 of
+     bleed on every side, so its own centre IS the viewport's centre". Widening the bleed
+     to give the blur more room therefore slid the whole field down and out of view --
+     measured in Chrome, the bottom of the hero went 17 to 20 levels lighter.
+
+     Split in two, the bleed is just padding again: the drawing lands in the same place at
+     any bleed, and the CSS is free to give blur(44px) the ~132px of neighbourhood it
+     actually samples. Which is the bug: at 80 the blur ran off its own content and mixed
+     the gradient with transparency, and WebKit shows that where Blink hides it -- the
+     hero's orange washed out over the bottom of the screen in desktop Safari, mobile
+     Safari and iOS Chrome. Bisected in Safari: with the blur removed it fills to the
+     corner, with the mask, the blend or either canvas removed it still fades.
+
+     BLEED_REF IS A CONSTANT, NOT A READING. It is the geometry the numbers in this file
+     were derived in, so it stays 80 whatever the stylesheet does. */
+  const BLEED_REF = 80;
+
+  let W = 0, H = 0;      // the bitmap
+  let RW = 0, RH = 0;    // the reference box the drawing is solved in
+  let OX = 0, OY = 0;    // where the reference sits inside the bitmap
   function resize() {
     /* The CANVAS's rect, not the footer's: it deliberately overhangs on three sides
        so the blur's edge falloff lands outside .pf's clip (see .pf__glow in the CSS),
@@ -193,6 +221,10 @@
     H = Math.max(1, Math.round(r.height * SCALE));
     if (cv.width !== W)  cv.width  = W;
     if (cv.height !== H) cv.height = H;
+    RW = Math.max(1, (window.innerWidth  + 2 * BLEED_REF) * SCALE);
+    RH = Math.max(1, (window.innerHeight + 2 * BLEED_REF) * SCALE);
+    OX = (W - RW) / 2;
+    OY = (H - RH) / 2;
   }
 
   /* ----------------------------------------------------------------- pointer */
@@ -351,8 +383,8 @@
          itself: at 0.40 the top landed 44 short of centre at 768-1023 and 25 short at
          375, and the correction those imply agrees to three places -- 0.3585, 0.3533,
          0.3526 -- so 0.355. */
-      const x = (b.x + dx + (cx - (b.x + dx)) * b.pull)        * W;
-      const y = (b.y + dy + (cy - (b.y + dy)) * b.pull * 0.45 - yLift()) * H;
+      const x = (b.x + dx + (cx - (b.x + dx)) * b.pull)        * RW + OX;
+      const y = (b.y + dy + (cy - (b.y + dy)) * b.pull * 0.45 - yLift()) * RH + OY;
 
       /* The mass BREATHES -- its radius swells and shrinks on a clock of its own, far
          slower than its drift. This is the term that makes the field read as fluid
@@ -366,7 +398,7 @@
       const q      = t * b.rSpd + b.rPh;
       const breath = 1 + b.rb * (0.62 * Math.sin(q) + 0.38 * Math.sin(q * 0.37 + 1.1));
       const near   = Math.max(0, 1 - Math.abs(cx - b.x) * 2.2);
-      const r      = b.r * W * breath * (1 + 0.12 * near);
+      const r      = b.r * RW * breath * (1 + 0.12 * near);
 
       /* STRETCH. The mass is drawn as an ellipse whose long axis turns, not as a
          disc: scale the context and the same radial gradient comes out elongated,
@@ -415,7 +447,7 @@
        cursor doing something. The hue follows at full strength. */
     const fNear    = reach(BLOBS[1].x);
     const floorCol = colourAt(BLOBS[1], t, 0, fNear * TINT, fNear * LIFT * 0.6);
-    const fl = ctx.createLinearGradient(0, H, 0, H * 0.72);
+    const fl = ctx.createLinearGradient(0, OY + RH, 0, OY + RH * 0.72);
     fl.addColorStop(0.00, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.52).toFixed(3) + ')');
     fl.addColorStop(0.42, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.20).toFixed(3) + ')');
     fl.addColorStop(1.00, 'rgba(' + floorCol.join(',') + ',0)');

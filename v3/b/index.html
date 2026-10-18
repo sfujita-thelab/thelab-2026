@@ -853,6 +853,38 @@
   .topbar.is-solid.on-dark { background: var(--black);
                              border-bottom-color: rgba(244, 244, 244, .10); }
 
+  /* AND THE GROUND IS GRAINED, light and dark alike, the same as the page it covers.
+
+     .grain is fixed at z-index 1 and this bar is a fixed z-index 6, so the bar paints
+     straight over it: the moment .is-solid gave it a ground, that ground was the one
+     opaque surface on the page with no texture on it -- a flat patch sliding over a
+     grained field. The footer had exactly this problem and solves it the same way, with
+     .pf::after; this is that rule, scoped to the states that actually have a ground.
+
+     IT LINES UP WITHOUT BEING TOLD TO. The tile is anchored to each element's own
+     top-left, the page layer is fixed at inset: 0 and this bar is fixed at top: 0 /
+     left: 0, so both origins are the viewport's corner and the tiles are in phase.
+     Same url, same --u-driven size, same blend, same opacity.
+
+     z-index 0 on the tile and 1 on the bar's children, as the footer does it, so the
+     texture sits above the ground and under the wordmark and the labels -- grain belongs
+     to surfaces, and nowhere else on the page does it cross type.
+
+     Faded rather than switched, on the same .25s the ground's own background-color
+     transition runs, or the texture would appear a frame before the colour it belongs
+     to. The transparent bar over the hero gets none of its own: there is no ground
+     there, and the page layer is already showing through. */
+  .topbar::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url(assets/grain.png);
+    background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .topbar.is-solid::after { opacity: var(--grain-a, .245); }
+  .topbar > * { position: relative; z-index: 1; }
+
   @media (prefers-reduced-motion: reduce) {
     .topbar { transition: none; }
   }
@@ -2280,8 +2312,24 @@
      --pf-mark-y stays in units. That is the mark's centre LINE, not its size, and the
      headline and the CTA both hang off it -- it has to keep tracking the band it
      divides. Only the drawing on that line is fixed. */
-  .pf { min-height: calc(583 * var(--u));
-        --pf-mark:   240px; }
+  /* NO min-height. It was calc(583 * --u), and the floor SCALED while nothing inside it
+     did -- the band is a flat 352, the office type and the legal line are on stepped
+     tokens -- so past roughly 1500 the floor outgrew its own content and the difference
+     became free space at the foot of a column flex box. The footer's bottom edge pulled
+     away from the legal line as the window widened: 64 at 1512, 247 at 1920, 497 at 2560,
+     against the --spacer-40 the line asks for.
+
+     Flattening it to 583px fixed most of that and not all: the content measures about 587
+     at 1440 but dips to 570 at 1920 and 580 at 2560, because the office addresses wrap
+     onto fewer lines in a wider track, so the floor still caught it there and left 13 and
+     3. The floor had to go entirely for the number to be 40 at every width.
+
+     Nothing is lost with it. 583 is footer.png's own height and was written to stop the
+     band collapsing below the reference at 1440 -- where the content measures 587 and
+     clears it anyway, so it has been inert at the only width it was drawn for. The
+     footer sizes to what is in it now, which is what every other section on the page
+     already does. */
+  .pf { --pf-mark: 240px; }
 
   /* FLUSH at the margin, where every other block of text on the page carries the shared
      8u inset. That is what footer.png draws: the headline's B inks at 44, the w of

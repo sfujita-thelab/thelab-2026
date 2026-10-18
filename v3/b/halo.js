@@ -195,13 +195,31 @@
       /* followX/followY are 0, so these resolve to the fixed offsets -- the mass is
          locked where the reference puts it. The terms are kept so the behaviour is
          one number away if it is ever wanted back. */
-      /* FURTHER RIGHT in the stacked layout. -0.90 puts the mass off the left edge
-         so the section shows its upper-right quadrant -- which at 1440 is most of the
-         width, but at 900 the same offset in p-space is the same FRACTION of a much
-         narrower box, so nearly all of the colour is outside it and what is left
-         reads as a stain in the corner. -0.45 brings the mass back under the
-         section. Desktop keeps -0.90. */
-      const offX = (window.innerWidth <= 1023 ? -0.45 : H.offsetX);
+      /* MEASURED FROM THE CANVAS'S LEFT EDGE, not from its centre.
+
+         p-space is aspect-corrected -- the shader builds it as
+         `(sc - 0.5) * vec2(uAspect, 1.0)` -- so x is in units of canvas HEIGHT and the
+         canvas spans -aspect/2 to +aspect/2 across. A FIXED offsetX is therefore a fixed
+         distance from the CENTRE, and this canvas is inset:0 on a section whose height
+         barely changes while its width tracks the viewport. So the aspect climbs -- 1.82
+         at 1024, 2.68 at 1440, 3.77 at 1920, 5.30 at 2560 -- the left edge runs away from
+         a stationary mass, and the mass reads as sliding to the middle. Measured as a
+         fraction of the half-width it sat at: -0.99 at 1024, -0.67 at 1440, -0.34 at
+         2560. The same arithmetic in the other direction is why the stacked widths needed
+         a second number at all.
+
+         Subtracting half the aspect pins it to the left edge instead, so the distance
+         between the two is what stays constant. 0.441 is the gap the tuned 1440 reference
+         has -- -0.90 against a left edge at -1.341 -- so 1440 renders exactly what it
+         rendered before and every other width now matches it rather than drifting.
+
+         The stacked branch keeps its own number: it was tuned against a box of a quite
+         different shape (aspect 1.07 at 768, where the mass sits 0.085 off the edge) and
+         nothing about the narrow layout is drifting. */
+      const HALO_FROM_LEFT = 0.441;
+      const offX = (window.innerWidth <= 1023
+                      ? -0.45
+                      : -(cssW / cssH) / 2 + HALO_FROM_LEFT);
       gl.uniform1f(u.uOffX, offX + cur.x * H.followX * cur.amt);
       gl.uniform1f(u.uOffY, H.offsetY + cur.y * H.followY * cur.amt);
       const fl = Math.hypot(cur.x, cur.y) || 1e-5;

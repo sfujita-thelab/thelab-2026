@@ -1,18 +1,63 @@
-# v3/b — tokenised against thelab.co
+# v3/b — the prototype, read against thelab.co
 
-`v3/b` is the prototype with every font and spacing value tied to thelab's tokens,
-and its colours tied to them too (in progress). `v3/a` is the build before any of it.
-It is the STEPPED build; the fluid twin is in `_archive/2026-10-16/v3-c`.
-`v3/b` is untouched and is the "before".
+This file exists for one job: **letting a developer compare this prototype with the live
+site's token system and see exactly where the two agree and where they do not.** Read it
+as the map; the four files beside it hold the detail.
 
-Load order in `index.html`, before the inline `<style>`:
+## Where each thing is written down
 
-1. `thelab-tokens.css` — the live site's tokens, stepped at 1023 / 767
-2. `thelab-type-fluid.css` — overrides the **type** tokens with `clamp()` above 767
-3. `thelab-space-fluid.css` — overrides the **spacer** tokens the same way
+| File | What it answers |
+|---|---|
+| `thelab-tokens.css` | The tokens themselves, copied from www.thelab.co on 2026-10-15. **Names are identical to production — do not rename.** Proposed additions are marked `REDESIGN` inline. |
+| `NEW-TOKENS.md` | Every token this redesign ADDS or CHANGES, and what each one would do to the live site — checked across all 21 pages in its sitemap. |
+| `TOKENS-REFERENCE.md` | What each token actually resolves to at mobile / tablet / desktop. A token's name is its DESKTOP value: `--spacer-80` is not 80 on a phone. |
+| `HANDOFF.md` (this file) | Which token each element uses, and where the prototype deliberately departs from the system. |
+| `README.md` | The WebGL work — the three GPU passes, `config.js`, the URL flags. Nothing to do with tokens. |
 
-All three are variable-only. Beausite and Recife load from thelab.co's CDN, so the
-real faces need a connection; without one the page falls back to `--font`.
+## The token contract
+
+Three kinds of value appear in this build, and a developer needs to tell them apart:
+
+1. **Production tokens.** Same name, same value as the live site. These should port
+   straight across. Everything in `thelab-tokens.css` without a `REDESIGN` marker.
+2. **Proposed tokens.** New or changed by this redesign, not on the live site yet. Marked
+   `REDESIGN` in the token file and argued for in `NEW-TOKENS.md` — `--font-p-14`,
+   `--font-tag`, `--font-h-80`, the flattened button steps, and the rest. **These need a
+   decision before they ship**, which is the main thing this prototype is asking for.
+3. **Prototype-only values.** Not tokens at all and not proposed as any: the layout
+   positions in design units, and a handful of named constants that exist to make a
+   browser behave (`--exp-guard`, `--cover-h`). They are listed under *Not tokenised* and
+   *Browser workarounds* below. **Do not port these as design decisions.**
+
+## What actually loads
+
+`index.html` links **one** stylesheet before its inline `<style>`:
+
+- `thelab-tokens.css` — the live site's tokens, stepped at 1023 and 767.
+
+`thelab-type-fluid.css` and `thelab-space-fluid.css` sit in the folder **unlinked, on
+purpose**. They are the fluid proposal from `NEW-TOKENS.md`: linking them turns this into
+the fluid build, which is archived at `_archive/2026-10-16/v3-c`. Leave them alone unless
+you mean to make that switch. As shipped there is **no `clamp()` and no `vw` anywhere** —
+every token takes its stepped value and switches at 1023 and 767, exactly as the live
+site does.
+
+Beausite and Recife load from thelab.co's CDN, so the real faces need a connection;
+without one the page falls back to `--font`.
+
+## How a change happens
+
+1. Edit inside `v3/b` only. `v1/`, `v2/` and `v3/a` are frozen reference copies — `v3/a`
+   is the build from before any tokenising, which is the "before" in any comparison.
+2. There is no build step. Open `index.html`, or serve the folder.
+3. Commit to `main`. This repo has no branches and never has; every commit goes straight
+   to `main`.
+4. GitHub Pages serves it within a minute or two at
+   **https://sfujita-thelab.github.io/thelab-2026/v3/b/** — which is what to open on a
+   phone, since several of the differences below only exist in WebKit.
+5. A value that belongs to the design system changes in `thelab-tokens.css` and gets a
+   line in `NEW-TOKENS.md`. A value that exists only to place something on the artboard
+   stays in the inline `<style>`. Keeping that line clean is the whole point of the file.
 
 **Breakpoint is 1023px**, in the stylesheet and in `config.js` (`grid.mobileAt`). Those two
 have to agree or the grid switches column count at a different width than the CSS.
@@ -152,8 +197,8 @@ Values are **mobile · desktop**.
 | **Footer** pill padding | `--spacer-8` / `--spacer-56` | 8 · 8 / 32 · 56 |
 | **Footer** city → address | `--spacer-12` | 8 · 12 |
 | **Footer** address → phone | `--spacer-8` | 8 · 8 |
-| **Footer** legal cluster gap | `--spacer-24` | 16 · 24 |
-| **Footer** legal nav gap | `--spacer-16` | 8 · 16 |
+| **Footer** legal cluster gap | `--spacer-16` | 12 · 16 |
+| **Footer** legal nav gap | `--spacer-16` | 12 · 16 |
 | **Footer** socials gap | `--spacer-12` | 8 · 12 |
 | **Footer** band padding *(mobile only)* | `--spacer-120` / `--spacer-80` | 56 / 40 |
 | **Footer** mark margin *(mobile only)* | `--spacer-80` | 40 · — |
@@ -166,13 +211,14 @@ Values are **mobile · desktop**.
   wider on desktop. If that is wrong, the fix is a `--spacer-48`, not a hand-set value.
 
 ### Mobile collisions
-Three token pairs collapse to one value on a phone — `12 & 16 → 8`, `32 & 40 → 24`,
-`56 & 64 → 32`. Two of them land in the same block:
+Some token pairs collapse to one value on a phone — `32 & 40 → 24` and `56 & 64 → 32`
+among them. One lands inside a single block, where it is visible:
 
 1. **Footer office card** — city → address (`--spacer-12`) and address → phone
    (`--spacer-8`) are both **8** on mobile, where desktop has 12 and 8.
-2. **Footer legal row** — the links' gap (`--spacer-16`) and the socials' gap
-   (`--spacer-12`) are both **8**, side by side, where desktop has 16 and 12.
+   *(A second collision used to be listed here — the legal links' gap against the
+   socials' — on the basis that `--spacer-16` is 8 on a phone. It is 12. Measured at 390:
+   the links sit on 12 and the socials on 8, so the two never collided.)*
 
 ### Mobile-only ties
 These exist on mobile alone, so they were picked by the mobile column, and two were
@@ -198,8 +244,8 @@ Everything here is measured off the 1440 artboard, or is geometry rather than sp
 - `.area` — `top: 670.4u` and the per-item inline `left`
 - `.proof .sec-head` — `top: 84u`, `width: 680u`
 - `.proof__stats` — `left: 722u`, `top: 83.2u`, track width `320u`
-- `.cover`, `.ticker` — `top`, and `.cover`'s `margin-left: -1146u`
-- `.pf__band` — `--pf-mark-y: 186.5u`; `.pf__mark` — `--pf-mark: 240u`
+- `.cover`, `.ticker` — `top`, and `.cover`'s `margin-left: -1432.5u` (`-2292u` stacked)
+- `.pf__band` — `--pf-mark-y: 186.5u`; `.pf__mark` — `--pf-mark`, a flat **240px**
 - `.featuredwork__inner` / `.exp__inner` / `.proof__inner` — explicit heights
 - `.cs-cursor` — `116u` box with `-58u` centring margins
 
@@ -217,58 +263,63 @@ Everything here is measured off the 1440 artboard, or is geometry rather than sp
 
 ---
 
-## Structural change this pass forced
+## Where this build departs from the live system
 
-**Featured Work's header is in flow now.** Its four pieces were each pinned to a hand-tuned
-absolute top — 52.4 / 84 / 231.2 / 346.7 — with the copy's line count baked into every one.
-Tokenising proved why that does not hold: `--font-p-18` in Beausite with no tracking takes
-the body from three lines to four, which left the CTA **2px** under the body instead of 24.
-The gaps are `--spacer-16` / `--spacer-24` / `--spacer-24` margins now, matching Expertise's
-and Proof's headers, and four numbers left the list above.
+Three kinds of departure, and only the first is a design decision.
 
-**Expertise's CTA came back into its header**, as its last line, 24 above the button — it
-was cut loose at `top: 951.2u` across the foot of the graphic. It is a child of
-`.expertise .sec-head` now, `inline-block` so the header's own `text-align: center` places it. Its
-`margin-top` is `calc(var(--spacer-24) - 2px)`: setting a margin-top replaces the `-2px`
-cancellation `.mask--cta` normally does for its clip guard, and without it the button lands
-at 26 where every other CTA lands at 24.
+### 1. In flow, where the reference positions absolutely
+Featured Work's header, Expertise's CTA and the footer's lower two rows are laid out in
+flow with spacer margins rather than pinned to hand-tuned `top` values. Each was pinned to
+a number with the copy's line count baked into it, so any type change broke it — tokenising
+the body copy took Featured Work's from three lines to four and left its CTA 2px under the
+body instead of 24. The gaps are `--spacer-*` margins now, matching the other headers.
+**This is the behaviour to port.**
 
-**The footer's two lower rows are in flow.** `.pf__locations` was pinned at `top: 387u` and
-`.pf__legal` at `bottom: 37u`, numbers measured against a footer whose content happened to
-end at 518u. An office card is 131 design units tall at 1440 and **207 at 1024**, so the row
-grew straight through the legal line everywhere below about 1430 — by 59 at 1024 and 107 at
-820 — and cleared it by a single pixel at 1440. `.pf__band` now has a real height (387u,
-where the office row used to start) and the two rows follow it, with `--spacer-56` above the
-legal line and `--spacer-40` below. `.pf` sizes itself; `min-height: 583u` stays as a floor.
+### 2. Browser workarounds — port the behaviour, not the numbers
+These exist because an engine misbehaves. They carry no design intent, and a real build on
+a different stack may not need them at all — but it will need whatever it takes to get the
+same result. Each was bisected in the browser that showed it, not guessed.
 
-The band's old `height: 0` was a deliberate guard against the ghost-button shape — an
-in-flow box the size of the footer that answers the pointer where its children do not. That
-guard is kept a better way: `.pf__band { pointer-events: none }` with
-`.pf__band > * { pointer-events: auto }`. Verified by hit-testing nine points across the
-footer CTA (all return `.pf__cta`) and a point over an office name.
+| Where | What | Why |
+|---|---|---|
+| `.expertise` | **No `overflow` at all**, and `--cover-h` sizes the dome to the gradient it has to finish rather than to a full circle | Safari has no `overflow-clip-margin`, and its `overflow: clip` painted a black band across Proof wherever the clipped layer reached. Sizing the cover to its job removed the overflow the clip existed for: measured at twelve widths from 320 to 2560, the document's scroll height is identical with the clip and without it |
+| `.expertise` | `--exp-guard` plus a negative `margin-top` and matching `padding-top` | Gives the dome's overhang room inside the section's own box, so Safari's tighter clip does not cut the arc flat. `expertise.js` reads that padding back in — five of its measurements are taken against the section's old top edge |
+| `.hero-glow`, `.pf__glow` | `transform: translateZ(0)` | WebKit rasterises a `position: fixed` element clipped to the viewport **before** filtering, so `blur(44px)` sampled transparency along the bottom edge and the hero's orange washed out. 400px of bleed and `blur(24px)` both failed; its own compositing layer fixed it. The footer's is precautionary — same blur past the same kind of boundary, different clip |
+| `.proof` | `z-index: 3` | With `z-index: auto` it opened no stacking context, so `#halogl` and its own copy landed in the root one and interleaved with the page's fixed layers |
+| `.hero` (≤1023) | `height: 100svh` | `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar — so the bottom-anchored copy and the ring jumped mid-scroll |
+| `app.js` | `viewH()` and `requestLayout()` | Everything geometric reads the *layout* viewport, which a disappearing chrome bar does not move, and a height-only resize no longer triggers a relayout. Measured: a 10% height change costs 0 relayouts, 40% costs 1 |
+| `<head>` | `format-detection` meta + `a[x-apple-data-detectors]` | WebKit finds the office addresses and phone numbers and wraps each in its own underlined, system-blue anchor. The numbers are our `tel:` links, so turning the detector off costs nothing |
 
-Two mobile rules also had to drop a blanket `margin: 0` (`.exp__eyebrow, .exp__head,
-.exp__body` and `.proof__head, .proof__body, .proof__cta`) — it was cancelling the spacer
-margins and setting those blocks flush on a phone.
+### 3. Values that only exist to place artwork
+See *Layout positions* above. Design units off the 1440 artboard, not candidates for
+tokens.
 
----
+## Open items — decisions this prototype is asking for
 
-## Open items
+These are for the design system, not bugs. Each needs a yes or no before the tokens ship.
 
-1. **The hero headline crosses the centre grid line below ~1430px.** `--font-h-80` plus the
-   removed tracking grew the longest keyword from 545 to 672px of ink. Over by 44 at 768,
-   27 at 1024, 15 at 1200; clear by 1px at 1440. Options: `--font-h-64`, let the keyword
-   line wrap, or shorten "e-comm platform."
-2. **`.stat__num` and `.stat__suffix` are now the same size** (both `--font-h-64`). Desktop
-   had 72 and 64. If the suffix should stay smaller it needs its own token.
-3. **Three headlines gained a line** from Beausite's wider setting with no tracking: Featured
-   Work's body 3→4, Expertise's headline 3→4, the footer headline 1→2. Only the first
-   broke anything; the other two absorbed it.
-4. The two mobile spacer collisions above.
-5. **The tablet measure is long.** 768–1023 uses the stacked single-column layout, so the
-   body runs about 760px at 900. Fixing it properly means a tablet layout that constrains
-   the measure, or defining the text columns in tokens rather than design units so boxes
-   and type share one curve.
+1. **Every `REDESIGN` token in `thelab-tokens.css`.** `--font-p-14`, `--font-tag`,
+   `--font-h-80`, the removal of `--font-h-48`, the flattened button steps, `--font-h-64`
+   losing its 1920 jump. `NEW-TOKENS.md` has the argument for each and what it would do
+   to the live site, checked across all 21 pages in its sitemap. **This is the main ask.**
+2. **Stepped or fluid.** As shipped it is stepped, like the live site. The fluid
+   alternative is two unlinked files in this folder and a table in `NEW-TOKENS.md`.
+3. **The hero headline crosses the centre grid line below ~1430px.** `--font-h-80` plus
+   the removed tracking grew the longest keyword from 545 to 672px of ink: over by 44 at
+   768, 27 at 1024, 15 at 1200, clear by 1px at 1440. Options are `--font-h-64`, letting
+   the keyword wrap, or shortening the word.
+4. **`.stat__num` and `.stat__suffix` are the same size** (both `--font-h-64`). The
+   reference had 72 and 64. A smaller suffix needs its own token.
+5. **Three headlines gained a line** from Beausite's wider setting with no tracking:
+   Featured Work's body 3→4, Expertise's headline 3→4, the footer's 1→2. Only the first
+   broke anything.
+6. **The page side margin.** `--m` and `--inset` are held at a flat 40 rather than taken
+   from `--container-margin`. See *Open: page side margin* in `NEW-TOKENS.md`.
+7. **The mobile collision above** — city→address and address→phone both land on 8.
+8. **The tablet measure is long.** 768–1023 uses the stacked single-column layout, so the
+   body runs about 760px at 900. A purpose-built tablet layout would constrain it, or the
+   text columns could be defined in tokens rather than design units so boxes and type
+   share one curve.
 
 ## Fixed on the way
 
@@ -277,5 +328,7 @@ they rendered at 3–5px on a phone. All are on tokens now: `.proof__body` 4.7�
 `.pf__city` 5.2→18, `.pf__addr`/`.pf__tel`/`.pf__legal` 3.6→14, `.cs-cursor span` 3.0→12,
 `.stat__suffix` 16.7→40.
 
-Two dead rules were removed — `.pf__body` and `.pf__offices`, left over from the
-five-column footer that `.pf__locations` replaced; neither class is in the markup.
+Three dead rules were removed — `.pf__body` and `.pf__offices`, left over from the
+five-column footer that `.pf__locations` replaced, and `.hero__head`, left over from the
+hand-built lockup before the mark and the wordmark became one SVG. None of the three is
+in the markup. `.hero__dot` looks dead and is not: `hero-type.js` creates it at runtime.

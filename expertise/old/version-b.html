@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services — thelab · Exploration B</title>
+    <meta name="description" content="Strategy, creative, platforms and performance — engineered as one connected system. (Exploration B)" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/b-PSqzje5i.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/webgl-BpYjFSnm.js">
+    <link rel="stylesheet" crossorigin href="./assets/b-B6uY9Pi1.css">
+  </head>
+  <body class="vb">
+    <canvas id="stage" aria-hidden="true"></canvas>
+    <div class="stage-overlay" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="mark" data-mark aria-hidden="true">
+      <div class="mark__inner">
+        <svg viewBox="0 0 200 200"><g data-ring-svg></g></svg>
+      </div>
+    </div>
+
+    <div class="rail" aria-hidden="true"><span class="rail__fill"></span></div>
+
+    <!-- Nav (reused from Version A) -->
+    <header class="nav" data-nav>
+      <a class="nav__brand" href="#top" aria-label="thelab home">
+        <span class="nav__word">thelab</span>
+      </a>
+      <nav class="nav__links">
+        <a href="#work">WORK</a>
+        <a href="#services" class="is-active">SERVICES</a>
+        <a href="#careers">CAREERS</a>
+      </nav>
+      <a class="nav__cta" href="#contact"><span>CONTACT</span></a>
+    </header>
+
+    <main id="top">
+      <!-- ============ 01 · HERO (reused) ============ -->
+      <section class="hero" data-scene="hero" id="services">
+        <div class="hero__inner">
+          <h1 class="hero__title">
+            <span class="line" data-reveal>Turning complex challenges</span>
+            <span class="line" data-reveal>into <em>connected experiences</em></span>
+            <span class="line" data-reveal>that drive growth</span>
+          </h1>
+        </div>
+        <a class="hero__more" href="#reasons">
+          <span>Scroll more</span>
+          <svg class="hero__caret" viewBox="0 0 26 14" fill="none" stroke="currentColor" aria-hidden="true">
+            <path d="M2 2 L13 12 L24 2" />
+          </svg>
+        </a>
+      </section>
+
+      <!-- ============ 02 · WHY CLIENTS + editorial transition ============ -->
+      <!-- The circle is the SAME WebGL circle carried from the hero; only the
+           copy is DOM, overlaid on the left/centre/right circle positions. -->
+      <section class="whyb" id="reasons">
+        <div class="whyb__stage" data-whyb-stage>
+          <!-- outer edges of the side circles fade into the background -->
+          <div class="whyb__edge whyb__edge--l" data-whyb-edge></div>
+          <div class="whyb__edge whyb__edge--r" data-whyb-edge></div>
+          <span class="whyb__label whyb__label--l">
+            <span class="whyb__ser">Campaigns</span><span>that connect every channel</span>
+          </span>
+          <span class="whyb__label whyb__label--c">
+            <span class="whyb__ser">Content ecosystems</span><span>that power every touchpoint</span>
+          </span>
+          <span class="whyb__label whyb__label--r">
+            <span class="whyb__ser">Platforms</span><span>that turn engagement into growth</span>
+          </span>
+        </div>
+        <!-- header scrolls naturally out of view (not pinned) -->
+        <div class="whyb__head">
+          <span class="eyebrow eyebrow--plain" data-whyb-eyebrow>Why choose us</span>
+          <h2 class="whyb__title" data-whyb-title>
+            When every touchpoint has to <em>work together.</em>
+          </h2>
+          <p class="whyb__copy" data-whyb-copy>
+            From campaigns to content and digital platforms, we create connected
+            experiences that scale with intention and deliver measurable impact.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 03 · OUR SERVICES (horizontal) ============ -->
+      <section class="svcx" data-scene="services" id="services-list">
+        <div class="svcx__track" data-svcx-track>
+          <!-- slide 1 — full-width, centred headline; slides in from the right -->
+          <article class="svcx__panel svcx__panel--intro" data-svc="intro">
+            <div class="svcx__introwrap" data-svcx-intro>
+              <h3 class="svcx__introhead">
+                <span class="svcx__introhead-a">Our services are built around one belief:</span>
+                <span class="svcx__introhead-b">connected thinking creates better outcomes.</span>
+              </h3>
+            </div>
+          </article>
+
+          <article class="svcx__panel svcx__panel--svc" data-svc="0" data-tint="growth">
+            <div class="svcx__content">
+              <h3 class="svcx__title">Growth <em>Strategy</em></h3>
+              <p class="svcx__desc">Navigate complexity and define clear pathways to sustainable growth.</p>
+              <ul class="svcx__pills">
+                <li>Audience &amp; segmentation</li>
+                <li>Customer journey &amp; CX strategy</li>
+                <li>Measurement frameworks &amp; KPIs</li>
+                <li>Experimentation roadmaps</li>
+              </ul>
+              <div class="svcx__work">
+                <span class="svcx__work-eyebrow">Case Study</span>
+                <span class="svcx__work-name">SKS</span>
+                <p>Connected commerce strategy that unified the funnel end to end.</p>
+                <a class="svcx__work-link" href="#">Learn More <i>→</i></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="svcx__panel svcx__panel--svc" data-svc="1" data-tint="platforms">
+            <div class="svcx__content">
+              <h3 class="svcx__title">Brand <em>Systems</em></h3>
+              <p class="svcx__desc">Create scalable content and brand expression.</p>
+              <ul class="svcx__pills">
+                <li>Brand identity &amp; creative direction</li>
+                <li>Content strategy &amp; production</li>
+                <li>Platform-native content</li>
+                <li>Creative testing &amp; iteration</li>
+              </ul>
+              <div class="svcx__work">
+                <span class="svcx__work-eyebrow">Case Study</span>
+                <span class="svcx__work-name">P&amp;G</span>
+                <p>A platform architecture built for scale, speed and measurement.</p>
+                <a class="svcx__work-link" href="#">Learn More <i>→</i></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="svcx__panel svcx__panel--svc" data-svc="2" data-tint="creative">
+            <div class="svcx__content">
+              <h3 class="svcx__title">Experience <em>Platforms</em></h3>
+              <p class="svcx__desc">Build connected digital experiences that engage and convert.</p>
+              <ul class="svcx__pills">
+                <li>UX / UI design systems</li>
+                <li>Website &amp; e-commerce development</li>
+                <li>CMS &amp; content platforms</li>
+                <li>Full-stack engineering</li>
+              </ul>
+              <div class="svcx__work">
+                <span class="svcx__work-eyebrow">Case Study</span>
+                <span class="svcx__work-name">Douglas Elliman</span>
+                <p>A design system that scaled a luxury brand across every surface.</p>
+                <a class="svcx__work-link" href="#">Learn More <i>→</i></a>
+              </div>
+            </div>
+          </article>
+
+          <article class="svcx__panel svcx__panel--svc" data-svc="3" data-tint="perf">
+            <div class="svcx__content">
+              <h3 class="svcx__title">Performance <em>Marketing</em></h3>
+              <p class="svcx__desc">Create demand and optimize for meaningful, measurable outcomes.</p>
+              <ul class="svcx__pills">
+                <li>Paid media &amp; search strategy</li>
+                <li>Lifecycle marketing (CRM, email, SMS)</li>
+                <li>Conversion optimization</li>
+                <li>Testing &amp; performance strategy</li>
+              </ul>
+              <div class="svcx__work">
+                <span class="svcx__work-eyebrow">Case Study</span>
+                <span class="svcx__work-name">Ka'Chava</span>
+                <p>Lifecycle and paid working as one — compounding measurable growth.</p>
+                <a class="svcx__work-link" href="#">Learn More <i>→</i></a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="svcx__pager" data-svcx-pager aria-hidden="true">
+          <span class="svcx__dot"></span>
+          <span class="svcx__dot"></span>
+          <span class="svcx__dot"></span>
+          <span class="svcx__dot"></span>
+        </div>
+      </section>
+
+      <!-- ============ 04 · WELLCOM HOME (Version-A media-grid design) ============ -->
+      <section class="wellcom" id="wellcom">
+        <div class="wellcom__head">
+          <span class="wellcom__eyebrow" data-reveal>Wellcom Home</span>
+          <h2 class="wellcom__title" data-reveal>
+            Built around<br /><em>how work happens</em>
+          </h2>
+          <p class="wellcom__lede" data-reveal>
+            HOME is the wellcom group's technical and AI operating model. It
+            focuses on building specific AI, automation, and data solutions
+            tailored to real client needs and content workflows.
+          </p>
+        </div>
+
+        <div class="wellcom__labels">
+          <span data-reveal>Innovation and AI positioning</span>
+          <span data-reveal>Digital transformation conversations</span>
+          <span data-reveal>Efficiency and performance optimization</span>
+          <span data-reveal>Technology-enabled solution design</span>
+        </div>
+
+        <div class="wellcom__media">
+          <figure class="wmedia wmedia--laptop" data-from="left">
+            <div class="wmedia__box"></div>
+          </figure>
+          <figure class="wmedia wmedia--logo" data-from="right">
+            <div class="wmedia__box"></div>
+          </figure>
+          <figure class="wmedia wmedia--render" data-from="left">
+            <div class="wmedia__box"></div>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ============ 05 · HOW WE WORK (reused) ============ -->
+      <section class="how" data-scene="ring" id="how">
+        <div class="how__grid">
+          <div class="how__left" aria-hidden="true"></div>
+          <div class="how__right">
+            <h2 class="how__title" data-reveal>
+              Principles that shape how we <em>build</em>, collaborate and deliver.
+            </h2>
+            <div class="principles">
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="users"></span>
+                <div>
+                  <h3>Users First</h3>
+                  <p>Prioritize people in everything we do — engaging experiences that solve real problems.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="creative"></span>
+                <div>
+                  <h3>Creative Led</h3>
+                  <p>A creative practice that fuels strategy and drives genuinely innovative solutions.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="chemistry"></span>
+                <div>
+                  <h3>Chemistry Matters</h3>
+                  <p>The best work happens in cultures built on trust, communication and strong relationships.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="accountability"></span>
+                <div>
+                  <h3>Accountability</h3>
+                  <p>Clear goals and expectations that drive teams toward shared, measurable responsibility.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FOOTER (reused) ============ -->
+      <footer class="footer" id="contact">
+        <div class="footer__top">
+          <div class="footer__ring" aria-hidden="true"></div>
+          <div class="footer__right">
+            <h2 class="footer__wordmark"><em>We are</em> thelab</h2>
+            <div class="footer__locations">
+              <div class="loc">
+                <h4>NYC</h4>
+                <p>1115 Broadway, 5th fl<br />NY, NY 10010, US<br />+1.212.209.1333</p>
+              </div>
+              <div class="loc">
+                <h4>LA</h4>
+                <p>909 N. Sepulveda Blvd, Suite 860<br />El Segundo, CA 90245, US<br />+1.310.392.4892</p>
+              </div>
+              <div class="loc">
+                <h4>IST</h4>
+                <p>Suadiye,<br />Kadıköy İstanbul, 34740, Turkey<br />+90.310.392.4892</p>
+              </div>
+              <div class="loc">
+                <h4>SYDNEY</h4>
+                <p>40-50 Francis St,<br />Darlinghurst, NSW 2010, Australia<br />+61.2.9310.4458</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer__bottom">
+          <span class="footer__legal">©2026 thelab. Part of <b>Wellcom</b> Worldwide</span>
+          <nav class="footer__links">
+            <a href="#">Linkedin</a>
+            <a href="#">Privacy</a>
+            <a href="#">Modern Slavery Statement</a>
+            <a href="#">Whistleblower Protection</a>
+          </nav>
+        </div>
+      </footer>
+    </main>
+
+  </body>
+</html>

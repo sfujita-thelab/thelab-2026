@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services — thelab</title>
+    <meta name="description" content="Strategy, creative, platforms and performance — engineered as one connected system." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/webgl-BpYjFSnm.js"></script>
+    <script type="module" crossorigin src="./assets/main-V-iR580n.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-DQBn2OT0.css">
+  </head>
+  <body>
+    <!-- Persistent WebGL stage (shared across sections) -->
+    <canvas id="stage" aria-hidden="true"></canvas>
+    <div class="stage-overlay" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- One shared logo mark: appears in How We Work, stays fixed through the
+         footer while its content scrolls around it, then slows to a stop -->
+    <div class="mark" data-mark aria-hidden="true">
+      <div class="mark__inner">
+        <svg viewBox="0 0 200 200"><g data-ring-svg></g></svg>
+      </div>
+    </div>
+
+    <!-- Progress rail -->
+    <div class="rail" aria-hidden="true"><span class="rail__fill"></span></div>
+
+    <!-- Nav -->
+    <header class="nav" data-nav>
+      <a class="nav__brand" href="#top" aria-label="thelab home">
+        <span class="nav__word">thelab</span>
+      </a>
+      <nav class="nav__links">
+        <a href="#work">WORK</a>
+        <a href="#services" class="is-active">SERVICES</a>
+        <a href="#careers">CAREERS</a>
+      </nav>
+      <a class="nav__cta" href="#contact"><span>CONTACT</span></a>
+    </header>
+
+    <main id="top">
+      <!-- ============ 01 · HERO ============ -->
+      <section class="hero" data-scene="hero" id="services">
+        <div class="hero__inner">
+          <h1 class="hero__title">
+            <span class="line" data-reveal>We build what</span>
+            <span class="line" data-reveal><em>moves brands forward.</em></span>
+          </h1>
+        </div>
+        <a class="hero__more" href="#reasons">
+          <span>Scroll more</span>
+          <svg class="hero__caret" viewBox="0 0 26 14" fill="none" stroke="currentColor" aria-hidden="true">
+            <path d="M2 2 L13 12 L24 2" />
+          </svg>
+        </a>
+      </section>
+
+      <!-- ============ 02 · REASONS / MORPH ============ -->
+      <section class="reasons" data-scene="morph" id="reasons">
+        <div class="reasons__grid">
+          <div class="reasons__left" data-pin-left>
+            <span class="eyebrow eyebrow--plain" data-reveal>Expertise</span>
+            <h2 class="reasons__title" data-reveal>
+              Where ambitious ideas <em>get to work.</em>
+            </h2>
+            <p class="reasons__copy" data-reveal>
+              We bring creative thinking, technical depth, and a performance
+              mindset to the challenges shaping brands and businesses.
+            </p>
+          </div>
+
+          <div class="reasons__right">
+            <article class="reason" data-block="0" data-morph="0">
+              <h3>Creativity expands what's possible</h3>
+              <p>
+                We look beyond the immediate ask to find the idea, experience,
+                or opportunity that can make the greatest difference.
+              </p>
+            </article>
+            <article class="reason" data-block="1" data-morph="1">
+              <h3>Technical depth makes it real</h3>
+              <p>
+                Our strategists, designers, makers, and engineers know how to
+                produce, build, launch, and scale ambitious work.
+              </p>
+            </article>
+            <article class="reason" data-block="2" data-morph="2">
+              <h3>Performance defines success</h3>
+              <p>
+                We establish what success means, learn from how the work
+                performs, and use those insights to keep improving.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 03 · OUR SERVICES ============ -->
+      <section class="services" data-scene="services" id="services-list">
+        <div class="services__viewport">
+          <!-- Five vertical parallax panels. The headline is the FIRST panel and
+               shares the same push-up + inner-parallax treatment as the rest, so
+               the whole thing reads as one continuous vertical sequence. -->
+          <article class="svc svc--intro" data-svc="0">
+            <div class="svc__bg"><span class="svc__bg-inner"></span></div>
+            <div class="svc__intro-inner">
+              <h2 class="services-intro__title" data-si-title>
+                <span class="si-line"><span class="si-inner">Start with the challenge.</span></span>
+                <span class="si-line si-line--accent"><span class="si-inner">We'll build from there.</span></span>
+                <!-- extends straight from the bottom of the headline down into
+                     the first panel, which covers it as it scrolls up -->
+                <span class="svc-thread" data-svc-thread aria-hidden="true"></span>
+              </h2>
+            </div>
+          </article>
+
+          <article class="svc" data-svc="1">
+            <div class="svc__bg"><span class="svc__bg-inner"></span></div>
+            <div class="svc__copy">
+              <h3 class="svc__title">Digital <em>Experiences</em></h3>
+              <p class="svc__desc">
+                We design and build digital experiences that express the brand,
+                simplify customer journeys, strengthen discoverability, and
+                deliver measurable business value.
+              </p>
+              <ul class="svc__pills">
+                <li>CX strategy</li>
+                <li>UX/UI design</li>
+                <li>Content strategy</li>
+                <li>E-commerce</li>
+                <li>Full-stack engineering</li>
+                <li>Analytics &amp; optimization</li>
+              </ul>
+            </div>
+            <div class="svc__work">
+              <span class="svc__work-eyebrow">Case Study</span>
+              <span class="svc__work-name">SKS</span>
+              <p class="svc__work-desc">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+              </p>
+              <a class="svc__work-link" href="#">Learn More <i>→</i></a>
+            </div>
+          </article>
+
+          <article class="svc" data-svc="2">
+            <div class="svc__bg"><span class="svc__bg-inner"></span></div>
+            <div class="svc__copy">
+              <h3 class="svc__title">Growth <em>Marketing</em></h3>
+              <p class="svc__desc">
+                We connect audience insight, creative, media, and continuous
+                experimentation to create demand and turn it into measurable
+                growth.
+              </p>
+              <ul class="svc__pills">
+                <li>Audience &amp; channel strategy</li>
+                <li>Paid media</li>
+                <li>Lifecycle marketing &amp; CRM</li>
+                <li>Performance creative</li>
+                <li>Measurement &amp; analytics</li>
+              </ul>
+            </div>
+            <div class="svc__work">
+              <span class="svc__work-eyebrow">Case Study</span>
+              <span class="svc__work-name">Ka'Chava</span>
+              <p class="svc__work-desc">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+              </p>
+              <a class="svc__work-link" href="#">Learn More <i>→</i></a>
+            </div>
+          </article>
+
+          <article class="svc" data-svc="3">
+            <div class="svc__bg"><span class="svc__bg-inner"></span></div>
+            <div class="svc__copy">
+              <h3 class="svc__title">AI &amp; <em>Automation</em></h3>
+              <p class="svc__desc">
+                We create AI tools, automations, and workflows around real teams
+                and business needs—helping organizations reduce friction,
+                increase capacity, and work more effectively.
+              </p>
+              <ul class="svc__pills">
+                <li>AI strategy &amp; opportunity definition</li>
+                <li>Custom AI tools &amp; applications</li>
+                <li>Workflow automation</li>
+                <li>Data &amp; knowledge integration</li>
+                <li>AI-powered customer experiences</li>
+              </ul>
+            </div>
+            <div class="svc__work">
+              <span class="svc__work-name">Wellcom HOME</span>
+              <p class="svc__work-desc">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+              </p>
+              <a class="svc__work-link" href="#">Learn More <i>→</i></a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ 05 · HOW WE WORK ============ -->
+      <section class="how" data-scene="ring" id="how">
+        <div class="how__grid">
+          <!-- left column reserved for the shared fixed mark -->
+          <div class="how__left" aria-hidden="true"></div>
+          <div class="how__right">
+            <h2 class="how__title" data-reveal>
+              <em>What we value</em> shows up in the work.
+            </h2>
+
+            <div class="principles">
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="users"></span>
+                <div>
+                  <h3>Put people first</h3>
+                  <p>We stay close to the people we're creating for and the clients we're creating with.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="creative"></span>
+                <div>
+                  <h3>Stay creatively restless</h3>
+                  <p>We question familiar answers, follow promising ideas, and keep looking for ways to make the work better.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="chemistry"></span>
+                <div>
+                  <h3>Build real chemistry</h3>
+                  <p>Trust, candor, and mutual respect create stronger teams—and stronger work.</p>
+                </div>
+              </article>
+              <article class="principle" data-reveal>
+                <span class="principle__icon" data-icon="accountability"></span>
+                <div>
+                  <h3>Own the outcome</h3>
+                  <p>We communicate clearly, follow through, and take shared responsibility for what the work achieves.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FOOTER ============ -->
+      <footer class="footer" id="contact">
+        <div class="footer__top">
+          <!-- left column reserved for the shared fixed mark -->
+          <div class="footer__ring" aria-hidden="true"></div>
+          <div class="footer__right">
+            <h2 class="footer__wordmark"><em>We are</em> thelab</h2>
+            <div class="footer__locations">
+              <div class="loc">
+                <h4>NYC</h4>
+                <p>1115 Broadway, 5th fl<br />NY, NY 10010, US<br />+1.212.209.1333</p>
+              </div>
+              <div class="loc">
+                <h4>LA</h4>
+                <p>909 N. Sepulveda Blvd, Suite 860<br />El Segundo, CA 90245, US<br />+1.310.392.4892</p>
+              </div>
+              <div class="loc">
+                <h4>IST</h4>
+                <p>Suadiye,<br />Kadıköy İstanbul, 34740, Turkey<br />+90.310.392.4892</p>
+              </div>
+              <div class="loc">
+                <h4>SYDNEY</h4>
+                <p>40-50 Francis St,<br />Darlinghurst, NSW 2010, Australia<br />+61.2.9310.4458</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer__bottom">
+          <span class="footer__legal">©2026 thelab. Part of <b>Wellcom</b> Worldwide</span>
+          <nav class="footer__links">
+            <a href="#">Linkedin</a>
+            <a href="#">Privacy</a>
+            <a href="#">Modern Slavery Statement</a>
+            <a href="#">Whistleblower Protection</a>
+          </nav>
+        </div>
+      </footer>
+    </main>
+
+  </body>
+</html>

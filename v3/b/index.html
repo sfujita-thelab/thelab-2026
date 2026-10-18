@@ -681,6 +681,24 @@
     position: fixed; left: -180px; bottom: -180px; z-index: 1;
     width: calc(100% + 360px); height: calc(100% + 360px);
     display: block; pointer-events: none;
+    /* ITS OWN COMPOSITING LAYER, AND THAT IS THE FIX -- not the bleed above it.
+
+       WebKit rasterises a position: fixed element CLIPPED TO THE VIEWPORT before it
+       filters, so blur(44px) sampled transparency along the viewport's bottom edge no
+       matter how far this box actually extends past it. The hero's orange washed out
+       over the bottom of the screen in desktop Safari, mobile Safari and iOS Chrome,
+       where Chrome fills to the corner. Promoted, the layer is rasterised at its real
+       size, overhang and all, and the blur has content to draw on.
+
+       Bisected in Safari, and the two negative results are what pin it: at 400px of
+       bleed it still faded, and at blur(24px) -- well inside even the old 80 -- it still
+       faded. So it was never reach and never the overhang. translateZ(0) alone fills it
+       to the edge, as does removing the blur, which was the control.
+
+       The bleed above still earns its place: it is what the promoted layer now has to
+       sample. The two are a pair -- the promotion makes the overhang reachable, the
+       overhang gives the blur its 3 sigma. */
+    transform: translateZ(0);
     mix-blend-mode: multiply;
     /* The footer's own 44px. It is what removes the last edges after the upscale from
        a sixth of layout size has done the bulk of it. */

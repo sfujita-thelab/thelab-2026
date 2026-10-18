@@ -2455,28 +2455,22 @@
   /* z-index 1 of its own now that it is a sibling of .pf__band rather than a child of
      it -- it used to inherit the band wrapper's layer. It is still positioned off .pf,
      which .pf__band is too, so 387 means what it always meant. */
-  /* margin-bottom: auto -- AND IT IS WHAT KEEPS THE LEGAL LINE ON 40.
+  /* NO BOTTOM MARGIN, and the footer's spare height therefore collects BELOW the legal
+     line rather than above it. That is a deliberate choice, not an oversight, so here is
+     the thing it chooses between.
 
      .pf is a column flex box with min-height: 583 * --u, and that floor SCALES while the
      content inside it does not: the band is a flat 352, the office type and the legal
      line are on stepped tokens, so the footer's content measures about 587 at any width
-     while the floor goes 583 at 1440, 777 at 1920, 1036 at 2560. Past ~1500 the floor
-     wins and the difference is free space, which a flex column leaves at the END -- below
-     the legal line, where the only thing that should be is --spacer-40. Measured in
-     Chrome at 1920: 247 under the legal line against the 40 it asks for, and 457 at 2560.
+     while the floor goes 583 at 1440, 777 at 1920, 1036 at 2560. Past roughly 1500 the
+     floor wins, and the difference is free space that a flex column leaves at the end.
+     At or under 1440 the content clears the floor by 4px, there is no free space, and
+     the legal line sits on its --spacer-40 exactly.
 
-     It reads as a browser difference and is not one. It is a WIDTH difference, and it was
-     only ever invisible in a window at or under 1440, where the content clears the floor
-     by 4px and there is no free space to misplace.
-
-     An auto margin on a flex item eats the free space where it is written, so the slack
-     opens HERE, between the offices and the legal row -- which is where the footer's own
-     field belongs and where this reference had it, back when .pf__legal was pinned to the
-     bottom edge rather than carried in flow. When the content clears the floor the free
-     space is zero, auto resolves to zero, and nothing moves: Chrome at 1440 measures the
-     same 40 it measured before. The --spacer-56 above the legal line is untouched, which
-     is why the air is added here rather than by making that margin auto. */
-  .pf__locations { position: static; z-index: 1; margin: 0 var(--m) auto; width: auto;
+     An `auto` here would eat that space instead, opening it between the offices and the
+     legal row and holding the line on 40 at every width. The air has to go somewhere;
+     this puts it under the line. */
+  .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
                    display: grid; grid-template-columns: repeat(4, 1fr);
                    grid-auto-flow: row; column-gap: 0; row-gap: 0; }
   /* The shared 8u inset on the left, --spacer-24 on the right -- the same asymmetry

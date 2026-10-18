@@ -214,7 +214,7 @@
   /* ONE ROW: the copyright on the left, the two glyphs on the right. */
   .menu__foot { margin-top: auto; padding-top: var(--spacer-56);
                 display: flex; align-items: center; justify-content: space-between;
-                gap: var(--spacer-24); }
+                gap: var(--spacer-16); }
   /* 24, where the footer's are 21 -- these sit beside a line of 14 copy rather than
      under a stacked legal block, and the glyphs do not fill their 24-unit viewBox. */
   .menu__social { display: flex; align-items: center; gap: var(--spacer-12); }
@@ -835,10 +835,23 @@
      vertical lines in the same weight rather than in a second grey of its own. */
   .topbar.is-solid { background: var(--color-primary);
                      border-bottom-color: rgb(var(--black-base) / var(--grid-a, .13)); }
-  /* NOT over the footer. on-dark flips the bar's type to light for the dark band behind
-     it, and a #f4f4f4 ground under light type is light on light. The footer is a solid
-     field in its own right, so there is nothing to be legible against there anyway. */
-  .topbar.is-solid.on-dark { background: transparent; border-bottom-color: transparent; }
+  /* OVER THE FOOTER IT TAKES THE FOOTER'S OWN GROUND, not the page's.
+
+     It used to take none at all: on-dark flips the bar's type to light, a #f4f4f4 ground
+     under light type is light on light, so the rule cancelled both the ground and the
+     rule and left the bar floating. That reasoning only holds while the dark behind the
+     bar is empty, and on a phone it is not -- the footer stacks, so its mark, its
+     headline and its pill all run up the middle of the column and pass straight through
+     the wordmark and MENU on their way off the top. Two pieces of light type crossing
+     each other with nothing between them.
+
+     --black is the field .pf itself is painted in, so the bar closes against the footer
+     seamlessly rather than introducing a second dark. The rule is the footer's OWN line
+     -- rgba(244,244,244,.10), the value .pf__grid i carries -- for the same reason the
+     light bar closes on --grid-a: the bar ends on a line the page already draws, in the
+     weight that page draws it. */
+  .topbar.is-solid.on-dark { background: var(--black);
+                             border-bottom-color: rgba(244, 244, 244, .10); }
 
   @media (prefers-reduced-motion: reduce) {
     .topbar { transition: none; }
@@ -1250,26 +1263,37 @@
      shrinking with the window -- 111 at 1024, which is what it used to resolve to. */
   .exp__inner { position: relative; z-index: 4; padding-top: var(--spacer-200); }
 
-  /* THE DOME STOPS GROWING THE PAGE. .cover is a circle of 2865 design units on
-     desktop and 4584 below 1024, absolutely positioned in this section -- and absolute
-     overflow still counts toward the document's scroll height, so its lower half hung
-     past the footer: 301px at 900 before the stacked fix, and 86 at 1440 / 576 at 1920
-     once the desktop circle went to 1.25x.
+  /* NO overflow HERE AT ALL ANY MORE -- AND THAT IS THE FIX FOR SAFARI.
 
-     overflow: clip, not hidden -- hidden would make this a scroll container.
+     This section used to carry `overflow: clip; overflow-clip-margin: 800px`, for one
+     reason: .cover is absolutely positioned, an absolutely positioned box counts toward
+     the document's scrollable overflow whether or not anything can see it, and the
+     circle's lower half ran up to 1734px past this section's bottom edge.
 
-     A FLAT 800, and it has to be a literal: this property does not accept calc() here.
-     `calc(400 * var(--u) + 8px)` -- the margin that tracks the dome's own overhang --
-     computes to 0px, so the clip fell back to the padding box and cut the dome off
-     FLAT along the section's top edge as it rose. A plain 408px computes fine; the
-     calc is what it rejects.
+     IN SAFARI THAT CLIP PAINTED A BLACK BAND ACROSS PROOF. Bisected in Safari 27.0.1 over
+     three rounds: with `.expertise { overflow: visible }` forced, the band is gone; with
+     the dome's will-change removed instead, it is not. Nothing that paints in that area
+     is responsible -- #halogl, .pf, .cover, #stage, .hero-glow, .grain and .page-grid
+     were each switched off at Proof with the dome at full scale and the band survived all
+     seven. It is the clip itself: Safari has no overflow-clip-margin, the clipping layer
+     has to contain a composited child that reaches ~1700px below the clip box, and what
+     it paints over Proof where it has nothing to put is black.
 
-     800 covers the overhang (400 * --u, so 400 at 1440 and 533 at 1920) out to a 2880
-     window, and at the other end it cuts the circle at this section's bottom + 800 --
-     past where the Work gradient ends, which is the only thing the dome exists to
-     cover, and still well above the document's own bottom at every width, so the tail
-     this rule exists to remove stays removed. */
-  .expertise { overflow: clip; overflow-clip-margin: 800px; }
+     So the overflow is REMOVED rather than clipped. --cover-h sizes the dome to the job
+     it actually does -- finishing the Work gradient -- instead of to a full circle, which
+     was between 1.4x and 3x taller than it needed everywhere. Measured at twelve widths
+     from 320 to 2560, the document's scroll height is now the same number with the clip
+     and without it, so dropping it costs nothing. See .cover.
+
+     THE HEADROOM STAYS, and is still load-bearing. Safari also has no clip margin to
+     spare for the dome's overhang ABOVE this section, so the border box starts 400u + 8
+     higher than it used to with the same padding-top putting the content back. Nothing
+     clips now, but the padding is what five measurements in expertise.js are taken
+     against -- coverStep adds it back before using the rect -- so it cannot simply be
+     deleted along with the overflow it was introduced for. */
+  .expertise { --exp-guard: 8px;
+               margin-top:  calc(-400 * var(--u) - var(--exp-guard));
+               padding-top: calc( 400 * var(--u) + var(--exp-guard)); }
 
   /* The covering surface. Its centre is pinned; only its radius grows with
      scroll, so the curved top edge sweeps up over the Work gradient and the
@@ -1286,11 +1310,42 @@
        above), so the arc is in the same place and simply FLATTER across the width.
        coverR() in expertise.js carries the same number; the two must not drift or the
        reveal gate fires at the wrong moment. */
-    position: absolute; left: 50%; top: calc(-400 * var(--u));
-    width: calc(2865 * var(--u)); height: calc(2865 * var(--u));
+    /* --exp-guard, not -400u: the section now starts 400u + the guard above its old
+       edge (see .expertise) and this top resolves against that padding box, so the guard
+       alone puts the apex exactly where -400u used to put it. */
+    /* HALF A DISC, NOT A CIRCLE -- the same arc, and no tail underneath it.
+
+       Only the top of this shape is ever seen: everything below the circle's own centre
+       line is page-coloured fill on a page-coloured ground, with .proof painting over it
+       from z-index 3. But it still COUNTED. An absolutely positioned box contributes to
+       the document's scrollable overflow whether or not anything can see it, and at 1023
+       the lower half ran 1734px past the section's bottom edge. .expertise carried
+       `overflow: clip` to swallow that, and the clip is what Safari turned into a black
+       band across Proof (see the rule there).
+
+       A box of width 2R and height R with an elliptical top corner radius of R by R IS
+       the top half of the same circle: 50% of the width is R across, 100% of the height
+       is R down, so the curve is the identical quadrant on each side. The arc is pixel
+       for pixel what it was -- measured at three scroll positions, the apex and both
+       edges match to the pixel -- and the box is half as tall, which at every width but
+       one now finishes INSIDE the section. 1023 is the exception and keeps a 98px tail,
+       against 1734 before.
+
+       transform-origin MOVES WITH IT, and has to. The apex maths is `centre - R * s`, and
+       the centre was the box's own middle while this was a circle; on a half-disc the
+       centre is the box's BOTTOM edge. 50% 100% is therefore the same fixed point, which
+       is why expertise.js needs no change -- COVER_R is still 1432.5, still width / 2.
+
+       The flat bottom edge is invisible: it is --color-primary meeting --color-primary,
+       with .grain and .page-grid both painting above it either way. */
+    --cover-h: 1950;
+    position: absolute; left: 50%; top: var(--exp-guard);
+    width: calc(2865 * var(--u)); height: calc(var(--cover-h) * var(--u));
     margin-left: calc(-1432.5 * var(--u));
-    border-radius: 50%; background: var(--color-primary);
-    transform-origin: 50% 50%;
+    border-radius: calc(1432.5 * var(--u)) calc(1432.5 * var(--u)) 0 0 /
+                   calc(1432.5 * var(--u)) calc(1432.5 * var(--u)) 0 0;
+    background: var(--color-primary);
+    transform-origin: 50% calc(1432.5 * var(--u));
     transform: scale(var(--cover-s, 1));
     will-change: transform; z-index: 1;   /* above the Work canvas, below the grid */
   }
@@ -1635,7 +1690,24 @@
      now, which is where the top one already was. #halogl is inset: 0 on this box, so
      the field still fills the padded section -- the green starts where the section
      does, not where the copy does. */
-  .proof { position: relative;      /* the containing block for #halogl */
+  /* position: relative AND z-index -- the second one was missing, and its absence is why
+     this section's layers were never really this section's.
+
+     With z-index: auto a positioned box opens no stacking context, so #halogl at 1 and
+     the section's own copy at 3 were not inside anything: they landed in the ROOT context
+     and interleaved with the page's fixed furniture, which lives at the same numbers.
+     #halogl sat directly on top of #stage (0) and .hero-glow (1, and earlier in the
+     markup), with .grain (1, later in the markup) and .page-grid (2) painting over it in
+     turn. Three comments in this sheet already describe the arrangement as though the
+     section contained it -- "in Proof the section's own content is at 3" -- and it did
+     not. It does now, at the same 3 .pf carries, so the two dark-ish fields at the foot
+     of the page are built the same way.
+
+     What moves: #halogl is inside, so .grain and .page-grid pass BEHIND Proof's gradient
+     where they used to cross it. That is the arrangement every other composed section
+     already has. Measured at 1440 it is a 0.06% pixel change, at most 18 pixels in any
+     one row -- the grid lines reading through the mint rather than over it. */
+  .proof { position: relative; z-index: 3;   /* the containing block for #halogl */
            padding: var(--spacer-80) 0 var(--spacer-120); }
   /* --spacer-152 under it on DESKTOP only. Written as an override rather than by
      changing the token above, because the stacked widths keep the 120 -- which steps
@@ -2383,7 +2455,28 @@
   /* z-index 1 of its own now that it is a sibling of .pf__band rather than a child of
      it -- it used to inherit the band wrapper's layer. It is still positioned off .pf,
      which .pf__band is too, so 387 means what it always meant. */
-  .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
+  /* margin-bottom: auto -- AND IT IS WHAT KEEPS THE LEGAL LINE ON 40.
+
+     .pf is a column flex box with min-height: 583 * --u, and that floor SCALES while the
+     content inside it does not: the band is a flat 352, the office type and the legal
+     line are on stepped tokens, so the footer's content measures about 587 at any width
+     while the floor goes 583 at 1440, 777 at 1920, 1036 at 2560. Past ~1500 the floor
+     wins and the difference is free space, which a flex column leaves at the END -- below
+     the legal line, where the only thing that should be is --spacer-40. Measured in
+     Chrome at 1920: 247 under the legal line against the 40 it asks for, and 457 at 2560.
+
+     It reads as a browser difference and is not one. It is a WIDTH difference, and it was
+     only ever invisible in a window at or under 1440, where the content clears the floor
+     by 4px and there is no free space to misplace.
+
+     An auto margin on a flex item eats the free space where it is written, so the slack
+     opens HERE, between the offices and the legal row -- which is where the footer's own
+     field belongs and where this reference had it, back when .pf__legal was pinned to the
+     bottom edge rather than carried in flow. When the content clears the floor the free
+     space is zero, auto resolves to zero, and nothing moves: Chrome at 1440 measures the
+     same 40 it measured before. The --spacer-56 above the legal line is untouched, which
+     is why the air is added here rather than by making that margin auto. */
+  .pf__locations { position: static; z-index: 1; margin: 0 var(--m) auto; width: auto;
                    display: grid; grid-template-columns: repeat(4, 1fr);
                    grid-auto-flow: row; column-gap: 0; row-gap: 0; }
   /* The shared 8u inset on the left, --spacer-24 on the right -- the same asymmetry
@@ -2475,6 +2568,21 @@
      from a 10 that had been solved against an earlier reference whose address line box
      was 16 rather than 19 -- three of that 10 had quietly become leading. */
   .pf__tel { margin-top: var(--spacer-8); }
+  /* A REAL tel: LINK, AND THAT IS THE FIX.
+
+     The numbers were plain text, and iOS Safari's data detector finds a phone number in
+     plain text, wraps it in an anchor of its own and paints that anchor in the SYSTEM
+     link blue with an underline -- on a .72-alpha white address block, in the middle of
+     a dark footer. Nothing in this stylesheet could reach it, because the element did
+     not exist until the page was on a phone.
+
+     Writing the anchor ourselves takes the detector out of it: Safari leaves a number
+     that is already a link alone, and the link is ours to style. color: inherit and no
+     underline is the number exactly as it read before, and it is dialable now, which the
+     plain text never was anywhere but iOS. Hover goes to --pf-ink, the same lift the
+     legal links and the social glyphs take. */
+  .pf__tel a { color: inherit; text-decoration: none; }
+  .pf__tel a:hover { color: var(--pf-ink); }
 
   .pf__legal nav { display: flex; gap: var(--spacer-16); flex-wrap: wrap; }
   .pf__legal a { color: inherit; text-decoration: none; }
@@ -2604,13 +2712,18 @@
     .hero { justify-content: flex-end; padding-bottom: var(--spacer-64); }
     .hero__mark { top: calc(50% - var(--spacer-104)); }
 
+
     /* ---- THE COVER, twice the radius it has on desktop. A circle always curves away
        at the viewport's edges, and at this width the shallow dome left a 266px band at
        each side where its arc had not arrived -- the two blue wedges. Doubling it
        halves that. expertise.js reads the same doubling through coverR(); the two must
        not drift, or the reveal gate fires at the wrong moment. */
-    .cover { width: calc(4584 * var(--u)); height: calc(4584 * var(--u));
-             margin-left: calc(-2292 * var(--u)); }
+    .cover { --cover-h: 3900;
+             width: calc(4584 * var(--u));
+             margin-left: calc(-2292 * var(--u));
+             border-radius: calc(2292 * var(--u)) calc(2292 * var(--u)) 0 0 /
+                            calc(2292 * var(--u)) calc(2292 * var(--u)) 0 0;
+             transform-origin: 50% calc(2292 * var(--u)); }
 
     /* ---- WORK: reading order. Card 2 lives inside the header's column, because that
        is what hangs it off the header on desktop -- which also makes it render BEFORE
@@ -2652,6 +2765,15 @@
        first two and .pf__social the third, so both boxes go to a column. */
     .pf__legal { flex-direction: column; align-items: center; }
     .pf__end   { flex-direction: column; align-items: center; }
+    /* AND THE LINKS INSIDE THE MIDDLE ROW. align-items centres each ROW of .pf__end --
+       the copyright, the nav box, the glyphs -- but the nav is itself a flex row, and at
+       350 of column its three labels do not fit on one line: Privacy and Modern Slavery
+       Statement take the first, Whistleblower Protection wraps to a second. A wrapped
+       flex row still packs from flex-start, so both lines sat hard against the left with
+       119px of air on the right of the first and 168 on the right of the second, under a
+       copyright line and above a pair of glyphs that were both centred. This centres the
+       lines themselves, so the whole block reads as one centred column. */
+    .pf__legal nav { justify-content: center; }
     /* the icons keep their desktop size rather than scaling with the artboard --
        21 design units resolves to 13 at this width. */
     .pf__icon svg { width: 21px; height: 21px; }
@@ -2944,6 +3066,15 @@
     /* Full width on a phone: 80% of two columns is a 268 measure at 375, which was
        breaking a 16px line every four or five words. */
     .expertise .sec-head__body { width: 100%; margin: 0 auto; }
+
+    /* TALLER AGAIN ON THE PHONE. --cover-h is how far the dome has to reach to finish
+       the Work gradient off, and that distance does not scale with --u: the stacked Work
+       section is laid out in FLOW, so as the viewport narrows its cards get taller in
+       px while --u gets smaller, and the number of design units between the dome's top
+       and the canvas's bottom climbs. Measured at the foot of that climb: 320 needs
+       4077u where 1023 needs 1526. 3900 covers everything from 768 up; the phone takes
+       4200, which clears 320 by 19px and 390 by 206. */
+    .cover { --cover-h: 4200; }
 
     .areas { position: relative; height: auto; margin-top: var(--spacer-32); }
     .areas__svg { --area-k: calc(2 * var(--col) / 1360);
@@ -3461,22 +3592,22 @@
       <div class="pf__office">
         <p class="pf__city">New York</p>
         <p class="pf__addr">1115 Broadway, 5th fl New York, NY 10010, US</p>
-        <p class="pf__tel">+1.212.209.1333</p>
+        <p class="pf__tel"><a href="tel:+12122091333">+1.212.209.1333</a></p>
       </div>
       <div class="pf__office">
         <p class="pf__city">London</p>
         <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
-        <p class="pf__tel">+90.310.392.4892</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
       </div>
       <div class="pf__office">
         <p class="pf__city">Istanbul</p>
         <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
-        <p class="pf__tel">+90.310.392.4892</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
       </div>
       <div class="pf__office">
         <p class="pf__city">Sydney</p>
         <p class="pf__addr">40-50 Francis St, Darlinghurst, NSW 2010, Australia</p>
-        <p class="pf__tel">+61.2.9310.4458</p>
+        <p class="pf__tel"><a href="tel:+61293104458">+61.2.9310.4458</a></p>
       </div>
     </div>
     <div class="pf__legal">

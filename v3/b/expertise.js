@@ -114,8 +114,16 @@
   function coverStep() {
     if (!cover) return;
     const r = section.getBoundingClientRect();
+    /* THE SECTION'S TOP, AS THIS FUNCTION HAS ALWAYS MEANT IT -- where its CONTENT
+       starts, not where its box does. The two were the same thing until .expertise took
+       the dome's overhang on as padding-top so that `overflow: clip` would stop cutting
+       the arc flat in Safari (see the rule in the stylesheet). The box top moved 400u + 8
+       higher; everything below is measured against the old edge, so the padding goes back
+       on here, once, and every term downstream keeps the value it had. Read rather than
+       written as 400u so the two cannot drift. */
     const vh = window.innerHeight;
     const u = unit();
+    const rTop = r.top + (parseFloat(getComputedStyle(section).paddingTop) || 0);
     const R = coverR();
     const A = (COVER_TOP + R) * u;   // the dome's apex at scale 0, below the section top
     const B = R * u;                 // how far the apex rises per unit of scale
@@ -152,8 +160,8 @@
          is the same sweep at every width and window height because every term in it is
          measured rather than assumed. */
       const hdr     = section.querySelector('.sec-head');
-      const padTop  = hdr ? hdr.getBoundingClientRect().top - r.top : 248;
-      const tickBot = ticker ? r.top - ticker.getBoundingClientRect().bottom : 54;
+      const padTop  = hdr ? hdr.getBoundingClientRect().top - rTop : 248;
+      const tickBot = ticker ? rTop - ticker.getBoundingClientRect().bottom : 54;
 
       /* THE APEX IS NOT THE PART THAT GRAZES. A dome's arc SAGS away from its apex
          toward the sides, by  rho - sqrt(rho^2 - d^2)  at d from the centre, so the
@@ -175,14 +183,14 @@
       const T1 = vh - padTop;
       const T2 = tickBot;
 
-      s = S1 + (r.top - T1) * (S2 - S1) / (T2 - T1);
+      s = S1 + (rTop - T1) * (S2 - S1) / (T2 - T1);
       s = Math.max(COVER_FROM, Math.min(1, s));
     } else {
       // Progress is measured from the moment the ticker's top crosses COVER_AT of the
       // viewport. Falls back to the section edge only if the ticker is missing.
       const from = ticker
         ? vh * COVER_AT - COVER_OFFSET * u - ticker.getBoundingClientRect().top
-        : vh * (1 + COVER_LEAD) - r.top;
+        : vh * (1 + COVER_LEAD) - rTop;
       const p = Math.max(0, Math.min(1, from / COVER_PX));
       const e = p * p * (3 - 2 * p);
       s = COVER_FROM + (1 - COVER_FROM) * e;
@@ -192,7 +200,7 @@
 
     // Where the circle's top arc actually is on screen. This -- not "the section
     // has entered the viewport" -- is what the first reveal waits for.
-    const apex = r.top + A - B * s;
+    const apex = rTop + A - B * s;
     coverage = Math.max(0, Math.min(1, (vh - apex) / vh));
   }
 

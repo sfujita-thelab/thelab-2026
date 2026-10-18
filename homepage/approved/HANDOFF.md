@@ -382,12 +382,26 @@ three gradients, plus an opacity each.
 
 | Panel group | Config | Drawn into | Section |
 |---|---|---|---|
-| Hero halo | `CONFIG.poles` | `#stage` (WebGL) | the hero |
+| Hero glow | `HEROGLOW` | `.hero-glow` (2D canvas) | the hero |
 | Work halo | `FEATUREDWORK` | `#featuredworkgl` (WebGL) | Featured Work |
 | Expertise glow | `EXPERTISE` | the loops' svg gradient | Expertise |
 | **Proof halo** | `HALO` | `#halogl` (WebGL) | **Proof** |
 
-Two things that were confusing and are now not:
+Three things that were confusing and are now not:
+
+**The hero's panel rows drove nothing.** They pointed at `CONFIG.poles` and
+`blob.paletteWash` — the WebGL mesh gradient on `#stage`. That is switched off
+(`blob.enabled: false`) and app.js holds `uHaloFade` at 0, which is the uniform its
+whole contribution is scaled by, so those sliders moved values nothing drew. Proved by
+hiding `.hero-glow`: the hero renders completely grey, so none of its colour comes from
+`#stage`. The panel points at `HEROGLOW` now, which is what you see. `CONFIG.poles` and
+`blob.*` stay in config.js for whoever sets that flag true again.
+
+**The hero is three hues, not one.** `.hero-glow` carries three families — a core and a
+highlight each — and the headline steps between them every few phrase changes, so the
+hero cycles the page's own section colours: orange, then Work's `#0587c1` exactly, then
+Proof's `#289581` exactly. The single-hue orange ladder described below belongs to the
+switched-off blob.
 
 **The Proof group was labelled *Expertise halo*** and never drove Expertise. The object is
 called `HALO` and routes through `halo.` because it began life there; the canvas moved to
@@ -416,16 +430,22 @@ Three families across the four fields, measured:
 
 | | hue | |
 |---|---|---|
-| Hero | 8–16° | orange |
+| Hero (live, `HEROGLOW`) | 16° · 199° · 168° | cycles orange → blue → green |
+| Hero (`CONFIG.poles`, switched off) | 8–16° | orange |
 | Work | 198–199° | blue |
-| Expertise | 8–16° | orange — the hero's, exactly |
+| Expertise | 8–16° | orange — the switched-off hero's, exactly |
 | Proof | 168–170° | green |
 
-Each field is deliberately one hue. The hero's is the clearest case: measured across
-`gradient-orange.png` its saturation varies by 0.02 and its value by 0.05, and the only
-thing that moves is hue, by 9° toward red on the right — so every pole is `#eb501b` and
-the three on the right carry that lean. Work is the same idea around `#0587c1`. Variation
-comes from lightness and from the wash, not from a second hue.
+The hero is the odd one: it steps between three families rather than holding one, and
+those families are the other sections' own colours. The three section fields are each
+deliberately single-hue — Work is a ladder around `#0587c1`, and the variation you see is
+lightness and wash, not a second hue.
+
+The orange ladder that `CONFIG.poles` holds was measured against a reference called
+`gradient-orange.png` — recorded in the comment there as saturation varying by 0.02 and
+value by 0.05, with hue moving 9° toward red on the right. **That file is not on disk**
+anywhere, so the numbers can be read but not re-checked. The same is true of `work.png`,
+`hp_modules.png` and `new-footer.png`, which other comments cite.
 
 Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
 the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.

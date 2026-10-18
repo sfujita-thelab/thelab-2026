@@ -37,14 +37,40 @@
   const ctx = cv.getContext('2d');
   if (!ctx) return;
 
-  /* The three families, as [core, light]. Taken from config.js rather than picked
-     again by eye: these are the same values the hero and the two section halos
-     use, so the footer is lit by the page's own palette. */
-  const FAMILIES = [
-    [[234,  82,  26], [255, 163, 133]],   // orange   #ea521a / #ffa385
-    [[  5, 135, 193], [108, 204, 249]],   // blue     #0587c1 / #6cccf9
-    [[ 40, 149, 129], [ 96, 240, 223]]    // green    #289581 / #60f0df
+  /* The three families, as [core, light] -- READ FROM CONFIG now, where they used to
+     be three hard-coded rgb triples here. Same values, same page palette: orange, then
+     Work's #0587c1, then Proof's #289581. Moving them is what puts the hero in the
+     tweak panel, which it never was -- the panel's old hero rows drove CONFIG.blob, and
+     that is switched off.
+
+     Parsed through a one-entry cache rather than on every read: colourAt runs per mass
+     per frame, and re-parsing six hex strings at that rate for the same answer would be
+     work for nothing. The key is the config values themselves, so a change in the panel
+     is picked up on the next frame and nothing else ever re-parses. */
+  const FALLBACK = [
+    [[234,  82,  26], [255, 163, 133]],
+    [[  5, 135, 193], [108, 204, 249]],
+    [[ 40, 149, 129], [ 96, 240, 223]]
   ];
+  const hex2rgb = h => {
+    const v = parseInt(String(h).replace('#', ''), 16);
+    return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+  };
+  let famKey = '', famCache = FALLBACK;
+  function families() {
+    const G = (typeof HEROGLOW !== 'undefined') ? HEROGLOW : null;
+    if (!G || !G.families || G.families.length !== 3) return FALLBACK;
+    const key = G.families.map(f => f.core + f.light).join('');
+    if (key !== famKey) {
+      famKey = key;
+      famCache = G.families.map(f => [hex2rgb(f.core), hex2rgb(f.light)]);
+    }
+    return famCache;
+  }
+  const alpha = () => {
+    const G = (typeof HEROGLOW !== 'undefined') ? HEROGLOW : null;
+    return (G && typeof G.alpha === 'number') ? G.alpha : 0.60;
+  };
 
   /* x/y are fractions of the canvas box; y >= 1 is at or below its bottom edge, which
      is where all three sit. r is a fraction of the canvas's WIDTH, so the masses keep
@@ -180,7 +206,7 @@
      which the note above measures. Multiplying into a white canvas has no such ceiling
      -- overlaps simply darken toward the colour -- and the mask keeps all of it in the
      bottom half of the viewport where there is no type to fight. */
-  const ALPHA = 0.60;        // peak alpha of a mass at its centre
+  /* The peak alpha of a mass is live from config now -- see families() above. */
 
   /* ------------------------------------------------------------------ sizing */
   /* TWO BOXES, AND THEY ARE NOT THE SAME BOX ANY MORE.
@@ -310,7 +336,8 @@
     const i  = Math.floor(f);
     const m  = f - i;
     const mix = sh => {
-      const a = FAMILIES[i][sh], bb = FAMILIES[(i + 1) % 3][sh];
+      const F = families();
+      const a = F[i][sh], bb = F[(i + 1) % 3][sh];
       return [a[0] + (bb[0] - a[0]) * m,
               a[1] + (bb[1] - a[1]) * m,
               a[2] + (bb[2] - a[2]) * m];
@@ -419,10 +446,10 @@
       ctx.rotate(ang);
       ctx.scale(e, 1 / e);          // area-preserving, so stretching does not also brighten
       const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      g.addColorStop(0.00, 'rgba(' + light.join(',') + ',' + ALPHA.toFixed(3) + ')');
-      g.addColorStop(0.20, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.86).toFixed(3) + ')');
-      g.addColorStop(0.50, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.48).toFixed(3) + ')');
-      g.addColorStop(0.80, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.14).toFixed(3) + ')');
+      g.addColorStop(0.00, 'rgba(' + light.join(',') + ',' + alpha().toFixed(3) + ')');
+      g.addColorStop(0.20, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.86).toFixed(3) + ')');
+      g.addColorStop(0.50, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.48).toFixed(3) + ')');
+      g.addColorStop(0.80, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.14).toFixed(3) + ')');
       g.addColorStop(1.00, 'rgba(' + core.join(',')  + ',0)');
       ctx.fillStyle = g;
       /* the fill has to cover the canvas in the TRANSFORMED space */
@@ -448,8 +475,8 @@
     const fNear    = reach(BLOBS[1].x);
     const floorCol = colourAt(BLOBS[1], t, 0, fNear * TINT, fNear * LIFT * 0.6);
     const fl = ctx.createLinearGradient(0, OY + RH, 0, OY + RH * 0.72);
-    fl.addColorStop(0.00, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.52).toFixed(3) + ')');
-    fl.addColorStop(0.42, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.20).toFixed(3) + ')');
+    fl.addColorStop(0.00, 'rgba(' + floorCol.join(',') + ',' + (alpha() * 0.52).toFixed(3) + ')');
+    fl.addColorStop(0.42, 'rgba(' + floorCol.join(',') + ',' + (alpha() * 0.20).toFixed(3) + ')');
     fl.addColorStop(1.00, 'rgba(' + floorCol.join(',') + ',0)');
     ctx.fillStyle = fl;
     ctx.fillRect(0, 0, W, H);

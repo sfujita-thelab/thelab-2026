@@ -24,7 +24,8 @@
   const ROOTS = {
     featuredwork: typeof FEATUREDWORK !== 'undefined' ? FEATUREDWORK : null,
     halo: typeof HALO !== 'undefined' ? HALO : null,
-    expertise: typeof EXPERTISE !== 'undefined' ? EXPERTISE : null
+    expertise: typeof EXPERTISE !== 'undefined' ? EXPERTISE : null,
+    heroglow: typeof HEROGLOW !== 'undefined' ? HEROGLOW : null
   };
 
   const resolve = path => {

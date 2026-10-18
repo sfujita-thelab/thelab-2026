@@ -631,6 +631,38 @@ const FEATUREDWORK = {
 
 
 /* ============================================================================
+   HERO GLOW — the colour you actually see in the hero.
+
+   NOT CONFIG.blob. That is the WebGL mesh gradient, and it is switched off
+   (`blob.enabled: false`), so its six poles and its paletteWash drive a layer
+   whose whole contribution app.js multiplies by zero. They stay in this file for
+   whoever sets that flag true again; they are not what is on screen.
+
+   What IS on screen is hero-glow.js: three soft masses on a 2D canvas,
+   multiplied onto the page. THREE FAMILIES, and the headline steps between them
+   -- every PER_FAM-th phrase change hands over to the next, so the hero cycles
+   through the page's own three section colours rather than holding one:
+
+     orange   the hero's and Expertise's tone
+     blue     Work's base, #0587c1 exactly
+     green    Proof's, #289581 exactly
+
+   Each family is a core and a light. The core carries the body of the mass and
+   the light its centre, so the pair is a tone and its highlight rather than two
+   separate colours. alpha is the peak of a mass at its middle; the stops below it
+   in hero-glow.js are fractions of it, so it scales the whole glow.
+   ========================================================================= */
+const HEROGLOW = {
+  alpha: 0.60,                 // peak alpha of a mass at its centre
+  families: [
+    { core: '#ea521a', light: '#ffa385' },   // orange
+    { core: '#0587c1', light: '#6cccf9' },   // blue  -- Work's base
+    { core: '#289581', light: '#60f0df' }    // green -- Proof's
+  ]
+};
+
+
+/* ============================================================================
    EXPERTISE GLOW — the warm radial behind the four loops.
 
    NOT a WebGL field like the other three. It is a plain <radialGradient> in the
@@ -771,28 +803,36 @@ const SCHEMA = [
      rather than by scrolling between groups -- which is the only reason to duplicate
      rows that also live in their own palettes below.
 
-     THE FOURTH IS NOT THE SAME KIND OF NUMBER, and that is worth knowing before
-     dragging it. The three WebGL fields expose paletteWash, which does not change
-     opacity at all: it mixes the poles toward the page background, so the field gets
-     paler without becoming more transparent. Expertise exposes alpha, the real peak
-     opacity of its svg gradient -- the glow genuinely thins out and what is behind it
-     shows through. They are grouped because they are the same CONTROL to a designer,
-     not because they are the same mechanism. */
+     THEY ARE NOT ALL THE SAME KIND OF NUMBER, which is worth knowing before dragging
+     them. Work and Proof expose paletteWash, which does not change opacity at all: it
+     mixes the poles toward the page background, so the field goes paler without
+     becoming transparent. Hero and Expertise expose a real alpha -- the glow thins and
+     what is behind it shows through. Grouped because they are the same CONTROL to a
+     designer, labelled because they are not the same mechanism. */
   ['Opacity \u00b7 all four fields', [
-    ['blob.paletteWash',      0,    0.85, 0.005, 'hero (wash)'],
+    ['heroglow.alpha',        0,    1,    0.005, 'hero (alpha)'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work (wash)'],
     ['expertise.alpha',       0,    1,    0.002, 'expertise (alpha)'],
     ['halo.paletteWash',      0,    0.85, 0.005, 'proof (wash)']
   ]],
-  ['Hero halo \u00b7 palette', [
-    ['poles.0.color', 'color', 'vermillion core'],
-    ['poles.1.color', 'color', 'vermillion'],
-    ['poles.2.color', 'color', 'mid orange'],
-    ['poles.3.color', 'color', 'warm orange'],
-    ['poles.4.color', 'color', 'cream tail'],
-    ['poles.5.color', 'color', 'luminous orange'],
-    ['bg',            'color', 'page background'],
-    ['blob.paletteWash',      0,    0.85, 0.005, 'opacity']
+  /* THE HERO, AS IT ACTUALLY RENDERS. These six wells are hero-glow.js's three
+     families -- a core and its highlight each -- and the headline steps between them,
+     so the hero cycles orange, then Work's blue, then Proof's green.
+
+     The rows that used to be here drove CONFIG.poles and blob.paletteWash, which are
+     the WebGL mesh gradient. That is switched off (blob.enabled: false) and app.js
+     multiplies its whole contribution by zero, so those sliders moved values nothing
+     drew. They are gone from the panel; the values stay in config.js for whoever
+     turns the flag back on. */
+  ['Hero glow \u00b7 palette', [
+    ['heroglow.families.0.core',  'color', 'orange core'],
+    ['heroglow.families.0.light', 'color', 'orange light'],
+    ['heroglow.families.1.core',  'color', 'blue core'],
+    ['heroglow.families.1.light', 'color', 'blue light'],
+    ['heroglow.families.2.core',  'color', 'green core'],
+    ['heroglow.families.2.light', 'color', 'green light'],
+    ['heroglow.alpha',       0,  1,  0.005, 'opacity'],
+    ['bg',                   'color', 'page background']
   ]],
   ['Work halo \u00b7 palette', [
     ['featuredwork.poles.0.color', 'color', 'pale icy blue'],

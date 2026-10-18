@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- WebKit's data detectors, off. Left alone, Safari and every iOS browser -- they are
+     all WebKit -- find the office ADDRESSES and the phone numbers in the markup, wrap
+     each one in an anchor of their own and paint it in the system link style: underlined,
+     and blue where our own colour should be. Nothing in the stylesheet can reach those
+     elements, because they do not exist until the page is on the device. The numbers are
+     real tel: links of ours, so turning the detector off costs nothing -- a number that
+     is already a link stays one, and the addresses were never meant to be. -->
+<meta name="format-detection" content="telephone=no,address=no,email=no,date=no">
 <title>Hero prototype — living gradient + optical circle</title>
 
 <!-- thelab design tokens — STEPPED ONLY, the live site's own system.
@@ -2683,6 +2691,19 @@
      legal links and the social glyphs take. */
   .pf__tel a { color: inherit; text-decoration: none; }
   .pf__tel a:hover { color: var(--pf-ink); }
+  /* AND A BELT FOR THAT BRACE. The meta above should stop the detector running at all,
+     but it is honoured inconsistently across WebKit versions, and when it is not the
+     anchor it injects carries this attribute. Styling it by that attribute is the one
+     handle there is on an element we never wrote. Covers the addresses too, which have
+     no link of their own and so no other rule to catch them.
+
+     -webkit-text-decoration as well as the standard property: older WebKit reads only
+     the prefixed one here, which is exactly the vintage that ignores the meta. */
+  .pf__addr a, .pf__tel a, a[x-apple-data-detectors] {
+    color: inherit !important;
+    -webkit-text-decoration: none !important;
+            text-decoration: none !important;
+  }
 
   .pf__legal nav { display: flex; gap: var(--spacer-16); flex-wrap: wrap; }
   .pf__legal a { color: inherit; text-decoration: none; }
@@ -2783,8 +2804,8 @@
        8, --spacer-8 is 8, --spacer-24 is 16, --spacer-16 is 8. Two COLLISIONS come with
        that and are flagged: city->address and address->phone are both 8 here where
        desktop has 12 and 8, and the legal nav's gap and the socials' gap are both 8
-       where desktop has 16 and 12. 44 -> --spacer-80 (40 here). */
-    .pf__legal { padding-left: 0; margin-top: var(--spacer-80); }
+       where desktop has 16 and 12. */
+    .pf__legal { padding-left: 0; }
   }
 
 

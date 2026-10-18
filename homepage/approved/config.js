@@ -767,10 +767,22 @@ const SCHEMA = [
      named and commented, and editing one there does exactly what dragging its slider
      did. This removes the UI, not the control -- and git has the rows if a round of
      retuning wants them back. */
-  ['Opacity \u00b7 the three WebGL fields', [
-    ['blob.paletteWash',      0,    0.85, 0.005, 'hero halo'],
-    ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work halo'],
-    ['halo.paletteWash',      0,    0.85, 0.005, 'proof halo']
+  /* ALL FOUR FIELDS IN ONE PLACE, so their strengths can be set against each other
+     rather than by scrolling between groups -- which is the only reason to duplicate
+     rows that also live in their own palettes below.
+
+     THE FOURTH IS NOT THE SAME KIND OF NUMBER, and that is worth knowing before
+     dragging it. The three WebGL fields expose paletteWash, which does not change
+     opacity at all: it mixes the poles toward the page background, so the field gets
+     paler without becoming more transparent. Expertise exposes alpha, the real peak
+     opacity of its svg gradient -- the glow genuinely thins out and what is behind it
+     shows through. They are grouped because they are the same CONTROL to a designer,
+     not because they are the same mechanism. */
+  ['Opacity \u00b7 all four fields', [
+    ['blob.paletteWash',      0,    0.85, 0.005, 'hero (wash)'],
+    ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work (wash)'],
+    ['expertise.alpha',       0,    1,    0.002, 'expertise (alpha)'],
+    ['halo.paletteWash',      0,    0.85, 0.005, 'proof (wash)']
   ]],
   ['Hero halo \u00b7 palette', [
     ['poles.0.color', 'color', 'vermillion core'],

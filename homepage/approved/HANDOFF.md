@@ -403,6 +403,30 @@ ratios in the JS, so `alpha` scales the whole fade without flattening it.
 Its oranges are the hero's, copied by hand when it was built. **Copied, not linked** —
 retuning the hero has never moved them and still does not.
 
+**The four opacities sit together in the first group**, so they can be set against each
+other. One caveat before dragging them: the three WebGL fields expose `paletteWash`,
+which is not opacity — it mixes the poles toward the page background, so the field goes
+paler without becoming transparent. Expertise exposes `alpha`, a real peak opacity: the
+glow thins and what is behind it shows through. Same control to a designer, different
+mechanism underneath.
+
+## The page's hues
+
+Three families across the four fields, measured:
+
+| | hue | |
+|---|---|---|
+| Hero | 8–16° | orange |
+| Work | 198–199° | blue |
+| Expertise | 8–16° | orange — the hero's, exactly |
+| Proof | 168–170° | green |
+
+Each field is deliberately one hue. The hero's is the clearest case: measured across
+`gradient-orange.png` its saturation varies by 0.02 and its value by 0.05, and the only
+thing that moves is hue, by 9° toward red on the right — so every pole is `#eb501b` and
+the three on the right carry that lean. Work is the same idea around `#0587c1`. Variation
+comes from lightness and from the wash, not from a second hue.
+
 Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
 the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.
 That was 18 groups and about 128 sliders on gradients that are now tuned.

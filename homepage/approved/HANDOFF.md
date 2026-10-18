@@ -382,12 +382,20 @@ three gradients, plus an opacity each.
 
 | Panel group | Config | Drawn into | Section |
 |---|---|---|---|
-| Hero glow | `HEROGLOW` | `.hero-glow` (2D canvas) | the hero |
+| Page glow | `PAGEGLOW` | `.hero-glow` + `.pf__glow` (2D canvases) | the hero **and** the footer |
 | Work halo | `FEATUREDWORK` | `#featuredworkgl` (WebGL) | Featured Work |
 | Expertise glow | `EXPERTISE` | the loops' svg gradient | Expertise |
 | **Proof halo** | `HALO` | `#halogl` (WebGL) | **Proof** |
 
 Three things that were confusing and are now not:
+
+**The hero and the footer are one palette.** Their three families were an identical copy
+of the same rgb triples in `hero-glow.js` and `footer-glow.js`, agreeing only because
+nobody had edited one of them — the hero's own comment reads *"THE ALPHA is the footer's
+0.30 doubled"*. `PAGEGLOW` owns them now, so the two cannot drift. Each keeps its own
+alpha (`heroAlpha` 0.60, `footerAlpha` 0.30): the footer is half the strength and is
+composited the other way round — the hero multiplies onto a light page, the footer adds
+onto `#222` and is multiplied in.
 
 **The hero's panel rows drove nothing.** They pointed at `CONFIG.poles` and
 `blob.paletteWash` — the WebGL mesh gradient on `#stage`. That is switched off

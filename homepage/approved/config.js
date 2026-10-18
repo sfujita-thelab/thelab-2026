@@ -631,29 +631,37 @@ const FEATUREDWORK = {
 
 
 /* ============================================================================
-   HERO GLOW — the colour you actually see in the hero.
+   PAGE GLOW — the soft masses in the hero AND in the footer.
 
-   NOT CONFIG.blob. That is the WebGL mesh gradient, and it is switched off
-   (`blob.enabled: false`), so its six poles and its paletteWash drive a layer
-   whose whole contribution app.js multiplies by zero. They stay in this file for
-   whoever sets that flag true again; they are not what is on screen.
+   ONE PALETTE, TWO STRENGTHS. These three families were duplicated as identical
+   rgb triples in hero-glow.js and footer-glow.js, agreeing only because nobody
+   had edited one of them: the hero's comment even reads "THE ALPHA is the
+   footer's 0.30 doubled". They are read from here now, so the two cannot drift.
+   Each keeps its own alpha, because they are not the same strength and are not
+   composited the same way -- the hero multiplies onto a light page, the footer
+   adds onto #222 and is multiplied in.
 
-   What IS on screen is hero-glow.js: three soft masses on a 2D canvas,
-   multiplied onto the page. THREE FAMILIES, and the headline steps between them
-   -- every PER_FAM-th phrase change hands over to the next, so the hero cycles
-   through the page's own three section colours rather than holding one:
+   NOT CONFIG.blob, which is the hero's other gradient: a WebGL mesh on #stage,
+   switched off (`blob.enabled: false`) with app.js holding uHaloFade at 0, so
+   its poles and paletteWash drive a layer whose contribution is multiplied by
+   zero. They stay in this file for whoever sets that flag true again.
+
+   THREE FAMILIES, and the headline steps between them -- every PER_FAM-th phrase
+   change hands over to the next, so the page cycles its own section colours
+   rather than holding one:
 
      orange   the hero's and Expertise's tone
      blue     Work's base, #0587c1 exactly
      green    Proof's, #289581 exactly
 
-   Each family is a core and a light. The core carries the body of the mass and
-   the light its centre, so the pair is a tone and its highlight rather than two
-   separate colours. alpha is the peak of a mass at its middle; the stops below it
-   in hero-glow.js are fractions of it, so it scales the whole glow.
+   Each family is a core and a light: the core carries the body of a mass and the
+   light its centre, so the pair is a tone and its highlight rather than two
+   separate colours. The stops in both files are fractions of their alpha, so each
+   alpha scales its whole glow.
    ========================================================================= */
-const HEROGLOW = {
-  alpha: 0.60,                 // peak alpha of a mass at its centre
+const PAGEGLOW = {
+  heroAlpha:   0.60,           // peak alpha of a mass in the HERO
+  footerAlpha: 0.30,           // and in the FOOTER, which is half as strong
   families: [
     { core: '#ea521a', light: '#ffa385' },   // orange
     { core: '#0587c1', light: '#6cccf9' },   // blue  -- Work's base
@@ -809,13 +817,14 @@ const SCHEMA = [
      becoming transparent. Hero and Expertise expose a real alpha -- the glow thins and
      what is behind it shows through. Grouped because they are the same CONTROL to a
      designer, labelled because they are not the same mechanism. */
-  ['Opacity \u00b7 all four fields', [
-    ['heroglow.alpha',        0,    1,    0.005, 'hero (alpha)'],
+  ['Opacity \u00b7 every field', [
+    ['pageglow.heroAlpha',    0,    1,    0.005, 'hero (alpha)'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work (wash)'],
     ['expertise.alpha',       0,    1,    0.002, 'expertise (alpha)'],
-    ['halo.paletteWash',      0,    0.85, 0.005, 'proof (wash)']
+    ['halo.paletteWash',      0,    0.85, 0.005, 'proof (wash)'],
+    ['pageglow.footerAlpha',  0,    1,    0.005, 'footer (alpha)']
   ]],
-  /* THE HERO, AS IT ACTUALLY RENDERS. These six wells are hero-glow.js's three
+  /* THE HERO AND THE FOOTER, AS THEY ACTUALLY RENDER. These six wells are the three
      families -- a core and its highlight each -- and the headline steps between them,
      so the hero cycles orange, then Work's blue, then Proof's green.
 
@@ -824,14 +833,15 @@ const SCHEMA = [
      multiplies its whole contribution by zero, so those sliders moved values nothing
      drew. They are gone from the panel; the values stay in config.js for whoever
      turns the flag back on. */
-  ['Hero glow \u00b7 palette', [
-    ['heroglow.families.0.core',  'color', 'orange core'],
-    ['heroglow.families.0.light', 'color', 'orange light'],
-    ['heroglow.families.1.core',  'color', 'blue core'],
-    ['heroglow.families.1.light', 'color', 'blue light'],
-    ['heroglow.families.2.core',  'color', 'green core'],
-    ['heroglow.families.2.light', 'color', 'green light'],
-    ['heroglow.alpha',       0,  1,  0.005, 'opacity'],
+  ['Page glow \u00b7 hero + footer', [
+    ['pageglow.families.0.core',  'color', 'orange core'],
+    ['pageglow.families.0.light', 'color', 'orange light'],
+    ['pageglow.families.1.core',  'color', 'blue core'],
+    ['pageglow.families.1.light', 'color', 'blue light'],
+    ['pageglow.families.2.core',  'color', 'green core'],
+    ['pageglow.families.2.light', 'color', 'green light'],
+    ['pageglow.heroAlpha',   0,  1,  0.005, 'hero opacity'],
+    ['pageglow.footerAlpha', 0,  1,  0.005, 'footer opacity'],
     ['bg',                   'color', 'page background']
   ]],
   ['Work halo \u00b7 palette', [

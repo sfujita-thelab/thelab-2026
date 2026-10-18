@@ -41,7 +41,8 @@
      be three hard-coded rgb triples here. Same values, same page palette: orange, then
      Work's #0587c1, then Proof's #289581. Moving them is what puts the hero in the
      tweak panel, which it never was -- the panel's old hero rows drove CONFIG.blob, and
-     that is switched off.
+     that is switched off. footer-glow.js reads the SAME families, so the two cannot
+     drift; each keeps its own alpha.
 
      Parsed through a one-entry cache rather than on every read: colourAt runs per mass
      per frame, and re-parsing six hex strings at that rate for the same answer would be
@@ -58,7 +59,7 @@
   };
   let famKey = '', famCache = FALLBACK;
   function families() {
-    const G = (typeof HEROGLOW !== 'undefined') ? HEROGLOW : null;
+    const G = (typeof PAGEGLOW !== 'undefined') ? PAGEGLOW : null;
     if (!G || !G.families || G.families.length !== 3) return FALLBACK;
     const key = G.families.map(f => f.core + f.light).join('');
     if (key !== famKey) {
@@ -68,8 +69,8 @@
     return famCache;
   }
   const alpha = () => {
-    const G = (typeof HEROGLOW !== 'undefined') ? HEROGLOW : null;
-    return (G && typeof G.alpha === 'number') ? G.alpha : 0.60;
+    const G = (typeof PAGEGLOW !== 'undefined') ? PAGEGLOW : null;
+    return (G && typeof G.heroAlpha === 'number') ? G.heroAlpha : 0.60;
   };
 
   /* x/y are fractions of the canvas box; y >= 1 is at or below its bottom edge, which

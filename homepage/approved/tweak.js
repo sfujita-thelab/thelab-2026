@@ -25,7 +25,7 @@
     featuredwork: typeof FEATUREDWORK !== 'undefined' ? FEATUREDWORK : null,
     halo: typeof HALO !== 'undefined' ? HALO : null,
     expertise: typeof EXPERTISE !== 'undefined' ? EXPERTISE : null,
-    heroglow: typeof HEROGLOW !== 'undefined' ? HEROGLOW : null
+    pageglow: typeof PAGEGLOW !== 'undefined' ? PAGEGLOW : null
   };
 
   const resolve = path => {

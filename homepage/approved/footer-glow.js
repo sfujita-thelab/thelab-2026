@@ -66,12 +66,37 @@
   /* The three families, as [core, light]. Taken from config.js rather than picked
      again by eye: these are the same values the hero and the two section halos
      use, so the footer is lit by the page's own palette. */
-  const FAMILIES = [
-    [[234,  82,  26], [255, 163, 133]],   // orange   #ea521a / #ffa385
-    [[  5, 135, 193], [108, 204, 249]],   // blue     #0587c1 / #6cccf9
-    [[ 40, 149, 129], [ 96, 240, 223]]    // green    #289581 / #60f0df
-  ];
+  /* The three families, READ FROM CONFIG -- the same ones the hero uses. They were an
+     identical copy of these rgb triples in both files, agreeing only because nobody had
+     edited one of them. PAGEGLOW owns them now; this file keeps its own alpha, because
+     the footer is half the hero's strength and is composited the other way round.
 
+     Cached on the values themselves, so a panel change lands next frame and nothing
+     else re-parses. FALLBACK is what renders if config has not loaded. */
+  const FALLBACK = [
+    [[234,  82,  26], [255, 163, 133]],
+    [[  5, 135, 193], [108, 204, 249]],
+    [[ 40, 149, 129], [ 96, 240, 223]]
+  ];
+  const hex2rgb = h => {
+    const v = parseInt(String(h).replace('#', ''), 16);
+    return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+  };
+  let famKey = '', famCache = FALLBACK;
+  function families() {
+    const G = (typeof PAGEGLOW !== 'undefined') ? PAGEGLOW : null;
+    if (!G || !G.families || G.families.length !== 3) return FALLBACK;
+    const key = G.families.map(f => f.core + f.light).join('');
+    if (key !== famKey) {
+      famKey = key;
+      famCache = G.families.map(f => [hex2rgb(f.core), hex2rgb(f.light)]);
+    }
+    return famCache;
+  }
+  const alpha = () => {
+    const G = (typeof PAGEGLOW !== 'undefined') ? PAGEGLOW : null;
+    return (G && typeof G.footerAlpha === 'number') ? G.footerAlpha : 0.30;
+  };
   /* x/y are fractions of the canvas box; y >= 1 is at or below its bottom edge, which
      is where all three sit. r is a fraction of the canvas's WIDTH, so the masses keep
      their proportions when the window changes.
@@ -154,7 +179,7 @@
      than the amount of colour -- so the fill comes down and the drift and breath go up.
      More of the dark field stays dark, and what you notice is the shapes moving
      through it rather than how much of it is lit. */
-  const ALPHA = 0.30;        // peak alpha of a mass at its centre
+  /* The peak alpha of a mass is live from config now -- see families() above. */
 
   /* ------------------------------------------------------------------ sizing */
   let W = 0, H = 0;
@@ -212,8 +237,9 @@
     const i  = Math.floor(f);
     const k  = f - i;
     const m  = k;
-    const a  = FAMILIES[i][shade];
-    const bb = FAMILIES[(i + 1) % 3][shade];
+    const F  = families();
+    const a  = F[i][shade];
+    const bb = F[(i + 1) % 3][shade];
     return [
       Math.round(a[0] + (bb[0] - a[0]) * m),
       Math.round(a[1] + (bb[1] - a[1]) * m),
@@ -283,10 +309,10 @@
       ctx.rotate(ang);
       ctx.scale(e, 1 / e);          // area-preserving, so stretching does not also brighten
       const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      g.addColorStop(0.00, 'rgba(' + light.join(',') + ',' + ALPHA.toFixed(3) + ')');
-      g.addColorStop(0.20, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.86).toFixed(3) + ')');
-      g.addColorStop(0.50, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.48).toFixed(3) + ')');
-      g.addColorStop(0.80, 'rgba(' + core.join(',')  + ',' + (ALPHA * 0.14).toFixed(3) + ')');
+      g.addColorStop(0.00, 'rgba(' + light.join(',') + ',' + alpha().toFixed(3) + ')');
+      g.addColorStop(0.20, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.86).toFixed(3) + ')');
+      g.addColorStop(0.50, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.48).toFixed(3) + ')');
+      g.addColorStop(0.80, 'rgba(' + core.join(',')  + ',' + (alpha() * 0.14).toFixed(3) + ')');
       g.addColorStop(1.00, 'rgba(' + core.join(',')  + ',0)');
       ctx.fillStyle = g;
       /* the fill has to cover the canvas in the TRANSFORMED space */
@@ -308,8 +334,8 @@
        to reach them. */
     const floorCol = colourAt(BLOBS[1], t, 0);
     const fl = ctx.createLinearGradient(0, H, 0, H * 0.72);
-    fl.addColorStop(0.00, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.52).toFixed(3) + ')');
-    fl.addColorStop(0.42, 'rgba(' + floorCol.join(',') + ',' + (ALPHA * 0.20).toFixed(3) + ')');
+    fl.addColorStop(0.00, 'rgba(' + floorCol.join(',') + ',' + (alpha() * 0.52).toFixed(3) + ')');
+    fl.addColorStop(0.42, 'rgba(' + floorCol.join(',') + ',' + (alpha() * 0.20).toFixed(3) + ')');
     fl.addColorStop(1.00, 'rgba(' + floorCol.join(',') + ',0)');
     ctx.fillStyle = fl;
     ctx.fillRect(0, 0, W, H);

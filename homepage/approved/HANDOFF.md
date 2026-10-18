@@ -8,6 +8,7 @@ as the map; the four files beside it hold the detail.
 
 `homepage/approved` is the homepage prototype, and the one to read. `homepage/v3/a` is
 the same page before any tokenising — the "before" for a comparison. `expertise/` and
+`work/` hold the other pages. `expertise/` and
 `work/` are placeholders for the other pages; neither has a build in it yet.
 
 ## Where each thing is written down
@@ -340,3 +341,48 @@ Three dead rules were removed — `.pf__body` and `.pf__offices`, left over from
 five-column footer that `.pf__locations` replaced, and `.hero__head`, left over from the
 hand-built lockup before the mark and the wordmark became one SVG. None of the three is
 in the markup. `.hero__dot` looks dead and is not: `hero-type.js` creates it at runtime.
+
+
+---
+
+## Work gradient — how it is tuned
+
+The brief was a cleaner gradient based on `#0587c1`. The base was already that colour, so
+nothing about the hue moved. What made it read as unclean was the field being zoned and
+stirred, and that is what changed — all of it in `config.js`, under `FEATUREDWORK`.
+These values arrived in a v4 round that has since replaced the build it was copied from.
+
+| | before | now | why |
+|---|---|---|---|
+| `colorFalloff` | 2.10 | **1.25** | Higher is tighter: each pole holds its own zone and the field reads as several blues meeting. Lower lets them average, so the ladder becomes a ramp. The biggest single lever. |
+| `colorWarpAmp` | 0.26 | **0.08** | The warp bending colour regions against each other. At 0.26 it put visible mottling through the ramp. Low rather than zero, or the field stops reading as living at all. |
+| `hueBreath` | 5.0° | **0** | Each pole drifted its own few degrees. With one hue across the ladder this was the one mechanism guaranteed to break it. |
+| `satBreath` | 0.20 | **0.06** | |
+| `brightBreath` | 0.14 | **0.05** | |
+| `radiusBreath` | 0.20 | **0.10** | |
+| light poles | `#56bdf0`, `#84c4e1` | **`#64b5d9`, `#a0d1e7`** | Exact tints of `#0587c1`, mixed toward white at 38% and 62%. |
+
+On the poles: the old two were only 1.4° and 0.2° off the base's hue, so this is a small
+move and not the reason the gradient looked busy. It is worth making anyway — derived
+tints cannot drift from the base when the base is retuned, where two separately chosen
+blues can.
+
+The four base poles, the shape, the floor, the scroll behaviour and the cursor response
+are all untouched.
+
+
+---
+
+## The tweak panel
+
+`T` opens it, and it is **the palettes only** — the six pole colours for each of the
+three halos, plus an opacity each.
+
+Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
+the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.
+That was 18 groups and about 128 sliders on gradients that are now tuned.
+
+Nothing is lost with them. Each value is still in its object in `config.js`, named and
+commented, and editing it there does exactly what dragging its slider did — the panel was
+a faster way to reach the same numbers, not a separate system. The rows are in git if a
+round of retuning wants them back.

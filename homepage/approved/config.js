@@ -502,8 +502,10 @@ const FEATUREDWORK = {
   colorSpread:  1.00,   // NB this scales with the poles' own spread, so pushing it
                         // past ~1.2 at this blob scale throws most of the tones
                         // outside the visible dome and it collapses to one hue           // keeps the six tones reading as distinct zones
-  colorFalloff: 2.10,   // tighter = tones stay distinct. NB adding more poles
-                        // REDUCES variation: every point averages over all of them.
+  /* 1.25, down from 2.10. Higher is TIGHTER -- each pole holds its own zone and the
+     field reads as several blues meeting. Lower lets them average into one another, so
+     the ladder becomes a ramp. This is the single biggest lever on how clean it looks. */
+  colorFalloff: 1.25,
   falloff:      1.15,
   edgeGain:     2.00,
   edgeShape:    2.30,          // tighter shoulder = a readable curved boundary
@@ -531,14 +533,17 @@ const FEATUREDWORK = {
   floorSoft: 0.505,            // 0 disables the floor (the hero and halo blobs)
 
   /* internal life only — regions drift, swell and breathe in place */
-  colorWarpAmp: 0.26, colorWarpFreq: 0.46, colorWarpSpeed: 0.024,
+  /* 0.08, down from 0.26. This is the warp that bends the colour regions against each
+     other; at 0.26 it is what put visible mottling through the ramp. Low, not zero --
+     the field would go dead flat and stop reading as a living gradient at all. */
+  colorWarpAmp: 0.08, colorWarpFreq: 0.46, colorWarpSpeed: 0.024,
   orbitAmp:     0.15,           // small: regions stir, the blob does not travel
   orbitPeriod:  78,
 
-  radiusBreath: 0.20,           // expand / contract areas of colour
+  radiusBreath: 0.10,           // expand / contract areas of colour -- halved, see below
   radiusBreathPeriod: 62,
-  brightBreath: 0.14,
-  satBreath:    0.20,
+  brightBreath: 0.05,
+  satBreath:    0.06,
   breathPeriod: 56,
 
   /* Each pole's hue drifts a few degrees on its own slow cycle. Because the
@@ -546,7 +551,10 @@ const FEATUREDWORK = {
      the whole field sliding one way — which is what makes it read as the blues
      shifting among themselves rather than the gradient changing colour.
      Keep it single-digit: past ~8 degrees the cool end starts leaving blue. */
-  hueBreath:       5.0,         // degrees either side of the pole's own hue
+  /* 0. The poles are one hue now, so letting each drift its own few degrees was the
+     one thing guaranteed to break that -- it is the mechanism that made the blues read
+     as shifting among themselves rather than as a single colour. */
+  hueBreath:       0.0,         // degrees either side of the pole's own hue
   hueBreathPeriod: 74,
 
   /* ---- scroll-driven expansion ------------------------------------------
@@ -609,8 +617,11 @@ const FEATUREDWORK = {
        (#c2eaf5, sat 0.21, value 0.96) -- filled, but light. A ladder weighted the other
        way, plus a shade below the base, is what made this dark: measured, the bottom
        left corner came out #1e5669 at value 0.41 against the reference's 0.96. */
-    { x: -0.66, y: -0.34, r: 0.34, color: '#56bdf0' },   // from the tweak panel
-    { x: -0.08, y: -0.22, r: 0.33, color: '#84c4e1' },   // from the tweak panel
+    /* EXACT TINTS OF THE BASE, mixed toward white at 38% and 62%. They were #56bdf0 and
+       #84c4e1, which sat 1.4 and 0.2 degrees off it -- close, but arrived at separately.
+       Derived from #0587c1 they cannot drift from it when the base is retuned. */
+    { x: -0.66, y: -0.34, r: 0.34, color: '#64b5d9' },   // base, 38% toward white
+    { x: -0.08, y: -0.22, r: 0.33, color: '#a0d1e7' },   // base, 62% toward white
     { x:  0.52, y: -0.06, r: 0.32, color: '#0587c1' },   // from the tweak panel, now THE BASE
     { x: -0.44, y:  0.18, r: 0.33, color: '#0587c1' },   // THE BASE
     { x:  0.16, y:  0.34, r: 0.33, color: '#0587c1' },   // THE BASE, centre-low
@@ -716,14 +727,23 @@ const SCHEMA = [
      as opacity while leaving the palette alone. Deliberately NOT repeated inside
      the per-gradient groups below -- two sliders bound to one value would fall
      out of step with each other the moment either was dragged. */
+  /* THE PANEL IS THE PALETTES ONLY.
+
+     Each halo used to carry four or five more groups -- colour, shape, flow, cursor, and
+     on the hero also wander, pointer lens, cursor smear, eclipse glow, circle and
+     blur/grid. That was 18 groups and about 128 sliders, every one of them a live handle
+     on a gradient that is now tuned. What is left is the thing still worth reaching for:
+     the six pole colours per halo and an opacity.
+
+     Nothing is lost. The values those sliders drove are all still in the objects above,
+     named and commented, and editing one there does exactly what dragging its slider
+     did. This removes the UI, not the control -- and git has the rows if a round of
+     retuning wants them back. */
   ['Opacity \u00b7 all three halos', [
     ['blob.paletteWash',      0,    0.85, 0.005, 'hero halo'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'work halo'],
     ['halo.paletteWash',      0,    0.85, 0.005, 'expertise halo']
   ]],
-
-  /* ======================================================= HERO (CONFIG) ==
-     Paths with no root prefix resolve against CONFIG, as they always have. */
   ['Hero halo \u00b7 palette', [
     ['poles.0.color', 'color', 'vermillion core'],
     ['poles.1.color', 'color', 'vermillion'],
@@ -734,91 +754,6 @@ const SCHEMA = [
     ['bg',            'color', 'page background'],
     ['blob.paletteWash',      0,    0.85, 0.005, 'opacity']
   ]],
-  ['Hero halo \u00b7 colour', [
-    ['blob.colorSpread',      0.6,  2.5,  0.01],
-    ['blob.colorFalloff',     0.5,  5,    0.05],
-    ['blob.brightBreath',     0,    0.4,  0.005],
-    ['blob.satBreath',        0,    0.5,  0.005],
-    ['blob.breathPeriod',     8,    120,  1]
-  ]],
-  ['Hero halo \u00b7 flow (slow!)', [
-    ['blob.orbitAmp',         0,    0.6,  0.005],
-    ['blob.orbitPeriod',      8,    140,  1],
-    ['blob.colorWarpAmp',     0,    0.8,  0.005],
-    ['blob.colorWarpFreq',    0.15, 2,    0.01],
-    ['blob.colorWarpSpeed',   0,    0.30, 0.002],
-    ['blob.shapeDrift',       0,    0.3,  0.005],
-    ['blob.shapePeriodMul',   1,    6,    0.1],
-    ['render.timeScale',      0.1,  20,   0.1]
-  ]],
-  ['Hero halo \u00b7 blob shape', [
-    ['blob.scale',            0.4,  2.2,  0.01],
-    ['blob.offsetX',         -1,    1,    0.01],
-    ['blob.offsetY',         -1,    1,    0.01],
-    ['blob.shapeWarpAmp',     0,    0.8,  0.005],
-    ['blob.shapeWarpFreq',    0.2,  3,    0.01],
-    ['blob.edgeGain',         0.2,  3,    0.01],
-    ['blob.edgeShape',        0.6,  4,    0.02],
-    ['blob.falloff',          0.5,  6,    0.05]
-  ]],
-  ['Hero halo \u00b7 wander', [
-    ['blob.wanderX',          0,    1.2,  0.01],
-    ['blob.wanderY',          0,    0.8,  0.01],
-    ['blob.wanderPx1',        20,   200,  1],
-    ['blob.wanderPy1',        20,   200,  1],
-    ['blob.shapeRound',       0,    1,    0.01]
-  ]],
-  ['Hero halo \u00b7 pointer lens', [
-    ['lens.strength',         0,    0.2,  0.002],
-    ['lens.radius',           0.1,  1.2,  0.01],
-    ['lens.pull',            -1,    1,    0.02],
-    ['lens.blur',            -1,    1,    0.02],
-    ['lens.lift',            -0.05, 0.1,  0.002],
-    ['lens.ease',             0.004,0.15, 0.002],
-    ['lens.edgeFeather',      0.01, 0.5,  0.005]
-  ]],
-  ['Hero halo \u00b7 cursor', [
-    ['pointer.gradFollow',    0,    0.5,  0.005],
-    ['pointer.gradFollowEase',0.004,0.2,  0.002],
-    ['pointer.radiusVH',      0.05, 0.8,  0.005],
-    ['pointer.strength',      0,    0.10, 0.001],
-    ['pointer.blurBoost',    -1,    1,    0.01],
-    ['pointer.ease',          0.01, 0.30, 0.005]
-  ]],
-  ['Hero halo \u00b7 cursor smear', [
-    ['smear.intensity',       0,    3,    0.01],
-    ['smear.radius',          0.05, 1.2,  0.01],
-    ['smear.reach',           0.1,  1,    0.01],
-    ['smear.rimWidth',        0.01, 0.3,  0.002],
-    ['smear.saturation',      0,    3,    0.01],
-    ['smear.taps',            4,    24,   1]
-  ]],
-  ['Hero halo \u00b7 eclipse glow', [
-    ['corona.intensity',      0,    2.5,  0.01],
-    ['corona.spread',         0.004,0.12, 0.001],
-    ['corona.outerScale',     1,    8,    0.1],
-    ['corona.outerWeight',    0,    1.5,  0.01],
-    ['corona.saturation',     0,    3,    0.01],
-    ['corona.gamma',          0.5,  3,    0.01]
-  ]],
-  ['Hero halo \u00b7 circle', [
-    ['circle.radiusScale',    0.4,  1.8,  0.01],
-    ['circle.maxRadiusVH',    0,    0.60, 0.005],   // 0 = off (the default)
-    ['circle.blurMix',        0,    1,    0.01],
-    ['circle.veilAlpha',      0,    1,    0.01],
-    ['circle.veilColor', 'color', 'veil tint', 'bg'],   // null here = follow bg
-    ['circle.strokeAlpha',    0,    1,    0.01],
-    ['refraction.strength',   0,    0.12, 0.001],
-    ['refraction.falloff',    1,    8,    0.1]
-  ]],
-  ['Hero halo \u00b7 blur / grid', [
-    ['blur.radiusPx',         0,    260,  1],
-    ['grid.alpha',            0,    0.3,  0.002],
-    ['render.dither',         0,    4,    0.1]
-  ]],
-
-  /* ================================================== FEATUREDWORK BLUE (FEATUREDWORK) ==
-     `featuredwork.` routes to the FEATUREDWORK object -- see resolve() in tweak.js. */
   ['Work halo \u00b7 palette', [
     ['featuredwork.poles.0.color', 'color', 'pale icy blue'],
     ['featuredwork.poles.1.color', 'color', 'turquoise'],
@@ -828,50 +763,6 @@ const SCHEMA = [
     ['featuredwork.poles.5.color', 'color', 'rich blue'],
     ['featuredwork.paletteWash',      0,    0.85, 0.005, 'opacity']
   ]],
-  ['Work halo \u00b7 colour', [
-    ['featuredwork.colorSpread',      0.6,  2.5,  0.01],
-    ['featuredwork.colorFalloff',     0.5,  5,    0.05],
-    ['featuredwork.brightBreath',     0,    0.4,  0.005],
-    ['featuredwork.satBreath',        0,    0.5,  0.005],
-    ['featuredwork.hueBreath',        0,    30,   0.5],
-    ['featuredwork.hueBreathPeriod',  10,   160,  1],
-    ['featuredwork.breathPeriod',     8,    120,  1]
-  ]],
-  ['Work halo \u00b7 shape', [
-    ['featuredwork.scale',            0.08, 0.8,  0.002],
-    ['featuredwork.offsetX',         -0.6,  0.6,  0.005],
-    ['featuredwork.offsetY',         -0.3,  0.4,  0.002],
-    ['featuredwork.edgeGain',         0.2,  4,    0.01],
-    ['featuredwork.edgeShape',        0.6,  4,    0.02],
-    ['featuredwork.falloff',          0.5,  6,    0.05],
-    ['featuredwork.shapeRound',       0,    1,    0.01],
-    ['featuredwork.floorAt',         -0.5,  0.8,  0.005],
-    ['featuredwork.floorSoft',        0,    0.8,  0.005]
-  ]],
-  ['Work halo \u00b7 flow', [
-    ['featuredwork.orbitAmp',         0,    0.6,  0.005],
-    ['featuredwork.orbitPeriod',      8,    160,  1],
-    ['featuredwork.colorWarpAmp',     0,    0.8,  0.005],
-    ['featuredwork.colorWarpFreq',    0.15, 2,    0.01],
-    ['featuredwork.colorWarpSpeed',   0,    0.30, 0.002],
-    ['featuredwork.shapeWarpAmp',     0,    0.5,  0.005],
-    ['featuredwork.shapeDrift',       0,    0.3,  0.005],
-    ['featuredwork.radiusBreath',     0,    0.6,  0.005],
-    ['featuredwork.blurPx',           0,    220,  1]
-  ]],
-  ['Work halo \u00b7 cursor tone', [
-    ['featuredwork.curSat',           0,    1.6,  0.01],
-    ['featuredwork.curHue',         -30,   30,    0.5],
-    ['featuredwork.curRadius',        0.2,  1.2,  0.01],
-    ['featuredwork.curFade',          0.005, 0.2, 0.005],
-    ['featuredwork.curEase',          0.005, 0.2, 0.005],
-    ['featuredwork.curWarp',          0,    0.3,  0.005],
-    ['featuredwork.curSpread',        0,    0.8,  0.01],
-    ['featuredwork.curBlur',         -1,    1,    0.01]
-  ]],
-
-  /* ============================================ EXPERTISE HALO (HALO) ==
-     `halo.` routes to the HALO object. */
   ['Expertise halo \u00b7 palette', [
     ['halo.poles.0.color', 'color', 'highlight'],
     ['halo.poles.1.color', 'color', 'pale aqua'],
@@ -881,39 +772,4 @@ const SCHEMA = [
     ['halo.poles.5.color', 'color', 'soft teal'],
     ['halo.paletteWash',      0,    0.85, 0.005, 'opacity']
   ]],
-  ['Expertise halo \u00b7 colour', [
-    ['halo.colorSpread',      0.6,  2.5,  0.01],
-    ['halo.colorFalloff',     0.5,  5,    0.05],
-    ['halo.brightBreath',     0,    0.4,  0.005],
-    ['halo.satBreath',        0,    0.5,  0.005],
-    ['halo.breathPeriod',     8,    120,  1]
-  ]],
-  ['Expertise halo \u00b7 shape', [
-    ['halo.scale',            0.08, 0.8,  0.002],
-    ['halo.offsetX',         -0.6,  0.6,  0.005],
-    ['halo.offsetY',         -0.3,  0.4,  0.002],
-    ['halo.edgeGain',         0.2,  4,    0.01],
-    ['halo.edgeShape',        0.6,  4,    0.02],
-    ['halo.falloff',          0.5,  6,    0.05],
-    ['halo.shapeRound',       0,    1,    0.01]
-  ]],
-  ['Expertise halo \u00b7 flow', [
-    ['halo.orbitAmp',         0,    0.6,  0.005],
-    ['halo.orbitPeriod',      8,    160,  1],
-    ['halo.colorWarpAmp',     0,    0.8,  0.005],
-    ['halo.colorWarpFreq',    0.15, 2,    0.01],
-    ['halo.colorWarpSpeed',   0,    0.30, 0.002],
-    ['halo.shapeWarpAmp',     0,    0.5,  0.005],
-    ['halo.shapeDrift',       0,    0.3,  0.005],
-    ['halo.radiusBreath',     0,    0.6,  0.005],
-    ['halo.blurPx',           0,    220,  1]
-  ]],
-  ['Expertise halo \u00b7 cursor', [
-    ['halo.rest',             0,    0.6,  0.005, 'resting opacity'],
-    ['halo.followX',          0,    1.2,  0.01],
-    ['halo.followY',          0,    1,    0.01],
-    ['halo.stretch',          0,    1,    0.01],
-    ['halo.ease',             0.005, 0.2, 0.005],
-    ['halo.fade',             0.005, 0.2, 0.005]
-  ]]
 ];

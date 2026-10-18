@@ -99,11 +99,6 @@
   html[data-edit] .hero h1,
   html[data-edit] .hero .hero__aside p { pointer-events: auto; user-select: text; }
 
-  .hero__head {
-    position: absolute; top: var(--pad-top); left: var(--m); right: var(--m);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
   /* One drawing: no gap, nothing to align, and the height is the only number. 30 is
      what the old mark was, and the lockup's 599 x 120 makes that 149.75 across --
      within 8px of the 158 the mark-plus-wordmark used to measure, so the bar's balance
@@ -3688,9 +3683,10 @@
 
 
   <!-- PROOF -> FOOTER, option B. An ordinary dark block that scrolls up on its own:
-       nothing is pinned and there is no entrance sequence. footer.js only builds the
-       mark and the grid lines; footer-type.js rewrites the headline's second line and
-       blinks the mark with it; footer-glow.js paints the canvas. -->
+       nothing is pinned and there is no entrance sequence. footer.js builds the mark
+       and the grid lines; footer-glow.js paints the canvas. NOT footer-type.js, which
+       this page does not load -- see the note on .pf__head below, which says so and is
+       the one to believe. The headline here is static. -->
   <footer class="pf" id="footer">
 
     <!-- footer.png, 1440 x 558, so its pixels are this page's units and every number in

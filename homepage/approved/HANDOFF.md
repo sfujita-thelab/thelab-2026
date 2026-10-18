@@ -1,8 +1,14 @@
-# v3/b — the prototype, read against thelab.co
+# homepage/approved — the prototype, read against thelab.co
 
 This file exists for one job: **letting a developer compare this prototype with the live
 site's token system and see exactly where the two agree and where they do not.** Read it
 as the map; the four files beside it hold the detail.
+
+## Where this sits
+
+`homepage/approved` is the homepage prototype, and the one to read. `homepage/v3/a` is
+the same page before any tokenising — the "before" for a comparison. `expertise/` and
+`work/` are placeholders for the other pages; neither has a build in it yet.
 
 ## Where each thing is written down
 
@@ -47,13 +53,15 @@ without one the page falls back to `--font`.
 
 ## How a change happens
 
-1. Edit inside `v3/b` only. `v1/`, `v2/` and `v3/a` are frozen reference copies — `v3/a`
-   is the build from before any tokenising, which is the "before" in any comparison.
+1. Edit inside `homepage/approved` only. `homepage/v3/a` is a frozen reference copy —
+   the build from before any tokenising, which is the "before" in any comparison. The
+   earlier options (`v1`, `v2`, `_archive`) are kept locally and are not in this repo;
+   see `.gitignore`.
 2. There is no build step. Open `index.html`, or serve the folder.
 3. Commit to `main`. This repo has no branches and never has; every commit goes straight
    to `main`.
 4. GitHub Pages serves it within a minute or two at
-   **https://sfujita-thelab.github.io/thelab-2026/v3/b/** — which is what to open on a
+   **https://sfujita-thelab.github.io/thelab-2026/homepage/approved/** — which is what to open on a
    phone, since several of the differences below only exist in WebKit.
 5. A value that belongs to the design system changes in `thelab-tokens.css` and gets a
    line in `NEW-TOKENS.md`. A value that exists only to place something on the artboard
@@ -102,7 +110,7 @@ the stacked layout with tablet-range fluid type — which is the point, see abov
 | Element | Token | Mobile · Desktop |
 |---|---|---|
 | `.nav a` | `--font-button-2` | 14 · 16 |
-| `.logo span` | — | **left alone**, pending the real logo SVG. Its `font-family` is pinned to v3/b's Helvetica Neue stack, because `--font` became Beausite for the page and was pulling the wordmark with it. |
+| `.logo span` | — | **left alone**, pending the real logo SVG. Its `font-family` is pinned to this build's Helvetica Neue stack, because `--font` became Beausite for the page and was pulling the wordmark with it. |
 
 ### Hero
 | Element | Token | Mobile · Desktop |

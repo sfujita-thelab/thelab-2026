@@ -637,7 +637,25 @@
      every measurement below is the number taken straight off the reference.
      app.js writes it from the same cssW the shader uses. */
   html, body { height: auto; overflow: visible; }
-  body { overflow-x: hidden; }
+  /* SIDEWAYS IS CLIPPED AT THE ROOT, and it has to be the root.
+
+     The page has one box wider than the viewport by design: .cover, the Expertise dome,
+     which at 390 is 1217 across and hangs 413 past each edge. .expertise used to clip it,
+     and that clip had to go -- Safari turned it into a black band across Proof (see the
+     rule there) -- which took the horizontal containment away with the vertical. Measured
+     at the dome's full scale: the document went 803 wide against a 390 viewport.
+
+     `overflow-x: hidden` on BODY was already here and is not enough. The viewport takes
+     its overflow from the root element, and html was `visible`, so on iOS the page still
+     answered a sideways drag -- which is what the recording shows. Setting it on html is
+     what actually reaches the viewport.
+
+     clip, not hidden: hidden would make the root a scroll container, and clip simply
+     refuses the overflow. overflow-y stays visible, so the page scrolls down exactly as
+     it did -- `visible` paired with `clip` is a legal pair and stays visible, where
+     paired with `hidden` it would have computed to `auto`. */
+  html { overflow-x: clip; }
+  body { overflow-x: clip; }
 
   /* ONE page-level background. Both canvases draw only their gradients on top of
      it, and the Work canvas is fully transparent where it has nothing to draw, so

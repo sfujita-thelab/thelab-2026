@@ -63,9 +63,11 @@ All Beausite 400; `-i` versions are Recife italic at the same sizes.
 | `--font-p-20` | 18 | 20 | 18.8 | 20 | 150% |
 | `--font-p-18` | 16 | 18 | 16.8 | 18 | 150% |
 | `--font-p-16` | 14 | 16 | 14.8 | 16 | 150% |
-| `--font-button-1` | 16 | 18 | 16.8 | 18 | 120% |
-| `--font-button-2` | 14 | 16 | 14.8 | 16 | 120% |
-| `--font-eyebrow` | 12 | 12 | 12 | 12 | 120% |
+| `--font-p-14` ★ new | 14 | 14 | 14 | 14 | 150% |
+| `--font-button-1` ★ down one step | 14 | 16 | 14.8 | 16 | 120% |
+| `--font-button-2` ★ down one step | 12 | 14 | 12.8 | 14 | 120% |
+| `--font-eyebrow` ★ 12 → 16 | 14 | 16 | 14.8 | 16 | 120% |
+| `--font-tag` ★ new | 12 | 12 | 12 | 12 | 120% |
 
 Line height in the fluid files uses the desktop value at all sizes above mobile.
 
@@ -80,7 +82,9 @@ Line height in the fluid files uses the desktop value at all sizes above mobile.
 | `--grid-gap` (column gutter) | 16 | 16 | 24 |
 | `--header-height` | ≈55 | 76 | 76 |
 
-The prototype currently uses its own 40px side margin at 1440 (see "Open: page side margin" in NEW-TOKENS.md).
+The prototype uses its own side margin, `--m`, stepping **40 · 32 · 20** on the same
+1023 / 767 boundaries. Decided 2026-10-16: keep it, and propose it as a change to
+`--container-margin`. See "Page side margin" in NEW-TOKENS.md.
 
 ---
 

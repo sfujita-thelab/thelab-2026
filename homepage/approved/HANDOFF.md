@@ -1,10 +1,18 @@
 # thelab 2026 — homepage
 
-## Project
+## Overview
 
-- **Project** — thelab.co homepage redesign.
-- **Stage** — working prototype, for alignment and dev scoping. Not production code.
-- **Scope** — homepage only: hero, Featured Work, Expertise, Proof, and footer.
+### Project
+
+thelab.co homepage redesign.
+
+### Stage
+
+Working prototype, for alignment and dev scoping. Not production code.
+
+### Scope
+
+Homepage only: hero, Featured Work, Expertise, Proof, and footer.
 
 **What changed** — the front-end visual framework: the vertical grid lines, the site
 margins, and the measure everything is placed on. Most design-principle tokens (colour,
@@ -97,26 +105,18 @@ Values read from `thelab-tokens.css` and confirmed against computed style in the
 | **768–1023** | Tablet | `-md` values |
 | **≥1024** | Desktop | `-lg` values |
 
-Layout across those bands, measured:
-
-| | ≤767 | 768–1023 | ≥1024 |
-|---|---|---|---|
-| Work cards | 1 column | 1 column | 2 columns |
-| Proof stats | 2 across | 4 across | 2 across |
-| Expertise items | 2 across | 4 across | 4 across |
-| Section header width | ~89% of viewport | ~70% | ~47% |
-
-`.hero` is `height: 100svh` below 1024, `auto` at 1024 and above.
-
 `config.js` (`grid.mobileAt: 1023`) has to agree with the stylesheet, or the grid changes
 column count at a different width than the CSS does.
 
 **Spacing is tokenised.** Every gap, pad and margin between elements is a `--spacer-*`
-token — 16 distinct tokens, 103 references — and `--inset` is one too. The page's side
-margin is not: it is a flat 40px, where production defines `--container-margin` at
-64 · 48 · 16. Open decision.
+token — 16 distinct tokens, 103 references — and `--inset` is one too.
 
-Body measure at 900 is about 760px.
+**The page's side margin is not a token.** `--m` steps 40 · 32 · 20 on the same
+1023 / 767 boundaries, where production's `--container-margin` is 64 · 48 · 16. Decided
+2026-10-16: keep the prototype's margin, and propose it as a change to
+`--container-margin`.
+
+A line of body copy runs about 760px at a 900px viewport.
 
 ---
 

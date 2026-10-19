@@ -82,10 +82,7 @@ html {
   /* REDESIGN: no longer jumps to 80px at ≥1920 (the -xl step is removed) */
   --font-h-64-lg: 400 64px / 110% Beausite; --font-h-64-md: 400 56px / 110% Beausite; --font-h-64-sm: 400 40px / 110% Beausite;
   --font-h-64-i-lg: italic 400 64px / 110% Recife; --font-h-64-i-md: italic 400 56px / 110% Recife; --font-h-64-i-sm: italic 400 40px / 110% Recife;
-  /* REDESIGN: new, and it replaces h-48, which is removed.
-     56 desktop / 48 tablet / 40 mobile. It had no tablet step and a 32
-     mobile; the -md is new and the -sm is up from 32. The stepped blocks below already
-     reference -md and -sm with an -lg fallback, so nothing else needs touching. */
+  /* REDESIGN: new. 56 desktop / 48 tablet / 40 mobile. Replaces h-48, which is removed. */
   --font-h-56-lg: 400 56px / 110% Beausite;  --font-h-56-md: 400 48px / 110% Beausite;  --font-h-56-sm: 400 40px / 110% Beausite;
   --font-h-56-i-lg: italic 400 56px / 110% Recife; --font-h-56-i-md: italic 400 48px / 110% Recife; --font-h-56-i-sm: italic 400 40px / 110% Recife;
   --font-h-40-lg: 400 40px / 110% Beausite;  --font-h-40-sm: 400 32px / 110% Beausite;
@@ -98,23 +95,18 @@ html {
   --font-p-20-lg: 400 20px / 150% Beausite;  --font-p-20-sm: 400 18px / 150% Beausite;
   --font-p-18-lg: 400 18px / 150% Beausite;  --font-p-18-sm: 400 16px / 150% Beausite;
   --font-p-16-lg: 400 16px / 150% Beausite;  --font-p-16-sm: 400 14px / 150% Beausite;
-  /* REDESIGN: new. The smallest body step, FLAT at 14 -- same at every width, like
-     --font-eyebrow. The set had no 14 at desktop (body ran 16/18/20/24), and the
-     footer's office lines and legal row are specified at a flat 14. See NEW-TOKENS.md. */
+  /* REDESIGN: new. The smallest body step, flat at 14 at every width. The set had no 14
+     at desktop -- body ran 16/18/20/24. See NEW-TOKENS.md. */
   --font-p-14-lg: 400 14px / 150% Beausite;  --font-p-14-sm: 400 14px / 150% Beausite;
-  /* REDESIGN: both come down one step. button-1 was 18 desktop / 16 mobile and is now
-     16 / 14; button-2 was 16 / 14 and is now 14 / 12. They still step at 767 -- an
-     earlier draft made them flat like --font-eyebrow and that is not what shipped.
-     See NEW-TOKENS.md. */
+  /* REDESIGN: both down one step. button-1 was 18 / 16 and is now 16 / 14;
+     button-2 was 16 / 14 and is now 14 / 12. See NEW-TOKENS.md. */
   --font-button-1-lg: 400 16px / 120% Beausite; --font-button-1-sm: 400 14px / 120% Beausite;
   --font-button-2-lg: 400 14px / 120% Beausite; --font-button-2-sm: 400 12px / 120% Beausite;
-  /* REDESIGN: 16 / 14, where it was a flat 12. It is the SECTION eyebrow's token now
-     -- the small uppercase label above each section headline -- and at 12 that label
-     was too quiet against a 56 headline. */
+  /* REDESIGN: 16 / 14, where it was a flat 12. It is the section eyebrow's token --
+     the small uppercase label above each section headline. */
   --font-eyebrow-lg: 400 16px / 120% Beausite;  --font-eyebrow-sm: 400 14px / 120% Beausite;
-  /* REDESIGN: new, and it is the flat 12 --font-eyebrow used to be. The card tags
-     (.pill) read that token while it was 12 and are not eyebrows -- they are a row of
-     small outlined labels inside a card. See NEW-TOKENS.md. */
+  /* REDESIGN: new. The flat 12 --font-eyebrow used to be. For the card tags (.pill).
+     See NEW-TOKENS.md. */
   --font-tag-lg: 400 12px / 120% Beausite;  --font-tag-sm: 400 12px / 120% Beausite;
 
   --font-h-128: var(--font-h-128-lg);  --font-h-128-i: var(--font-h-128-i-lg);

@@ -105,10 +105,8 @@ card. Two names, one each.
 |---|---|---|---|---|---|
 | **Add** | `--font-p-14` | 14 | 14 | 14 | Smallest body step. Flat, like `--font-eyebrow`. |
 
-**Where it is needed:** the footer's legal row (`.pf__legal` and its links), at a flat 14.
-The office lines used it briefly and are back on `--font-p-16`, so the legal row is now
-its only consumer — which sharpens the question below about whether one component earns a
-step in the scale.
+**Where it is needed:** the footer's legal row (`.pf__legal` and its links) and the
+mobile menu's foot (`.menu__foot p`), at a flat 14.
 
 **Why the existing tokens do not work:** no unsuffixed token is 14 at desktop. The body
 steps are 16, 18, 20 and 24, the buttons are 16 and 18, and `--font-eyebrow` is 12. 14
@@ -126,31 +124,27 @@ and it stays a flat 14 above 767 as well — which is the point of the token.
 
 Measured at 375, 1024 and 1440 in both the fluid and stepped builds: **14 / 14 / 14**.
 
-Still worth a decision for production: the footer is the only place on the page that asks
-for 14, so this is a one-component token. Accepting 16 there instead would avoid adding a
-step to the scale.
+**Decision needed:** two places on the page ask for 14 — the footer's legal row and the
+mobile menu's foot. Accepting 16 for both would avoid adding a step to the scale.
 
-## Open: page side margin
+## Page side margin
 
-The prototype's side margin is 40px at 1440 and scales with the window. The shader circle and grid lines are built on it.
-The live site uses `--container-margin`: 64 desktop · 48 tablet · 16 mobile.
-Decision needed: adopt the live margin (graphics re-fit to it), or keep 40px and propose it as a redesign change.
+**Decided (2026-10-16): keep the prototype's margin. Proposed as a redesign change to
+`--container-margin`.**
 
-**Decided (2026-10-16): keep 40px. Proposed as a redesign change to `--container-margin`.**
+`--m` is set by app.js and steps **40 · 32 · 20** on the same 1023 / 767 boundaries the
+type tokens use. The live site's `--container-margin` is 64 · 48 · 16; it is loaded but
+unused. The shader circle and the grid lines are built on `--m`. Reasons, and what each
+option does to the graphics:
 
-`--m` stays as app.js computes it — `clamp(20, 2.78vw, 72)`, which is 40 at 1440 — and `--container-margin`
-is loaded but unused. Reasons, and what each option does to the graphics:
-
-- **Keeping 40.** The grid, the shader's own grid and the circle all derive from `--m` and
-  `--col = (width - 2m) / columns`, so they stay self-consistent and keep scaling smoothly with the
-  window. Every position written against the 1440 artboard (cards at 720, headers at 380 and 1060,
-  stats at 722, the footer's office columns) keeps landing on its grid line. Nothing to re-fit.
+- **Keeping it.** The grid, the shader's own grid and the circle all derive from `--m` and
+  `--col = (width - 2m) / columns`, so they stay self-consistent. Every position written against the
+  1440 artboard (cards at 720, headers at 380 and 1060, stats at 722, the footer's office columns)
+  keeps landing on its grid line. Nothing to re-fit.
 - **Switching to 64/48/16.** The circle and grid would stay internally consistent — the maths is
-  relative, the centre is `m + 2*col = width/2` for any margin — but two things break around them.
-  (1) At 1440 the lines move to 64 / 392 / 720 / 1048 / 1376, so every artboard position above is off
-  its line by up to 12px and all of them need re-deriving, along with the 680-wide header boxes.
-  (2) The live margin is STEPPED where the prototype's is fluid, so the grid would stop scaling with
-  the window and the circle's radius would jump at 1024 and 768 instead of growing through them.
+  relative, the centre is `m + 2*col = width/2` for any margin — but at 1440 the lines move to
+  64 / 392 / 720 / 1048 / 1376, so every artboard position above is off its line by up to 12px and
+  all of them need re-deriving, along with the 680-wide header boxes.
 
 It is a geometry re-fit rather than a token swap, so it wants its own pass — doing it inside this one
 would mean every before/after screenshot carried two causes at once.

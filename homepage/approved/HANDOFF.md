@@ -1,465 +1,121 @@
-# homepage/approved — the prototype, read against thelab.co
+# homepage/approved — read against thelab.co
 
-This file exists for one job: **letting a developer compare this prototype with the live
-site's token system and see exactly where the two agree and where they do not.** Read it
-as the map; the four files beside it hold the detail.
+The homepage prototype. This file answers two questions and nothing else:
+**what it takes from the live site**, and **what it changes**.
 
-## Where this sits
+No build step — open `index.html`, or serve the folder.
 
-`homepage/approved` is the homepage prototype, and the one to read. `homepage/v3/a` is
-the same page before any tokenising — the "before" for a comparison. `expertise/` and
-`work/` hold the other pages. `expertise/` and
-`work/` are placeholders for the other pages; neither has a build in it yet.
-
-## Where each thing is written down
-
-| File | What it answers |
+| File | What it holds |
 |---|---|
-| `thelab-tokens.css` | The tokens themselves, copied from www.thelab.co on 2026-10-15. **Names are identical to production — do not rename.** Proposed additions are marked `REDESIGN` inline. |
-| `NEW-TOKENS.md` | Every token this redesign ADDS or CHANGES, and what each one would do to the live site — checked across all 21 pages in its sitemap. |
-| `TOKENS-REFERENCE.md` | What each token actually resolves to at mobile / tablet / desktop. A token's name is its DESKTOP value: `--spacer-80` is not 80 on a phone. |
-| `HANDOFF.md` (this file) | Which token each element uses, and where the prototype deliberately departs from the system. |
-| `README.md` | The WebGL work — the three GPU passes, `config.js`, the URL flags. Nothing to do with tokens. |
-
-## The token contract
-
-Three kinds of value appear in this build, and a developer needs to tell them apart:
-
-1. **Production tokens.** Same name, same value as the live site. These should port
-   straight across. Everything in `thelab-tokens.css` without a `REDESIGN` marker.
-2. **Proposed tokens.** New or changed by this redesign, not on the live site yet. Marked
-   `REDESIGN` in the token file and argued for in `NEW-TOKENS.md` — `--font-p-14`,
-   `--font-tag`, `--font-h-80`, the flattened button steps, and the rest. **These need a
-   decision before they ship**, which is the main thing this prototype is asking for.
-3. **Prototype-only values.** Not tokens at all and not proposed as any: the layout
-   positions in design units, and a handful of named constants that exist to make a
-   browser behave (`--exp-guard`, `--cover-h`). They are listed under *Not tokenised* and
-   *Browser workarounds* below. **Do not port these as design decisions.**
-
-## What actually loads
-
-`index.html` links **one** stylesheet before its inline `<style>`:
-
-- `thelab-tokens.css` — the live site's tokens, stepped at 1023 and 767.
-
-`thelab-type-fluid.css` and `thelab-space-fluid.css` sit in the folder **unlinked, on
-purpose**. They are the fluid proposal from `NEW-TOKENS.md`: linking them turns this into
-the fluid build, which is archived at `_archive/2026-10-16/v3-c`. Leave them alone unless
-you mean to make that switch. As shipped there is **no `clamp()` and no `vw` anywhere** —
-every token takes its stepped value and switches at 1023 and 767, exactly as the live
-site does.
-
-Beausite and Recife load from thelab.co's CDN, so the real faces need a connection;
-without one the page falls back to `--font`.
-
-## How a change happens
-
-1. Edit inside `homepage/approved` only. `homepage/v3/a` is a frozen reference copy —
-   the build from before any tokenising, which is the "before" in any comparison. The
-   earlier options (`v1`, `v2`, `_archive`) are kept locally and are not in this repo;
-   see `.gitignore`.
-2. There is no build step. Open `index.html`, or serve the folder.
-3. Commit to `main`. This repo has no branches and never has; every commit goes straight
-   to `main`.
-4. GitHub Pages serves it within a minute or two at
-   **https://sfujita-thelab.github.io/thelab-2026/homepage/approved/** — which is what to open on a
-   phone, since several of the differences below only exist in WebKit.
-5. A value that belongs to the design system changes in `thelab-tokens.css` and gets a
-   line in `NEW-TOKENS.md`. A value that exists only to place something on the artboard
-   stays in the inline `<style>`. Keeping that line clean is the whole point of the file.
-
-**Breakpoint is 1023px**, in the stylesheet and in `config.js` (`grid.mobileAt`). Those two
-have to agree or the grid switches column count at a different width than the CSS.
-
-It is 1023 and not 767 for a measurable reason. The layout is drawn in design units
-(`--u = width / 1440`) so every box shrinks *proportionally* — at 768 the artboard is 53%
-of its 1440 size. The type tokens do not: they clamp toward a mobile floor that is a much
-higher fraction of their desktop value. Measured as how much of the layout's own grid each
-token occupies:
-
-| width | `--u` | `--font-h-56` | `--font-p-18` | `--font-button-2` |
-|---|---|---|---|---|
-| 1440 | 1.000 | 56.0u | 18.0u | 16.0u |
-| 1200 | 0.833 | 56.9u | 20.7u | 18.3u |
-| 1024 | 0.711 | 57.9u | 23.6u | 20.8u |
-| 900 | 0.625 | 58.7u | 26.2u | 23.0u |
-| 768 | 0.533 | 60.0u | **30.0u** | **26.3u** |
-
-1440 is the tuned row; anything above it is type outgrowing its box. Headlines behave
-because `--font-h-56`'s floor is 32/56 = 57%, close to the layout's own 53%. Body copy does
-not: `--font-p-18`'s floor is 16/18 = **89%**, so at 768 it occupies 30 design units where
-the layout budgeted 18. `--font-eyebrow` would be the extreme at 12/12 = 100%.
-
-So 768–1023 uses the stacked layout, which has no fixed unit measure for type to outgrow.
-**Known trade-off:** the stacked layout runs a single full-width column, so the body measure
-at 900–1023 is long (~760px at 900). A purpose-built tablet layout would constrain it.
-
-See `TOKENS-REFERENCE.md` for what every token resolves to, and `NEW-TOKENS.md` for the
-redesign's token changes plus the fluid type and spacing proposals.
+| `thelab-tokens.css` | The tokens. Names are identical to production — do not rename. |
+| `NEW-TOKENS.md` | Every token this redesign adds or changes, what each would do to the live site across all 21 pages, and **the decisions still open**. |
+| `TOKENS-REFERENCE.md` | What each token resolves to at mobile / tablet / desktop. A token's name is its desktop value: `--spacer-80` is not 80 on a phone. |
+| `README.md` | The WebGL work — the GPU passes, `config.js`, the URL flags. |
 
 ---
 
-## Type, by section
+## 1. What it takes from the live site
 
-Values are **mobile · desktop 1440**; between 768 and 1440 each one scales smoothly.
-
-Note the two breakpoints are deliberately different: the **token** values switch at 767
-(that is the token files' own boundary), the **layout** switches at 1023. So 768–1023 gets
-the stacked layout with tablet-range fluid type — which is the point, see above.
-
-### Topbar
-| Element | Token | Mobile · Desktop |
+| What | Where it comes from | Watch out for |
 |---|---|---|
-| `.nav a` | `--font-button-2` | 14 · 16 |
-| `.logo span` | — | **left alone**, pending the real logo SVG. Its `font-family` is pinned to this build's Helvetica Neue stack, because `--font` became Beausite for the page and was pulling the wordmark with it. |
+| **Design tokens** | `thelab-tokens.css`, copied verbatim from `/static/cbcaee7b/dist/index.css`, pulled **2026-10-15** | Names match production exactly. Anything marked `REDESIGN` inline is *proposed*, not live. |
+| **Webfonts** | Beausite (4 faces) and Recife italic, loaded over the network from `https://www.thelab.co/static/cbcaee7b/dist/*.woff2` | The `cbcaee7b` folder changes when the site redeploys. When it does, the faces 404 and the page silently falls back to `--font`. Offline does the same. |
+| **Breakpoints** | `md ≤1023` and `sm ≤767`, the live site's own | `config.js` (`grid.mobileAt`) has to agree with the stylesheet or the grid changes column count at a different width than the CSS. |
+| **Letter-spacing** | Zero everywhere, as thelab.co sets it | Verified: the only `letter-spacing` left in the file is the tweak panel's own UI. |
+| **Mobile menu open state** | Measured off thelab.co at 375, not eyeballed | |
+| **Topbar arrangement** | Wordmark left, Menu right, as thelab.co | |
+| **Logo lockup** | `assets/logo-thelab.svg`, inlined in the markup | Inline on purpose: the bar inverts over the footer's dark band by setting `color`, which only reaches the drawing if the drawing is in the document. |
 
-### Hero
-| Element | Token | Mobile · Desktop |
-|---|---|---|
-| `h1` | `--font-h-80` | 48 · 80 |
-| `.hero__aside p` | `--font-p-18` | 16 · 18 |
-| `.cta` (all solid pills) | `--font-button-2` | 14 · 16 |
-
-### Featured Work
-| Element | Token | Mobile · Desktop |
-|---|---|---|
-| `.featuredwork__eyebrow` | `--font-button-2` | 14 · 16 |
-| `.featuredwork h2` | `--font-h-56` | 32 · 56 |
-| `.featuredwork .sec-head p` | `--font-p-18` | 16 · 18 |
-| `.card__client` | `--font-p-18` | 16 · 18 |
-| `.card__title` | `--font-h-24` | 20 · 24 |
-| `.pill` | `--font-eyebrow` | 12 · 12 |
-| `.cs-cursor span` | `--font-eyebrow` | 12 · 12 |
-
-### Expertise
-| Element | Token | Mobile · Desktop |
-|---|---|---|
-| `.exp__eyebrow` | `--font-button-2` | 14 · 16 |
-| `.exp__head` | `--font-h-56` | 32 · 56 |
-| `.exp__body` | `--font-p-18` | 16 · 18 |
-| `.area` (4 titles) | `--font-h-32` | 24 · 32 |
-| `.area__desc` | `--font-p-18` | 16 · 18 |
-
-### Proof
-| Element | Token | Mobile · Desktop |
-|---|---|---|
-| `.proof__head` | `--font-h-56` | 32 · 56 |
-| `.proof__body` | `--font-p-18` | 16 · 18 |
-| `.stat__num` | `--font-h-64` | 40 · 64 |
-| `.stat__suffix` | `--font-h-64` | 40 · 64 |
-| `.stat__sub` | `--font-p-18` | 16 · 18 |
-
-### Footer
-| Element | Token | Mobile · Desktop |
-|---|---|---|
-| `.pf__head` | `--font-h-40` | 32 · 40 |
-| `.pf__cta` | `--font-button-2` | 14 · 16 |
-| `.pf__city` | `--font-h-24` | 20 · 24 |
-| `.pf__addr`, `.pf__tel` | `--font-p-16` | 14 · 16 |
-| `.pf__legal` + its links | `--font-p-14` ★ new | 14 · 14 |
-
-**Letter-spacing is zero everywhere**, per thelab.co. The headlines previously carried
-−0.012em to −0.035em. `text-transform: uppercase` is kept on the eyebrows, pills, nav and
-CTA labels; their positive tracking is not.
+**What it does not take:** every layout position. Those are design units off the 1440
+artboard (`--u = width / 1440`), not tokens, and are not candidates to become tokens.
 
 ---
 
-## Spacers, by section
+## 2. What's changed
 
-Values are **mobile · desktop**.
+### Added
 
-| Where | Token | Mobile · Desktop |
+**Tokens** — all marked `REDESIGN` in `thelab-tokens.css`, argued in `NEW-TOKENS.md`.
+
+| Token | Desktop · Tablet · Mobile | What for |
 |---|---|---|
-| **Topbar** padding-block | `--spacer-24` | 16 · 24 |
-| **Topbar** nav gap | `--spacer-32` | 24 · 32 |
-| **Topbar** logo gap | `--spacer-12` | 8 · 12 |
-| **Hero** body → CTA | `--spacer-24` | 16 · 24 |
-| **Hero** headline → body *(mobile only)* | `--spacer-40` | 24 · — |
-| **CTA** padding | `--spacer-8` / `--spacer-56` | 8 · 8 / 32 · 56 |
-| **Work** eyebrow → headline | `--spacer-16` | 8 · 16 |
-| **Work** headline → body | `--spacer-24` | 16 · 24 |
-| **Work** body → CTA | `--spacer-24` | 16 · 24 |
-| **Work** headline measure (padding-right) | `--spacer-40` | 24 · 40 |
-| **Work** card client → title | `--spacer-16` | 8 · 16 |
-| **Work** card title → pills | `--spacer-24` | 16 · 24 |
-| **Work** pill gap | `--spacer-4` | 4 · 4 |
-| **Work** pill padding | `--spacer-8` | 8 · 8 |
-| **Work** ticker logo gap | `--spacer-80` | 40 · 80 |
-| **Work** section padding *(mobile only)* | `--spacer-152` / `--spacer-80` | 64 / 40 |
-| **Work** card → card *(mobile only)* | `--spacer-80` | 40 · — |
-| **Work** image → text *(mobile only)* | `--spacer-24` | 16 · — |
-| **Work** ticker top *(mobile only)* | `--spacer-120` | 56 · — |
-| **Expertise** eyebrow → headline | `--spacer-16` | 8 · 16 |
-| **Expertise** headline → body | `--spacer-24` | 16 · 24 |
-| **Expertise** title → description | `--spacer-16` | 8 · 16 |
-| **Expertise** section padding *(mobile only)* | `--spacer-200` / `--spacer-152` | 80 / 64 |
-| **Expertise** list top *(mobile only)* | `--spacer-80` | 40 · — |
-| **Expertise** item → item *(mobile only)* | `--spacer-40` | 24 · — |
-| **Proof** headline → body | `--spacer-24` | 16 · 24 |
-| **Proof** headline measure (padding-right) | `--spacer-40` | 24 · 40 |
-| **Proof** number → suffix | `--spacer-8` | 8 · 8 |
-| **Proof** number → caption | `--spacer-24` | 16 · 24 |
-| **Proof** stats column gap | `--spacer-16` | 8 · 16 |
-| **Proof** stats row gap | `--spacer-32` | 24 · 32 |
-| **Proof** section padding *(mobile only)* | `--spacer-200` / `--spacer-80` | 80 / 40 |
-| **Proof** stats top *(mobile only)* | `--spacer-56` | 32 · — |
-| **Footer** pill padding | `--spacer-8` / `--spacer-56` | 8 · 8 / 32 · 56 |
-| **Footer** city → address | `--spacer-12` | 8 · 12 |
-| **Footer** address → phone | `--spacer-8` | 8 · 8 |
-| **Footer** legal cluster gap | `--spacer-16` | 12 · 16 |
-| **Footer** legal nav gap | `--spacer-16` | 12 · 16 |
-| **Footer** socials gap | `--spacer-12` | 8 · 12 |
-| **Footer** band padding *(mobile only)* | `--spacer-120` / `--spacer-80` | 56 / 40 |
-| **Footer** mark margin *(mobile only)* | `--spacer-80` | 40 · — |
-| **Footer** locations row gap *(mobile only)* | `--spacer-40` | 24 · — |
-| **Footer** offices → legal | `--spacer-56` | 32 · 56 |
-| **Footer** legal → page foot | `--spacer-40` | 24 · 40 |
+| `--font-h-80` (+ `-i`) | 80 · 64 · 48 | New top headline step, for the hero |
+| `--font-h-56` (+ `-i`) | 56 · 56 · 32 | New section headline step |
+| `--font-p-14` | flat 14 | Smallest body step, same at every width |
+| `--font-tag` | flat 12 | The card tags — this is the flat 12 that `--font-eyebrow` used to be |
 
-### Snaps larger than 4px
-- `.cta` / `.pf__cta` padding-inline **50 → 56** and **53 → 56**. Every pill is ~12px
-  wider on desktop. If that is wrong, the fix is a `--spacer-48`, not a hand-set value.
+**Page**
 
-### Mobile collisions
-Some token pairs collapse to one value on a phone — `32 & 40 → 24` and `56 & 64 → 32`
-among them. One lands inside a single block, where it is visible:
+- **Four gradient fields.** Hero and footer share one palette (`PAGEGLOW`, 2D canvas);
+  Work and Proof are WebGL (`FEATUREDWORK`, `HALO`); Expertise is a `<radialGradient>`
+  in the loops' svg whose stops are written from `EXPERTISE`.
+- **The hero's optical circle and mark entrance**, and the **rolling headline** that
+  cycles the keyword.
+- **Scroll-triggered entrances** on Work, Expertise and Proof, with the Proof stats
+  counting up. They replay when you scroll away and come back.
+- **The topbar slides in** with the first grid line, at `INTRO.navStart` in `app.js` —
+  the one number to retune if it should arrive later.
+- **"View case study" cursor** (`.cs-cursor`) over the card images.
+- **The tweak panel** (`T`) — prototype tooling, the palettes only. Not for production.
 
-1. **Footer office card** — city → address (`--spacer-12`) and address → phone
-   (`--spacer-8`) are both **8** on mobile, where desktop has 12 and 8.
-   *(A second collision used to be listed here — the legal links' gap against the
-   socials' — on the basis that `--spacer-16` is 8 on a phone. It is 12. Measured at 390:
-   the links sit on 12 and the socials on 8, so the two never collided.)*
+### Edited
 
-### Mobile-only ties
-These exist on mobile alone, so they were picked by the mobile column, and two were
-exact ties resolved by judgement:
+- **Headers moved into flow.** Featured Work's header, Expertise's CTA and the footer's
+  lower two rows used hand-tuned absolute `top` values with the copy's line count baked
+  in, so any type change broke them. They are `--spacer-*` margins now. **This is the
+  behaviour to port** — it is the one departure here that is a design decision.
+- **Seven styles had no mobile size** and were inheriting a design-unit desktop value, so
+  they rendered at 3–5px on a phone. All on tokens now — `.proof__body` 4.7→16,
+  `.pf__city` 5.2→18, `.pf__addr`/`.pf__tel`/`.pf__legal` 3.6→14, `.cs-cursor span`
+  3.0→12, `.stat__suffix` 16.7→40.
+- **The Work gradient was retuned** — `config.js`, under `FEATUREDWORK`. The hue did not
+  move; the field was zoned and stirred, and that is what changed. `colorFalloff`
+  2.10→1.25 is the biggest single lever; the light poles are now exact tints of
+  `#0587c1` rather than two separately chosen blues.
+- **Arming a reveal is instant.** Every armed state declares `transition: none`, so the
+  hidden state can only ever animate on the way *in*. Without it the type played its
+  entrance backwards on reload.
+- **Homepage copy** — the approved deck: Work's headline, Expertise's and Proof's bodies,
+  and all four Proof stats. ⚠️ The second stat is **not signed off** — the deck has it as
+  `XX %`, so the old 74 is still in the markup behind a comment saying so.
 
-- Hero headline → body: **28 → `--spacer-40` (24)**. 28 sits exactly between 24 and 32.
-- Work section top: **72 → `--spacer-152` (64)**. Also between 64 and 80.
-- Expertise section bottom: **60 → `--spacer-152` (64)**.
-- Card → card: **44 → `--spacer-80` (40)**.
-- Ticker logo gap on mobile went **54 → 40**, inherited from `--spacer-80`.
+### Removed
+
+**Tokens**
+
+| Token | Note |
+|---|---|
+| `--font-h-48` (+ `-i`) | Prototype headlines moved to `--font-h-56`. Existing live uses were remapped to `--font-h-40` — the affected components are listed in `NEW-TOKENS.md`. |
+| `--font-h-64-xl` / `-i-xl` | The ≥1920px jump to 80. Nothing changes below 1920; above it those headlines drop 80→64. 80 lives in `--font-h-80` now. |
+
+**Page**
+
+- **All tracking.** Headlines carried −0.012em to −0.035em and the uppercase labels
+  carried positive tracking. Both are gone; thelab.co sets none. `text-transform:
+  uppercase` stays on the eyebrows, pills, nav and CTA labels.
+- **Three dead rules** — `.pf__body` and `.pf__offices`, left from the five-column footer
+  that `.pf__locations` replaced, and `.hero__head`, left from the hand-built lockup
+  before the mark and wordmark became one SVG. None was in the markup.
+  *(`.hero__dot` looks dead and is not — `hero-type.js` creates it at runtime.)*
+- **Most of the tweak panel.** It was 18 groups and ~128 sliders across colour, shape,
+  flow, cursor, wander, pointer lens, smear, eclipse, circle and blur. Nothing is lost:
+  every value is still named and commented in `config.js`, and editing it there does what
+  dragging its slider did.
 
 ---
 
-## Layout positions — deliberately NOT tokenised
+## Browser workarounds — port the behaviour, not the numbers
 
-Everything here is measured off the 1440 artboard, or is geometry rather than spacing.
-
-**Absolute positions in design units**
-- `.card--tula` / `.card--sks` / `.card--elliman` — `left` / `top`
-- `.card__meta` — `left` / `right`
-- `.featuredwork .sec-head` — `top: 52.4u` (the block's start; its internals are margins now)
-- `.expertise .sec-head` — `left: 380u`, `top: 156.4u`, `width: 680u`
-- `.area` — `top: 670.4u` and the per-item inline `left`
-- `.proof .sec-head` — `top: 84u`, `width: 680u`
-- `.proof__stats` — `left: 722u`, `top: 83.2u`, track width `320u`
-- `.cover`, `.ticker` — `top`, and `.cover`'s `margin-left: -1432.5u` (`-2292u` stacked)
-- `.pf__band` — `--pf-mark-y: 186.5u`; `.pf__mark` — `--pf-mark`, a flat **240px**
-- `.featuredwork__inner` / `.exp__inner` / `.proof__inner` — explicit heights
-- `.cs-cursor` — `116u` box with `-58u` centring margins
-
-**Not spacing at all**
-- `inset: 0` on the glow canvases, grain, grid overlays
-- `left: 50%` centring on `.pf__mark`, `transform: translateX(-50%)` on `.area`
-- `h1`, `.featuredwork h2`, `.proof__head` — `margin-left: -0.012em` / `-0.015em`, optical
-- `h1 .mask` and the headline masks — `.16em / .10em / .12em` clip padding with matching
-  negative margins
-- `.mask--cta` — the 2px/3px clip guard
-- `.ticker__row img` — `height: 46px`
-- `.nav a::after` — the 1px rule and its `-7u` offset
-- All shader and WebGL maths in `config.js` / the `*.js` files
-- `--m` (page side margin) and `--inset` — **kept at 40px**, see NEW-TOKENS.md
-
----
-
-## Where this build departs from the live system
-
-Three kinds of departure, and only the first is a design decision.
-
-### 1. In flow, where the reference positions absolutely
-Featured Work's header, Expertise's CTA and the footer's lower two rows are laid out in
-flow with spacer margins rather than pinned to hand-tuned `top` values. Each was pinned to
-a number with the copy's line count baked into it, so any type change broke it — tokenising
-the body copy took Featured Work's from three lines to four and left its CTA 2px under the
-body instead of 24. The gaps are `--spacer-*` margins now, matching the other headers.
-**This is the behaviour to port.**
-
-### 2. Browser workarounds — port the behaviour, not the numbers
-These exist because an engine misbehaves. They carry no design intent, and a real build on
-a different stack may not need them at all — but it will need whatever it takes to get the
-same result. Each was bisected in the browser that showed it, not guessed.
+These exist because an engine misbehaves. They carry no design intent, and a build on a
+different stack may not need them — but it will need whatever gets the same result. Each
+was bisected in the browser that showed it.
 
 | Where | What | Why |
 |---|---|---|
-| `.expertise` | **No `overflow` at all**, and `--cover-h` sizes the dome to the gradient it has to finish rather than to a full circle | Safari has no `overflow-clip-margin`, and its `overflow: clip` painted a black band across Proof wherever the clipped layer reached. Sizing the cover to its job removed the overflow the clip existed for: measured at twelve widths from 320 to 2560, the document's scroll height is identical with the clip and without it |
-| `.expertise` | `--exp-guard` plus a negative `margin-top` and matching `padding-top` | Gives the dome's overhang room inside the section's own box, so Safari's tighter clip does not cut the arc flat. `expertise.js` reads that padding back in — five of its measurements are taken against the section's old top edge |
-| `.hero-glow`, `.pf__glow` | `transform: translateZ(0)` | WebKit rasterises a `position: fixed` element clipped to the viewport **before** filtering, so `blur(44px)` sampled transparency along the bottom edge and the hero's orange washed out. 400px of bleed and `blur(24px)` both failed; its own compositing layer fixed it. The footer's is precautionary — same blur past the same kind of boundary, different clip |
-| `.proof` | `z-index: 3` | With `z-index: auto` it opened no stacking context, so `#halogl` and its own copy landed in the root one and interleaved with the page's fixed layers |
-| `.hero` (≤1023) | `height: 100svh` | `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar — so the bottom-anchored copy and the ring jumped mid-scroll |
-| `app.js` | `viewH()` and `requestLayout()` | Everything geometric reads the *layout* viewport, which a disappearing chrome bar does not move, and a height-only resize no longer triggers a relayout. Measured: a 10% height change costs 0 relayouts, 40% costs 1 |
-| `<head>` | `format-detection` meta + `a[x-apple-data-detectors]` | WebKit finds the office addresses and phone numbers and wraps each in its own underlined, system-blue anchor. The numbers are our `tel:` links, so turning the detector off costs nothing |
-
-### 3. Values that only exist to place artwork
-See *Layout positions* above. Design units off the 1440 artboard, not candidates for
-tokens.
-
-## Open items — decisions this prototype is asking for
-
-These are for the design system, not bugs. Each needs a yes or no before the tokens ship.
-
-1. **Every `REDESIGN` token in `thelab-tokens.css`.** `--font-p-14`, `--font-tag`,
-   `--font-h-80`, the removal of `--font-h-48`, the flattened button steps, `--font-h-64`
-   losing its 1920 jump. `NEW-TOKENS.md` has the argument for each and what it would do
-   to the live site, checked across all 21 pages in its sitemap. **This is the main ask.**
-2. **Stepped or fluid.** As shipped it is stepped, like the live site. The fluid
-   alternative is two unlinked files in this folder and a table in `NEW-TOKENS.md`.
-3. **The hero headline crosses the centre grid line below ~1430px.** `--font-h-80` plus
-   the removed tracking grew the longest keyword from 545 to 672px of ink: over by 44 at
-   768, 27 at 1024, 15 at 1200, clear by 1px at 1440. Options are `--font-h-64`, letting
-   the keyword wrap, or shortening the word.
-4. **`.stat__num` and `.stat__suffix` are the same size** (both `--font-h-64`). The
-   reference had 72 and 64. A smaller suffix needs its own token.
-5. **Three headlines gained a line** from Beausite's wider setting with no tracking:
-   Featured Work's body 3→4, Expertise's headline 3→4, the footer's 1→2. Only the first
-   broke anything.
-6. **The page side margin.** `--m` and `--inset` are held at a flat 40 rather than taken
-   from `--container-margin`. See *Open: page side margin* in `NEW-TOKENS.md`.
-7. **The mobile collision above** — city→address and address→phone both land on 8.
-8. **The tablet measure is long.** 768–1023 uses the stacked single-column layout, so the
-   body runs about 760px at 900. A purpose-built tablet layout would constrain it, or the
-   text columns could be defined in tokens rather than design units so boxes and type
-   share one curve.
-
-## Fixed on the way
-
-Seven styles had no mobile size at all and were inheriting a design-unit desktop value, so
-they rendered at 3–5px on a phone. All are on tokens now: `.proof__body` 4.7→16,
-`.pf__city` 5.2→18, `.pf__addr`/`.pf__tel`/`.pf__legal` 3.6→14, `.cs-cursor span` 3.0→12,
-`.stat__suffix` 16.7→40.
-
-Three dead rules were removed — `.pf__body` and `.pf__offices`, left over from the
-five-column footer that `.pf__locations` replaced, and `.hero__head`, left over from the
-hand-built lockup before the mark and the wordmark became one SVG. None of the three is
-in the markup. `.hero__dot` looks dead and is not: `hero-type.js` creates it at runtime.
-
-
----
-
-## Work gradient — how it is tuned
-
-The brief was a cleaner gradient based on `#0587c1`. The base was already that colour, so
-nothing about the hue moved. What made it read as unclean was the field being zoned and
-stirred, and that is what changed — all of it in `config.js`, under `FEATUREDWORK`.
-These values arrived in a v4 round that has since replaced the build it was copied from.
-
-| | before | now | why |
-|---|---|---|---|
-| `colorFalloff` | 2.10 | **1.25** | Higher is tighter: each pole holds its own zone and the field reads as several blues meeting. Lower lets them average, so the ladder becomes a ramp. The biggest single lever. |
-| `colorWarpAmp` | 0.26 | **0.08** | The warp bending colour regions against each other. At 0.26 it put visible mottling through the ramp. Low rather than zero, or the field stops reading as living at all. |
-| `hueBreath` | 5.0° | **0** | Each pole drifted its own few degrees. With one hue across the ladder this was the one mechanism guaranteed to break it. |
-| `satBreath` | 0.20 | **0.06** | |
-| `brightBreath` | 0.14 | **0.05** | |
-| `radiusBreath` | 0.20 | **0.10** | |
-| light poles | `#56bdf0`, `#84c4e1` | **`#64b5d9`, `#a0d1e7`** | Exact tints of `#0587c1`, mixed toward white at 38% and 62%. |
-
-On the poles: the old two were only 1.4° and 0.2° off the base's hue, so this is a small
-move and not the reason the gradient looked busy. It is worth making anyway — derived
-tints cannot drift from the base when the base is retuned, where two separately chosen
-blues can.
-
-The four base poles, the shape, the floor, the scroll behaviour and the cursor response
-are all untouched.
-
-
----
-
-## The tweak panel
-
-`T` opens it, and it is **the palettes only** — the six pole colours for each of the
-three gradients, plus an opacity each.
-
-**Which group is which section**, because one name is not what it looks like:
-
-| Panel group | Config | Drawn into | Section |
-|---|---|---|---|
-| Page glow | `PAGEGLOW` | `.hero-glow` + `.pf__glow` (2D canvases) | the hero **and** the footer |
-| Work halo | `FEATUREDWORK` | `#featuredworkgl` (WebGL) | Featured Work |
-| Expertise glow | `EXPERTISE` | the loops' svg gradient | Expertise |
-| **Proof halo** | `HALO` | `#halogl` (WebGL) | **Proof** |
-
-Three things that were confusing and are now not:
-
-**The hero and the footer are one palette.** Their three families were an identical copy
-of the same rgb triples in `hero-glow.js` and `footer-glow.js`, agreeing only because
-nobody had edited one of them — the hero's own comment reads *"THE ALPHA is the footer's
-0.30 doubled"*. `PAGEGLOW` owns them now, so the two cannot drift. Each keeps its own
-alpha (`heroAlpha` 0.60, `footerAlpha` 0.30): the footer is half the strength and is
-composited the other way round — the hero multiplies onto a light page, the footer adds
-onto `#222` and is multiplied in.
-
-**The hero's panel rows drove nothing.** They pointed at `CONFIG.poles` and
-`blob.paletteWash` — the WebGL mesh gradient on `#stage`. That is switched off
-(`blob.enabled: false`) and app.js holds `uHaloFade` at 0, which is the uniform its
-whole contribution is scaled by, so those sliders moved values nothing drew. Proved by
-hiding `.hero-glow`: the hero renders completely grey, so none of its colour comes from
-`#stage`. The panel points at `HEROGLOW` now, which is what you see. `CONFIG.poles` and
-`blob.*` stay in config.js for whoever sets that flag true again.
-
-**The hero is three hues, not one.** `.hero-glow` carries three families — a core and a
-highlight each — and the headline steps between them every few phrase changes, so the
-hero cycles the page's own section colours: orange, then Work's `#0587c1` exactly, then
-Proof's `#289581` exactly. The single-hue orange ladder described below belongs to the
-switched-off blob.
-
-**The Proof group was labelled *Expertise halo*** and never drove Expertise. The object is
-called `HALO` and routes through `halo.` because it began life there; the canvas moved to
-Proof and the label did not follow it.
-
-**Expertise had no controls at all** — the page has four coloured fields and the panel had
-three. Its glow is not a WebGL blob but a `<radialGradient>` in the loops' svg, eleven
-stops that were hand-written in the markup. `EXPERTISE` now holds the four colours and a
-peak opacity, and `expertise-halo.js` writes the stops from it. The stops stay in
-`index.html` so the glow is right on the first paint; the ramp's shape lives in a table of
-ratios in the JS, so `alpha` scales the whole fade without flattening it.
-
-Its oranges are the hero's, copied by hand when it was built. **Copied, not linked** —
-retuning the hero has never moved them and still does not.
-
-**The four opacities sit together in the first group**, so they can be set against each
-other. One caveat before dragging them: the three WebGL fields expose `paletteWash`,
-which is not opacity — it mixes the poles toward the page background, so the field goes
-paler without becoming transparent. Expertise exposes `alpha`, a real peak opacity: the
-glow thins and what is behind it shows through. Same control to a designer, different
-mechanism underneath.
-
-## The page's hues
-
-Three families across the four fields, measured:
-
-| | hue | |
-|---|---|---|
-| Hero (live, `HEROGLOW`) | 16° · 199° · 168° | cycles orange → blue → green |
-| Hero (`CONFIG.poles`, switched off) | 8–16° | orange |
-| Work | 198–199° | blue |
-| Expertise | 8–16° | orange — the switched-off hero's, exactly |
-| Proof | 168–170° | green |
-
-The hero is the odd one: it steps between three families rather than holding one, and
-those families are the other sections' own colours. The three section fields are each
-deliberately single-hue — Work is a ladder around `#0587c1`, and the variation you see is
-lightness and wash, not a second hue.
-
-The orange ladder that `CONFIG.poles` holds was measured against a reference called
-`gradient-orange.png` — recorded in the comment there as saturation varying by 0.02 and
-value by 0.05, with hue moving 9° toward red on the right. **That file is not on disk**
-anywhere, so the numbers can be read but not re-checked. The same is true of `work.png`,
-`hp_modules.png` and `new-footer.png`, which other comments cite.
-
-Every halo used to carry four or five more groups: colour, shape, flow, cursor, and on
-the hero also wander, pointer lens, cursor smear, eclipse glow, circle and blur/grid.
-That was 18 groups and about 128 sliders on gradients that are now tuned.
-
-Nothing is lost with them. Each value is still in its object in `config.js`, named and
-commented, and editing it there does exactly what dragging its slider did — the panel was
-a faster way to reach the same numbers, not a separate system. The rows are in git if a
-round of retuning wants them back.
+| `.expertise` | **No `overflow` at all**; `--cover-h` sizes the dome to the gradient it has to finish rather than to a full circle | Safari has no `overflow-clip-margin`, and its `overflow: clip` painted a black band across Proof wherever the clipped layer reached. Measured at twelve widths from 320 to 2560: scroll height is identical with the clip and without it. |
+| `.expertise` | `--exp-guard` plus a negative `margin-top` and matching `padding-top` | Room for the dome's overhang inside the section's own box. `expertise.js` reads that padding back in — five of its measurements are against the section's old top edge. |
+| `.hero-glow`, `.pf__glow` | `transform: translateZ(0)` | WebKit rasterises a `position: fixed` element clipped to the viewport *before* filtering, so `blur(44px)` sampled transparency along the bottom edge and the hero's orange washed out. Its own compositing layer fixed it; 400px of bleed did not. |
+| `.proof` | `z-index: 3` | With `z-index: auto` it opened no stacking context, so `#halogl` and its copy landed in the root one and interleaved with the page's fixed layers. |
+| `.hero` (≤1023) | `height: 100svh` | `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar — the bottom-anchored copy and the ring jumped mid-scroll. |
+| `app.js` | `viewH()` and `requestLayout()` | Everything geometric reads the *layout* viewport, and a height-only resize no longer triggers a relayout. |
+| `<head>` | `format-detection` meta + `a[x-apple-data-detectors]` | WebKit finds the office addresses and phone numbers and wraps each in its own underlined, system-blue anchor. The numbers are already our `tel:` links. |

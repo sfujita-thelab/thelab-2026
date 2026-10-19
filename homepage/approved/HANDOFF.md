@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | **Project** | thelab.co homepage redesign |
-| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. The Base UI system has been changed, while most of the design-principle tokens remain the same. |
-| **Stage** | Working prototype, for design-system review. Not production code. |
+| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. The front-end visual framework has changed — the vertical grid lines, the site margins, the measure everything is placed on — while most of the design-principle tokens remain the same. |
+| **Stage** | Working prototype, for alignment and dev scoping. Not production code. |
 
 ---
 
@@ -35,18 +35,18 @@ redeploys. When it does, the faces 404 and the page silently falls back to `--fo
 
 ## Summary
 
-The prototype rebuilds the homepage on thelab.co's own token names so the two can be
-compared directly. Type is where it diverges: the redesign adds two headline steps above
-and below the existing scale, adds a flat 14 body step and a flat 12 tag step, moves the
-section eyebrow up from 12, drops both button steps by one, and removes `--font-h-48`.
-Spacing and colour tokens are unchanged from production.
-
-Layout is drawn in design units off a 1440 artboard rather than in tokens, so positions
-are not candidates to become tokens. All tracking is removed, per the live site.
-
-Everything animates on entrance, and every entrance is reversible and re-plays on
-scroll-back. The one rule that holds it together: **arming never animates** — a hidden
-state applies instantly and only the reveal has a transition.
+- **Built on thelab.co's own token names**, so the prototype and the live site can be
+  compared directly. Nothing is renamed.
+- **Type is the only thing that changes.** Two new headline steps, one above the scale
+  and one inside it; a flat 14 body step and a flat 12 tag step; the section eyebrow up
+  from 12; both button steps down one; `--font-h-48` removed.
+- **Spacing and colour tokens are production's, untouched.**
+- **All tracking is removed**, per the live site.
+- **Layout is drawn in design units off a 1440 artboard**, not in tokens — so positions
+  are not candidates to become tokens.
+- **Everything animates on entrance**, and every entrance is reversible — it re-plays on
+  scroll-back. One rule holds it together: *arming never animates*. The hidden state
+  applies instantly; only the reveal has a transition.
 
 ---
 
@@ -94,22 +94,15 @@ Values read from `thelab-tokens.css` and confirmed against what the browser comp
 
 ## Components
 
-### Base UI system — changed
+**Carried over from thelab.co unchanged:** the bar's arrangement (wordmark left, Menu
+right), the nav's underline-on-hover, the mobile menu's open state — measured off
+thelab.co at 375 rather than designed fresh — and zero letter-spacing.
 
-The components below are rebuilt for this redesign rather than carried across. Every one
-of them picks up a reveal state, the topbar gains an entrance and a scroll behaviour it
-did not have, and the nav, buttons and card tags all move onto different type tokens —
-see *Token changes*.
+**Rebuilt here:** every component picks up a reveal state, the topbar gains an entrance
+and a scroll behaviour it did not have, and the nav, buttons and card tags move onto
+different type tokens. See *Token changes*.
 
-What is carried over from thelab.co unchanged: the arrangement of the bar (wordmark
-left, Menu right), the nav's underline-on-hover, the mobile menu's open state (measured
-off thelab.co at 375 rather than designed fresh), the token *names*, the two breakpoints,
-and zero letter-spacing everywhere.
-
-The design-principle tokens are largely untouched — every token change in this handoff is
-type. Spacing and colour are production's, unmodified.
-
-### Components, with variants and states
+### Variants and states
 
 | Component | Variants | States |
 |---|---|---|
@@ -201,36 +194,32 @@ renders finished, the topbar is simply present, and the rolling headline still s
 
 ## Responsive notes
 
-**Three breakpoints — 767, 1023 and 1440.** The first two do different jobs and are
-deliberately not the same number: **tokens** switch their values at 767, the **layout**
-stacks at 1023. So 768–1023 gets the stacked layout with desktop-range type. 1440 is a
-single type step, and is the only `min-width: 1440` rule in the page.
+**The breakpoints are thelab.co's — this redesign does not move them.** 767 and 1023 do
+different jobs and are deliberately not the same number: **tokens** switch their values
+at 767, the **layout** stacks at 1023. So 768–1023 gets the stacked layout with
+desktop-range type.
+
+| Width | What changes |
+|---|---|
+| **≤767** | Token `-sm` values apply throughout — headlines, body copy and buttons each drop a step. |
+| **≤1023** | Layout stacks to a single column; section headers go full width. `.hero` uses `height: 100svh`, so it does not jump when a phone hides its bottom bar. |
+| **≥1024** | Desktop layout: the grid, the placed cards, the two-column Proof block. |
 
 `config.js` (`grid.mobileAt: 1023`) has to agree with the stylesheet, or the grid changes
 column count at a different width than the CSS does.
 
-| Width | What changes |
-|---|---|
-| **≤767** | Token `-sm` values apply throughout: headlines, body copy and buttons all drop a step. |
-| **≤1023** | Layout stacks to a single column. Section headers go `position: static` at full width. `.hero` uses `height: 100svh` — `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar, so the bottom-anchored copy jumped mid-scroll. |
-| **≥1024** | Desktop layout: the grid, the absolutely-placed cards and the two-column Proof block. |
-| **≥1440** | `.area` steps from `--font-h-24` to `--font-h-32`. Nothing else. |
+**Two small differences from the live site.** thelab.co has a third breakpoint at 1920,
+where `--font-h-64` stepped up to 80 — the only `-xl` value it defines. This redesign
+moves that 80 into `--font-h-80`, so nothing happens at 1920 any more. In its place the
+prototype adds one `min-width: 1440` rule: `.area` steps from `--font-h-24` to
+`--font-h-32`.
 
-Above 1440 the page does not change again. The token file still carries a
-`@media (min-width: 1920px)` block, but it is **inert**: it remaps five tokens to `-xl`
-variants that are not defined anywhere in the file, so every one falls back to `-lg`.
-Worth confirming against production — if the live site defines those `-xl` values, this
-copy of the token file is missing them.
-
-**The layout is not responsive in tokens.** Every position is a design unit —
-`--u = width / 1440` — so the artboard scales proportionally, with `--m` (page margin,
-40px) and `--col` (340px) holding the grid. Type does not scale that way, which is why
-the layout stacks at 1023 rather than 767: by 768 the body token occupies 30 design units
-where the layout budgeted 18.
-
-**Known trade-off.** The stacked layout runs a single full-width column, so the body
-measure at 900–1023 is long — about 760px at 900. A purpose-built tablet layout would
-constrain it.
+**Layout is not responsive in tokens.** Every position is a design unit —
+`--u = width / 1440`, with `--m` (40px) and `--col` (340px) holding the grid — so the
+artboard scales proportionally while type does not. That is why the layout stacks at 1023
+rather than 767: by 768 the body token occupies 30 design units where the layout budgeted
+18. Known trade-off: the stacked layout runs one full-width column, so the body measure
+at 900–1023 is long, about 760px at 900.
 
 ---
 

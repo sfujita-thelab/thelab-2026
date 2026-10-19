@@ -54,7 +54,7 @@ All Beausite 400; `-i` versions are Recife italic at the same sizes.
 | `--font-h-104` | 56 | 80 | 74 | 104 | 100% (mobile 110%) |
 | `--font-h-80` ★ new | 48 | 64 | 60 | 80 | 110% |
 | `--font-h-64` ★ no 80 at ≥1920 | 40 | 56 | 49 | 64 | 110% |
-| `--font-h-56` ★ new | 32 | 56 | 41 | 56 | 110% |
+| `--font-h-56` ★ new | 40 | 48 | 41 | 56 | 110% |
 | ~~`--font-h-48`~~ ★ removed | — | — | — | — | use `--font-h-56` or `--font-h-40` |
 | `--font-h-40` | 32 | 40 | 35 | 40 | 110% |
 | `--font-h-32` | 24 | 32 | 27 | 32 | 110% |

@@ -82,8 +82,8 @@ html {
   /* REDESIGN: no longer jumps to 80px at ≥1920 (the -xl step is removed) */
   --font-h-64-lg: 400 64px / 110% Beausite; --font-h-64-md: 400 56px / 110% Beausite; --font-h-64-sm: 400 40px / 110% Beausite;
   --font-h-64-i-lg: italic 400 64px / 110% Recife; --font-h-64-i-md: italic 400 56px / 110% Recife; --font-h-64-i-sm: italic 400 40px / 110% Recife;
-  /* REDESIGN: new. 56 desktop · 56 tablet · 32 mobile. Replaces h-48, which is removed */
-  /* REDESIGN: 56 desktop / 48 tablet / 40 mobile. It had no tablet step and a 32
+  /* REDESIGN: new, and it replaces h-48, which is removed.
+     56 desktop / 48 tablet / 40 mobile. It had no tablet step and a 32
      mobile; the -md is new and the -sm is up from 32. The stepped blocks below already
      reference -md and -sm with an -lg fallback, so nothing else needs touching. */
   --font-h-56-lg: 400 56px / 110% Beausite;  --font-h-56-md: 400 48px / 110% Beausite;  --font-h-56-sm: 400 40px / 110% Beausite;
@@ -94,10 +94,6 @@ html {
   --font-h-32-i-lg: italic 400 32px / 110% Recife; --font-h-32-i-sm: italic 400 24px / 110% Recife;
   --font-h-24-lg: 400 24px / 110% Beausite;  --font-h-24-sm: 400 20px / 110% Beausite;
   --font-h-24-i-lg: italic 400 24px / 110% Recife; --font-h-24-i-sm: italic 400 20px / 110% Recife;
-  /* REDESIGN: new. 20 desktop / 18 mobile, the step below h-24 -- it continues the
-     scale's own pattern, where each heading's mobile size is the next step's desktop
-     size. Same sizes as --font-p-20 but at a heading's 110% line height, which is the
-     point: it is for short label-like headings, not running copy. */
   --font-p-24-lg: 400 24px / 170% Beausite;  --font-p-24-sm: 400 20px / 150% Beausite;
   --font-p-20-lg: 400 20px / 150% Beausite;  --font-p-20-sm: 400 18px / 150% Beausite;
   --font-p-18-lg: 400 18px / 150% Beausite;  --font-p-18-sm: 400 16px / 150% Beausite;
@@ -106,8 +102,10 @@ html {
      --font-eyebrow. The set had no 14 at desktop (body ran 16/18/20/24), and the
      footer's office lines and legal row are specified at a flat 14. See NEW-TOKENS.md. */
   --font-p-14-lg: 400 14px / 150% Beausite;  --font-p-14-sm: 400 14px / 150% Beausite;
-  /* REDESIGN: both flat. button-1 was 18 desktop / 16 mobile and button-2 was 16 / 14;
-     they are a single size at every width now, like --font-eyebrow. See NEW-TOKENS.md. */
+  /* REDESIGN: both come down one step. button-1 was 18 desktop / 16 mobile and is now
+     16 / 14; button-2 was 16 / 14 and is now 14 / 12. They still step at 767 -- an
+     earlier draft made them flat like --font-eyebrow and that is not what shipped.
+     See NEW-TOKENS.md. */
   --font-button-1-lg: 400 16px / 120% Beausite; --font-button-1-sm: 400 14px / 120% Beausite;
   --font-button-2-lg: 400 14px / 120% Beausite; --font-button-2-sm: 400 12px / 120% Beausite;
   /* REDESIGN: 16 / 14, where it was a flat 12. It is the SECTION eyebrow's token now

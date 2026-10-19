@@ -5,8 +5,21 @@
 | | |
 |---|---|
 | **Project** | thelab.co homepage redesign |
-| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. The front-end visual framework has changed — the vertical grid lines, the site margins, the measure everything is placed on — while most of the design-principle tokens remain the same. |
 | **Stage** | Working prototype, for alignment and dev scoping. Not production code. |
+
+### Scope
+
+Homepage only: hero, Featured Work, Expertise, Proof, and footer.
+
+**What changed** — the front-end visual framework: the vertical grid lines, the site
+margins, and the measure everything is placed on. Most design-principle tokens (colour,
+typography, and the rest) stay the same; the type tokens that do move are listed under
+*Token changes*.
+
+**What's next**
+
+- Upcoming Expertise pages will use the new framework.
+- Existing pages — Case Study, Careers — will need updating to match.
 
 ---
 
@@ -35,18 +48,14 @@ redeploys. When it does, the faces 404 and the page silently falls back to `--fo
 
 ## Summary
 
-- **Built on thelab.co's own token names**, so the prototype and the live site can be
-  compared directly. Nothing is renamed.
-- **Type is the only thing that changes.** Two new headline steps, one above the scale
-  and one inside it; a flat 14 body step and a flat 12 tag step; the section eyebrow up
-  from 12; both button steps down one; `--font-h-48` removed.
-- **Spacing and colour tokens are production's, untouched.**
-- **All tracking is removed**, per the live site.
-- **Layout is drawn in design units off a 1440 artboard**, not in tokens — so positions
-  are not candidates to become tokens.
-- **Everything animates on entrance**, and every entrance is reversible — it re-plays on
-  scroll-back. One rule holds it together: *arming never animates*. The hidden state
-  applies instantly; only the reveal has a transition.
+- The homepage, rebuilt on thelab.co's own token names so the prototype and the live
+  site can be compared directly.
+- The front-end visual framework is new — the grid, the margins, and the measure the
+  page is placed on.
+- Among the tokens, only type moves. Colour and spacing are production's, untouched.
+- **Animation** comes in two kinds: the **intro animation** on load, and the **scroll
+  animations** that bring each section in as you reach it, and replay on scroll-back.
+- Responsive behaviour follows the live site's breakpoints.
 
 ---
 
@@ -79,17 +88,6 @@ and colour tokens.
 
 Values read from `thelab-tokens.css` and confirmed against what the browser computes.
 
-### Two notes in the token file that do not match it
-
-1. **`--font-h-56` carries two `REDESIGN` comments.** The first says `56 · 56 · 32`; the
-   second, directly under it, says `56 · 48 · 40` and explains that the `-md` is new and
-   the `-sm` is up from 32. The declaration is **56 · 48 · 40**, so the second comment is
-   the live decision and the first is stale. `NEW-TOKENS.md` and `TOKENS-REFERENCE.md`
-   still carry the old `56 · 56 · 32` and need correcting.
-2. **An orphaned proposal for `--font-h-20`** (20 · 18, "the step below h-24") sits above
-   the `--font-p-*` block. No such token exists in the file and nothing references it.
-   Either add it or delete the note.
-
 ---
 
 ## Components
@@ -98,31 +96,28 @@ Values read from `thelab-tokens.css` and confirmed against what the browser comp
 right), the nav's underline-on-hover, the mobile menu's open state — measured off
 thelab.co at 375 rather than designed fresh — and zero letter-spacing.
 
-**Rebuilt here:** every component picks up a reveal state, the topbar gains an entrance
-and a scroll behaviour it did not have, and the nav, buttons and card tags move onto
-different type tokens. See *Token changes*.
+**Rebuilt here:** the nav, buttons and card tags move onto different type tokens (see
+*Token changes*), the topbar gains an entrance and a scroll behaviour it did not have,
+and every section animates in on scroll.
 
-### Variants and states
+One state is shared and is not repeated below: anything that animates in has a **hidden
+state before its reveal**. How that works is one rule, in *Interactions*.
 
-| Component | Variants | States |
+| Component | Variants | States / behaviour |
 |---|---|---|
-| **Topbar** `.topbar` | — | `.is-preload` (entrance start) · default · `.is-away` (scrolled down, hidden) · `.is-back` (returning) · `.is-solid` (ground, once over content) · `.on-dark` (inverted over the footer band) |
-| **Nav link** `.nav a` | — | rest · hover (underline wipes in from the left) |
-| **Menu** `.navtoggle` + `.menu` | — | closed · `.is-open`; root takes `.is-menu` for the scroll lock |
-| **CTA pill** `.cta`, `.pf__cta` | solid (hero, sections) · footer | rest · hover (`.cta__roll` rolls the label) · armed `.pre` |
-| **Section header** `.sec-head` | `--left` (Work, Proof) · `--center` (Expertise) | per-element armed `.pre`, revealed in sequence |
-| **Masked line** `.mask` | `--cta` (clip guard) · `--pill` | armed `.pre` / `.hpre` · revealed |
-| **Hero headline** `h1` + `.hero__head-dyn` | — | `.hpre` armed · `.is-placed` (after first layout) · `.is-live` (rolling) · incoming word `.hero__w--in` |
-| **Hero mark** `.hero__mark` | — | `.is-in` (entrance) · `.is-settled` (transform handed to `--spin`) |
-| **Page grid** `.page-grid` | — | `.drawn` (lines wipe down) · `.toned` (resting weight) |
-| **Work card** `.card` | `--1` · `--2` · `--3` | armed `.pre` + `.framed` (clipped) · frame opens · copy follows. Two of three carry an mp4 over a png poster. |
-| **Card tag** `.pill` | — | static |
-| **Case-study cursor** `.cs-cursor` | — | off · `.on` (over a card image) |
-| **Ticker** `.ticker` | — | armed `.pre` · revealed · running |
-| **Expertise area** `.area` | four items | armed `.pre` · loop opening · copy in at 50% of its loop |
-| **Stat** `.stat` | `data-row` 0 · 1 | armed `.pre` · counting · landed |
-| **Footer mark** `.pf__mark` | — | `.is-in` |
-| **Tweak panel** `#tweak` | — | closed · open (`T`). Prototype tooling — not for production. |
+| **Topbar** | over light · over dark (inverts on the footer band) | at rest, transparent over the hero · hidden, scrolling down · returning, scrolling up · with a ground once it is over content |
+| **Nav link** | — | rest · hover, underline wipes in from the left |
+| **Menu** (≤1023) | — | closed · open, covers the page and locks its scroll |
+| **CTA pill** | on light · on dark | rest · hover, the label rolls over |
+| **Section header** | left-aligned (Work, Proof) · centred (Expertise) | eyebrow, headline, body and CTA reveal in sequence |
+| **Work card** | three, staggered down the grid | image or a looping video · client, title and tags · hover shows the "View case study" cursor over the image |
+| **Card tag** | — | static |
+| **Logo ticker** | — | scrolls continuously |
+| **Expertise area** | four | a loop graphic opens, then the title and description arrive |
+| **Stat** | two rows of two | number, suffix and caption; the number counts up when the row arrives |
+
+`#tweak`, the palette panel on `T`, is prototype tooling. It is not part of the system
+and should not be carried across.
 
 ---
 
@@ -130,7 +125,7 @@ different type tokens. See *Token changes*.
 
 **Live prototype:** https://sfujita-thelab.github.io/thelab-2026/homepage/approved/
 
-### The page intro — runs on every load, including reload
+### Intro animation — runs on every load, including reload
 
 | At | What | Duration · easing |
 |---|---|---|
@@ -152,7 +147,7 @@ arriving. Hold is **2133ms + 63ms per character + up to 333ms random**; the hand
 **890ms** (230ms delay + 660ms travel) and is pinned to the stylesheet — changing it in
 the JS alone commits the swap before the words have finished moving.
 
-### Scroll entrances — all reversible
+### Scroll animations — all reversible
 
 Each re-arms when it leaves through the bottom and plays again on the way back. An
 element that has left through the **top** keeps its finished state.
@@ -208,18 +203,15 @@ desktop-range type.
 `config.js` (`grid.mobileAt: 1023`) has to agree with the stylesheet, or the grid changes
 column count at a different width than the CSS does.
 
-**Two small differences from the live site.** thelab.co has a third breakpoint at 1920,
-where `--font-h-64` stepped up to 80 — the only `-xl` value it defines. This redesign
-moves that 80 into `--font-h-80`, so nothing happens at 1920 any more. In its place the
-prototype adds one `min-width: 1440` rule: `.area` steps from `--font-h-24` to
-`--font-h-32`.
+**Spacing is tokenised throughout.** Every gap, pad and margin between elements is a
+`--spacer-*` token — 16 of them across the page — and the page inset is one too. What is
+*not* on a token is the page's own side margin, held at a flat 40px: production has a
+`--container-margin` (64 desktop · 48 tablet · 16 mobile) that it could be mapped to
+instead. **That is an open decision.**
 
-**Layout is not responsive in tokens.** Every position is a design unit —
-`--u = width / 1440`, with `--m` (40px) and `--col` (340px) holding the grid — so the
-artboard scales proportionally while type does not. That is why the layout stacks at 1023
-rather than 767: by 768 the body token occupies 30 design units where the layout budgeted
-18. Known trade-off: the stacked layout runs one full-width column, so the body measure
-at 900–1023 is long, about 760px at 900.
+**Known trade-off.** The stacked layout runs one full-width column, so the body measure
+at 900–1023 is long — about 760px at 900. A purpose-built tablet layout would constrain
+it.
 
 ---
 

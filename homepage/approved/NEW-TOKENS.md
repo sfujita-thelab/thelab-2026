@@ -11,7 +11,7 @@ All headline tokens are Beausite 400, line height 110%, with a matching Recife i
 | Change | Token | Desktop | Tablet | Mobile | Notes |
 |---|---|---|---|---|---|
 | **Add** | `--font-h-80` (+ `--font-h-80-i`) | 80 | 64 | 48 | New top headline step for the hero. |
-| **Add** | `--font-h-56` (+ `--font-h-56-i`) | 56 | 56 | 32 | New section headline step. |
+| **Add** | `--font-h-56` (+ `--font-h-56-i`) | 56 | 48 | 40 | New section headline step. |
 | **Change** | `--font-h-64` (+ `--font-h-64-i`) | 64 | 56 | 40 | Removed the ≥1920px step that bumped it to 80. `--font-h-64-xl` / `--font-h-64-i-xl` are deleted; 80 now lives in `--font-h-80`. |
 | **Remove** | `--font-h-48` (+ `--font-h-48-i`) | ~~48~~ | ~~48~~ | ~~40~~ | Prototype headlines move to `--font-h-56`. Existing live uses move to `--font-h-40` (see impact below). |
 
@@ -66,7 +66,7 @@ Same token names, new values, for type only (spacing stays stepped).
 |---|---|---|---|---|---|
 | `--font-h-80` | 48 | 48 | 48 | 60 | 80 |
 | `--font-h-64` | 40 | 40 | 40 | 49 | 64 |
-| `--font-h-56` | 32 | 32 | 32 | 41 | 56 |
+| `--font-h-56` | 40 | 40 | 40 | 46 | 56 |
 | `--font-h-24` | 20 | 20 | 20 | 21.5 | 24 |
 | `--font-p-18` | 16 | 16 | 16 | 17 | 18 |
 | `--font-eyebrow` | 12 | 12 | 12 | 12 | 12 |

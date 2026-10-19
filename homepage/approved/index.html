@@ -1290,7 +1290,32 @@
   .card__img { transition: clip-path .95s cubic-bezier(.62,.02,.28,1); }
   .card__meta { transition: opacity .6s ease .12s, transform .6s cubic-bezier(.22,.61,.36,1) .12s; }
 
-  [data-rv].pre, .card.pre { opacity: 0; transform: translateY(calc(26 * var(--u))); }
+  /* ---- ARMING IS INSTANT; ONLY THE REVEAL ANIMATES ---------------------------
+     Every armed state below kills the transition it would otherwise inherit, and this
+     is the whole fix for "the text plays its animation backwards on reload".
+
+     The hidden state is added by JS, not by CSS -- deliberately, see the note above:
+     if a trigger ever fails the copy is visible rather than stuck invisible. The cost
+     is that the page can paint with the type already in place, and the script then
+     adds .pre to type the reader can SEE. The base rule's transition is live at that
+     moment, so the line slides 104% down and fades out over .82s before sliding back
+     in: the entrance, run backwards. Reload is where it shows, because a warm cache
+     puts first paint and script execution close enough together to race.
+
+     A transition is chosen from the END state of the change. Armed states therefore
+     declare `transition: none` -- ADDING .pre lands instantly, and REMOVING it is read
+     against the base rule, which still has the .82s, so the reveal is untouched.
+
+     The scroll-away re-arm becomes an instant reset instead of an animated one. That is
+     the behaviour it always wanted: both exits are BOTTOM exits, below the fold by the
+     time they fire, and an out-animation nobody is meant to watch was only ever a way
+     to be caught mid-flight. */
+  [data-rv].pre, .card.pre { opacity: 0; transform: translateY(calc(26 * var(--u)));
+                             transition: none; }
+  /* The frame's start state is an inline clip-path written by featuredwork.js at the
+     same moment .pre lands, so it races in exactly the same way. .pre comes off 60ms
+     before the path is opened, so the .95s is back by the time the frame plays. */
+  .card.pre .card__img { transition: none; }
 
   /* Masked reveal: the line sits in an overflow-hidden box and slides up into it,
      so the type emerges into place rather than drifting in from nowhere. */
@@ -1322,7 +1347,7 @@
     display: block;
     transition: transform .82s cubic-bezier(.16,1,.3,1), opacity .5s ease;
   }
-  .mask.pre > span, .mask.hpre > span { transform: translateY(104%); }
+  .mask.pre > span, .mask.hpre > span { transform: translateY(104%); transition: none; }
   /* the CTA needs a little breathing room or the pill's own edge gets clipped */
   .mask--cta { padding: 2px 2px 3px; margin: -2px -2px -3px; }
 
@@ -1956,7 +1981,8 @@
   }
   .stat__num > span { display: inline-block; transition: opacity .5s ease,
                       transform .6s cubic-bezier(.22,.61,.36,1); }
-  .stat.pre .stat__num > span { opacity: 0; transform: translateY(calc(16 * var(--u))); }
+  .stat.pre .stat__num > span { opacity: 0; transform: translateY(calc(16 * var(--u)));
+                                transition: none; }
 
   @media (max-width: 1023px) {
     /* Both exact on the mobile column: 80 -> --spacer-200, 40 -> --spacer-80. */

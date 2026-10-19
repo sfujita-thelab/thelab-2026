@@ -1,15 +1,12 @@
 # thelab 2026 — homepage
 
-## Project / stage
+## Project
 
 | | |
 |---|---|
 | **Project** | thelab.co homepage redesign |
+| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. The Base UI system has been changed, while most of the design-principle tokens remain the same. |
 | **Stage** | Working prototype, for design-system review. Not production code. |
-| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. |
-| **What it is asking for** | A decision on the proposed type tokens. Everything else is built and behaving. |
-| **Tokens pulled** | 2026-10-15, from the live site |
-| **Build step** | None. Open `index.html`, or serve the folder. |
 
 ---
 
@@ -19,7 +16,7 @@
 |---|---|
 | **Live prototype** | https://sfujita-thelab.github.io/thelab-2026/homepage/approved/ |
 | **Repo** | https://github.com/sfujita-thelab/thelab-2026 |
-| **Token source** | `www.thelab.co` → `/static/cbcaee7b/dist/index.css`, copied verbatim into `thelab-tokens.css` |
+| **Token source** | `www.thelab.co` → `/static/cbcaee7b/dist/index.css`, pulled 2026-10-15 and copied verbatim into `thelab-tokens.css` |
 | **Webfonts** | Beausite (4 faces) + Recife italic, loaded at runtime from the same CDN path |
 
 **Files in this folder**
@@ -30,10 +27,6 @@
 | `NEW-TOKENS.md` | Token impact on the live site, checked across all 21 pages in its sitemap. |
 | `TOKENS-REFERENCE.md` | What each token resolves to per breakpoint. |
 | `README.md` | The WebGL work — GPU passes, `config.js`, URL flags. |
-
-**Excluded — present in the folder but not used by the page:** `thelab-type-fluid.css`
-and `thelab-space-fluid.css`. They are the fluid `clamp()` alternative and are **not
-linked**; the page is stepped throughout. Do not read them as current.
 
 ⚠️ The webfont path contains a build hash (`cbcaee7b`) that changes when thelab.co
 redeploys. When it does, the faces 404 and the page silently falls back to `--font`.
@@ -101,12 +94,20 @@ Values read from `thelab-tokens.css` and confirmed against what the browser comp
 
 ## Components
 
-### Base UI system — reused from the live site
+### Base UI system — changed
 
-Taken from thelab.co and kept: the topbar arrangement (wordmark left, Menu right), the
-solid CTA pill, the nav's underline-on-hover, the type scale's token names, the two
-breakpoints, and zero letter-spacing everywhere. The mobile menu's open state was
-measured off thelab.co at 375 rather than designed fresh.
+The components below are rebuilt for this redesign rather than carried across. Every one
+of them picks up a reveal state, the topbar gains an entrance and a scroll behaviour it
+did not have, and the nav, buttons and card tags all move onto different type tokens —
+see *Token changes*.
+
+What is carried over from thelab.co unchanged: the arrangement of the bar (wordmark
+left, Menu right), the nav's underline-on-hover, the mobile menu's open state (measured
+off thelab.co at 375 rather than designed fresh), the token *names*, the two breakpoints,
+and zero letter-spacing everywhere.
+
+The design-principle tokens are largely untouched — every token change in this handoff is
+type. Spacing and colour are production's, unmodified.
 
 ### Components, with variants and states
 
@@ -200,20 +201,26 @@ renders finished, the topbar is simply present, and the rolling headline still s
 
 ## Responsive notes
 
-**Two breakpoints, deliberately different.** Tokens switch at **767**; the layout stacks
-at **1023**. So 768–1023 gets the stacked layout with desktop-range type.
+**Three breakpoints — 767, 1023 and 1440.** The first two do different jobs and are
+deliberately not the same number: **tokens** switch their values at 767, the **layout**
+stacks at 1023. So 768–1023 gets the stacked layout with desktop-range type. 1440 is a
+single type step, and is the only `min-width: 1440` rule in the page.
 
 `config.js` (`grid.mobileAt: 1023`) has to agree with the stylesheet, or the grid changes
 column count at a different width than the CSS does.
 
 | Width | What changes |
 |---|---|
-| **≤767** | Token `-sm` values apply: `--font-h-80` 48, `--font-h-56` 40, `--font-h-64` 40, body 16, buttons 14/12. |
+| **≤767** | Token `-sm` values apply throughout: headlines, body copy and buttons all drop a step. |
 | **≤1023** | Layout stacks to a single column. Section headers go `position: static` at full width. `.hero` uses `height: 100svh` — `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar, so the bottom-anchored copy jumped mid-scroll. |
-| **768–1439** | `--font-h-56` sits on its `-md` step: **48**. |
-| **≥1024** | Desktop layout. `--font-h-56` reaches 56. |
-| **≥1440** | The only `min-width: 1440` rule: `.area` steps from `--font-h-24` to `--font-h-32`. |
-| **≥1920** | Nothing, now that `--font-h-64`'s `-xl` step is removed. |
+| **≥1024** | Desktop layout: the grid, the absolutely-placed cards and the two-column Proof block. |
+| **≥1440** | `.area` steps from `--font-h-24` to `--font-h-32`. Nothing else. |
+
+Above 1440 the page does not change again. The token file still carries a
+`@media (min-width: 1920px)` block, but it is **inert**: it remaps five tokens to `-xl`
+variants that are not defined anywhere in the file, so every one falls back to `-lg`.
+Worth confirming against production — if the live site defines those `-xl` values, this
+copy of the token file is missing them.
 
 **The layout is not responsive in tokens.** Every position is a design unit —
 `--u = width / 1440` — so the artboard scales proportionally, with `--m` (page margin,

@@ -887,6 +887,25 @@
                                 color .22s ease,
                                 background-color .25s ease, border-color .25s ease; }
 
+  /* ---- THE BAR ARRIVES WITH THE PAGE ---------------------------------------------
+     Its start position for the intro, armed by app.js before the first paint and
+     released on the intro's own clock, so the bar slides down into the frame rather
+     than being in it from frame one.
+
+     Deliberately the SAME transform as .is-away, not a new number: there is one
+     off-screen position for this bar and both the scroll hide and the entrance use it,
+     so a change to the clearance can never leave the two disagreeing. It is placed
+     after .is-away so that while the page is loading it wins -- the two only ever
+     coincide if the reader scrolls during the intro, and then they agree anyway.
+
+     transition: none for the same reason every other armed state has it -- see the note
+     by [data-rv].pre. ADDING this class must never animate: it is a start position, not
+     a move, and a bar that animates INTO its hidden state is the reverse-on-reload bug
+     wearing a different hat. The release is what animates, and it is read against
+     .is-back -- the .55s ease-out this bar already uses for arriving, because arriving
+     is a response rather than a disappearance. */
+  .topbar.is-preload { transform: translateY(calc(-100% - 10px)); transition: none; }
+
   /* ---- the ground, only once the bar is over content ------------------------------
      A bar sliding back down over the middle of the page needs something to be legible
      against; at the TOP of the page it does not -- the hero is built with the bar

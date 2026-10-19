@@ -1023,7 +1023,16 @@
        hero reads as a single block arriving rather than a list being filled in. 1610 is
        where the first line always started, so the intro as a whole is no shorter -- it
        just stops trailing 350ms behind itself. */
-    text:      [1610, 1610, 1610, 1610]        // 2 headline lines, body, CTA -- together
+    text:      [1610, 1610, 1610, 1610],       // 2 headline lines, body, CTA -- together
+    /* THE TOPBAR, with the first grid line rather than with the type. The bar is chrome,
+       not artwork -- the same reason its padding is flat px -- so it belongs to the frame
+       the page assembles before it speaks: lines wipe down, bar slides down, and both are
+       resting long before the headline arrives at 1610. Its own .55s lands it at ~930.
+
+       THIS IS THE ONE NUMBER TO RETUNE. Later reads as the bar being announced in its own
+       right: INTRO.text's 1610 brings it in with the headline, and anything past ~1900
+       puts it after the hero has finished, which is the most deliberate of the three. */
+    navStart:  INTRO_T.gridStart              // == 380
   };
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1091,6 +1100,32 @@
       introIsDone();                                     // see the note below
       return;
     }
+    /* ---- the bar's entrance ------------------------------------------------------
+       Armed here, with the hero's masks and before the reflow below, so the start
+       position is painted rather than transitioned into.
+
+       NOT armed on the paths that return above this: ?intro=0 and reduced motion both
+       want the bar simply present, and so does ?top=1, which exists to photograph the
+       page in its finished state. A capture that caught the bar mid-slide would be a
+       bug in the screenshot, not in the page. */
+    const captureTop = /[?&]top=1/.test(location.search);
+    const bar = document.querySelector('.topbar');
+    const armBar = bar && !captureTop;
+    if (armBar) bar.classList.add('is-preload');
+
+    /* Releasing it is two decisions, not one: WHETHER to animate, and whether the
+       scroll handler has already claimed the bar. A reader who scrolls down during the
+       intro has asked for it to be away -- .is-away is that answer -- so the entrance
+       stands down rather than sliding a bar into view that the page has just been told
+       to hide. Dropping .is-preload is still right there: both classes carry the same
+       transform, so nothing moves, and the bar is left under the handler's control. */
+    const navIn = (animated) => {
+      if (!armBar) return;
+      const claimed = bar.classList.contains('is-away');
+      if (animated && !claimed) bar.classList.add('is-back');
+      bar.classList.remove('is-preload');
+    };
+
     heroMasks.forEach(el => el.classList.add('hpre'));
     const grid = document.querySelector('.page-grid');
     void document.body.offsetHeight;           // paint the armed state first
@@ -1104,6 +1139,7 @@
       // pinned: the mark is either in or not, never mid-turn
       if (INTRO_AT >= INTRO.gridStart) markIn(false);
       if (INTRO_AT >= INTRO.glowStart) glowIn(false);
+      if (INTRO_AT >= INTRO.navStart)  navIn(false);
       INTRO.text.forEach((ms, i) => {
         if (heroMasks[i] && INTRO_AT >= ms) {
           heroMasks[i].style.transition = 'none';
@@ -1115,6 +1151,7 @@
     }
 
     requestAnimationFrame(() => markIn(true));   // the same frame the lines start
+    setTimeout(() => navIn(true),  INTRO.navStart);
     setTimeout(() => glowIn(true), INTRO.glowStart);
     if (grid) {
       requestAnimationFrame(() => grid.classList.add('drawn'));

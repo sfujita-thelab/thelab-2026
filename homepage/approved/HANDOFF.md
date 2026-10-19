@@ -1,121 +1,242 @@
-# homepage/approved — read against thelab.co
+# thelab 2026 — homepage
 
-The homepage prototype. This file answers two questions and nothing else:
-**what it takes from the live site**, and **what it changes**.
+## Project / stage
 
-No build step — open `index.html`, or serve the folder.
+| | |
+|---|---|
+| **Project** | thelab.co homepage redesign |
+| **Stage** | Working prototype, for design-system review. Not production code. |
+| **Scope** | The homepage only — hero, Featured Work, Expertise, Proof, footer. |
+| **What it is asking for** | A decision on the proposed type tokens. Everything else is built and behaving. |
+| **Tokens pulled** | 2026-10-15, from the live site |
+| **Build step** | None. Open `index.html`, or serve the folder. |
+
+---
+
+## Links & references
+
+| | |
+|---|---|
+| **Live prototype** | https://sfujita-thelab.github.io/thelab-2026/homepage/approved/ |
+| **Repo** | https://github.com/sfujita-thelab/thelab-2026 |
+| **Token source** | `www.thelab.co` → `/static/cbcaee7b/dist/index.css`, copied verbatim into `thelab-tokens.css` |
+| **Webfonts** | Beausite (4 faces) + Recife italic, loaded at runtime from the same CDN path |
+
+**Files in this folder**
 
 | File | What it holds |
 |---|---|
-| `thelab-tokens.css` | The tokens. Names are identical to production — do not rename. |
-| `NEW-TOKENS.md` | Every token this redesign adds or changes, what each would do to the live site across all 21 pages, and **the decisions still open**. |
-| `TOKENS-REFERENCE.md` | What each token resolves to at mobile / tablet / desktop. A token's name is its desktop value: `--spacer-80` is not 80 on a phone. |
-| `README.md` | The WebGL work — the GPU passes, `config.js`, the URL flags. |
+| `thelab-tokens.css` | The tokens. Names identical to production — do not rename. Proposals marked `REDESIGN` inline. |
+| `NEW-TOKENS.md` | Token impact on the live site, checked across all 21 pages in its sitemap. |
+| `TOKENS-REFERENCE.md` | What each token resolves to per breakpoint. |
+| `README.md` | The WebGL work — GPU passes, `config.js`, URL flags. |
+
+**Excluded — present in the folder but not used by the page:** `thelab-type-fluid.css`
+and `thelab-space-fluid.css`. They are the fluid `clamp()` alternative and are **not
+linked**; the page is stepped throughout. Do not read them as current.
+
+⚠️ The webfont path contains a build hash (`cbcaee7b`) that changes when thelab.co
+redeploys. When it does, the faces 404 and the page silently falls back to `--font`.
 
 ---
 
-## 1. What it takes from the live site
+## Summary
 
-| What | Where it comes from | Watch out for |
-|---|---|---|
-| **Design tokens** | `thelab-tokens.css`, copied verbatim from `/static/cbcaee7b/dist/index.css`, pulled **2026-10-15** | Names match production exactly. Anything marked `REDESIGN` inline is *proposed*, not live. |
-| **Webfonts** | Beausite (4 faces) and Recife italic, loaded over the network from `https://www.thelab.co/static/cbcaee7b/dist/*.woff2` | The `cbcaee7b` folder changes when the site redeploys. When it does, the faces 404 and the page silently falls back to `--font`. Offline does the same. |
-| **Breakpoints** | `md ≤1023` and `sm ≤767`, the live site's own | `config.js` (`grid.mobileAt`) has to agree with the stylesheet or the grid changes column count at a different width than the CSS. |
-| **Letter-spacing** | Zero everywhere, as thelab.co sets it | Verified: the only `letter-spacing` left in the file is the tweak panel's own UI. |
-| **Mobile menu open state** | Measured off thelab.co at 375, not eyeballed | |
-| **Topbar arrangement** | Wordmark left, Menu right, as thelab.co | |
-| **Logo lockup** | `assets/logo-thelab.svg`, inlined in the markup | Inline on purpose: the bar inverts over the footer's dark band by setting `color`, which only reaches the drawing if the drawing is in the document. |
+The prototype rebuilds the homepage on thelab.co's own token names so the two can be
+compared directly. Type is where it diverges: the redesign adds two headline steps above
+and below the existing scale, adds a flat 14 body step and a flat 12 tag step, moves the
+section eyebrow up from 12, drops both button steps by one, and removes `--font-h-48`.
+Spacing and colour tokens are unchanged from production.
 
-**What it does not take:** every layout position. Those are design units off the 1440
-artboard (`--u = width / 1440`), not tokens, and are not candidates to become tokens.
+Layout is drawn in design units off a 1440 artboard rather than in tokens, so positions
+are not candidates to become tokens. All tracking is removed, per the live site.
+
+Everything animates on entrance, and every entrance is reversible and re-plays on
+scroll-back. The one rule that holds it together: **arming never animates** — a hidden
+state applies instantly and only the reveal has a transition.
 
 ---
 
-## 2. What's changed
+## Token changes
 
-### Added
+Existing production tokens whose value this redesign changes or removes. Old values are
+as recorded in the token file's own `REDESIGN` notes.
 
-**Tokens** — all marked `REDESIGN` in `thelab-tokens.css`, argued in `NEW-TOKENS.md`.
+| Token | Old | New | Reason | What it affects |
+|---|---|---|---|---|
+| `--font-h-64` (+ `-i`) | 64 · 56 · 40, **plus 80 at ≥1920** | 64 · 56 · 40, no `-xl` step | 80 now lives in its own `--font-h-80`, so one token means one size | **Nothing below 1920.** At ≥1920 these drop 80→64 on the live site: `RichText largeHeadings` h1–h3, homepage `paragraphSlideBody`, `CaseStudies nextStudyBlock`, `services_body`, `JobList_heading`, legal page h1, contact dialog h2. Here: `.stat__num`. |
+| `--font-h-48` (+ `-i`) | 48 · 48 · 40 | **removed** | Prototype section headlines moved to `--font-h-56`; the scale had two steps doing one job | Live uses remap to `--font-h-40`: pull quotes (`Quotes_quote`), the italic stat suffix (`StatsBlock`), the `RichText` h1 fallback and h4–h6, and two unused utility classes. Decided 2026-10-15. |
+| `--font-eyebrow` | flat 12 | 16 · 14 | At 12 the section label was too quiet against a 56 headline | `.featuredwork .sec-head__eyebrow`, `.expertise .sec-head__eyebrow`. Its old flat 12 did not disappear — it became `--font-tag`. |
+| `--font-button-1` | 18 · 16 | 16 · 14 | Both button steps come down one, so the scale is not top-heavy | `.nav a`, `.navtoggle`, `.cta`, `.pf__cta` |
+| `--font-button-2` | 16 · 14 | 14 · 12 | As above | `.cs-cursor span` |
 
-| Token | Desktop · Tablet · Mobile | What for |
+Everything else in `thelab-tokens.css` matches production exactly, including all spacing
+and colour tokens.
+
+---
+
+## New tokens
+
+| Token | Value (desktop · tablet · mobile) | Where it's used |
 |---|---|---|
-| `--font-h-80` (+ `-i`) | 80 · 64 · 48 | New top headline step, for the hero |
-| `--font-h-56` (+ `-i`) | 56 · 56 · 32 | New section headline step |
-| `--font-p-14` | flat 14 | Smallest body step, same at every width |
-| `--font-tag` | flat 12 | The card tags — this is the flat 12 that `--font-eyebrow` used to be |
+| `--font-h-80` (+ `-i`) | 80 · 64 · 48 | `h1` — the hero headline. One use. |
+| `--font-h-56` (+ `-i`) | 56 · 48 · 40 | The three section headlines, and nothing else: `.featuredwork .sec-head__title`, `.expertise .sec-head__title`, `.proof .sec-head__title` |
+| `--font-p-14` | flat 14 | `.pf__legal`, `.menu__foot p` |
+| `--font-tag` | flat 12 | `.pill` — the card tags. This is the flat 12 `--font-eyebrow` used to be. |
 
-**Page**
+Values read from `thelab-tokens.css` and confirmed against what the browser computes.
 
-- **Four gradient fields.** Hero and footer share one palette (`PAGEGLOW`, 2D canvas);
-  Work and Proof are WebGL (`FEATUREDWORK`, `HALO`); Expertise is a `<radialGradient>`
-  in the loops' svg whose stops are written from `EXPERTISE`.
-- **The hero's optical circle and mark entrance**, and the **rolling headline** that
-  cycles the keyword.
-- **Scroll-triggered entrances** on Work, Expertise and Proof, with the Proof stats
-  counting up. They replay when you scroll away and come back.
-- **The topbar slides in** with the first grid line, at `INTRO.navStart` in `app.js` —
-  the one number to retune if it should arrive later.
-- **"View case study" cursor** (`.cs-cursor`) over the card images.
-- **The tweak panel** (`T`) — prototype tooling, the palettes only. Not for production.
+### Two notes in the token file that do not match it
 
-### Edited
+1. **`--font-h-56` carries two `REDESIGN` comments.** The first says `56 · 56 · 32`; the
+   second, directly under it, says `56 · 48 · 40` and explains that the `-md` is new and
+   the `-sm` is up from 32. The declaration is **56 · 48 · 40**, so the second comment is
+   the live decision and the first is stale. `NEW-TOKENS.md` and `TOKENS-REFERENCE.md`
+   still carry the old `56 · 56 · 32` and need correcting.
+2. **An orphaned proposal for `--font-h-20`** (20 · 18, "the step below h-24") sits above
+   the `--font-p-*` block. No such token exists in the file and nothing references it.
+   Either add it or delete the note.
 
-- **Headers moved into flow.** Featured Work's header, Expertise's CTA and the footer's
-  lower two rows used hand-tuned absolute `top` values with the copy's line count baked
-  in, so any type change broke them. They are `--spacer-*` margins now. **This is the
-  behaviour to port** — it is the one departure here that is a design decision.
-- **Seven styles had no mobile size** and were inheriting a design-unit desktop value, so
-  they rendered at 3–5px on a phone. All on tokens now — `.proof__body` 4.7→16,
-  `.pf__city` 5.2→18, `.pf__addr`/`.pf__tel`/`.pf__legal` 3.6→14, `.cs-cursor span`
-  3.0→12, `.stat__suffix` 16.7→40.
-- **The Work gradient was retuned** — `config.js`, under `FEATUREDWORK`. The hue did not
-  move; the field was zoned and stirred, and that is what changed. `colorFalloff`
-  2.10→1.25 is the biggest single lever; the light poles are now exact tints of
-  `#0587c1` rather than two separately chosen blues.
-- **Arming a reveal is instant.** Every armed state declares `transition: none`, so the
-  hidden state can only ever animate on the way *in*. Without it the type played its
-  entrance backwards on reload.
-- **Homepage copy** — the approved deck: Work's headline, Expertise's and Proof's bodies,
-  and all four Proof stats. ⚠️ The second stat is **not signed off** — the deck has it as
-  `XX %`, so the old 74 is still in the markup behind a comment saying so.
+---
 
-### Removed
+## Components
 
-**Tokens**
+### Base UI system — reused from the live site
 
-| Token | Note |
+Taken from thelab.co and kept: the topbar arrangement (wordmark left, Menu right), the
+solid CTA pill, the nav's underline-on-hover, the type scale's token names, the two
+breakpoints, and zero letter-spacing everywhere. The mobile menu's open state was
+measured off thelab.co at 375 rather than designed fresh.
+
+### Components, with variants and states
+
+| Component | Variants | States |
+|---|---|---|
+| **Topbar** `.topbar` | — | `.is-preload` (entrance start) · default · `.is-away` (scrolled down, hidden) · `.is-back` (returning) · `.is-solid` (ground, once over content) · `.on-dark` (inverted over the footer band) |
+| **Nav link** `.nav a` | — | rest · hover (underline wipes in from the left) |
+| **Menu** `.navtoggle` + `.menu` | — | closed · `.is-open`; root takes `.is-menu` for the scroll lock |
+| **CTA pill** `.cta`, `.pf__cta` | solid (hero, sections) · footer | rest · hover (`.cta__roll` rolls the label) · armed `.pre` |
+| **Section header** `.sec-head` | `--left` (Work, Proof) · `--center` (Expertise) | per-element armed `.pre`, revealed in sequence |
+| **Masked line** `.mask` | `--cta` (clip guard) · `--pill` | armed `.pre` / `.hpre` · revealed |
+| **Hero headline** `h1` + `.hero__head-dyn` | — | `.hpre` armed · `.is-placed` (after first layout) · `.is-live` (rolling) · incoming word `.hero__w--in` |
+| **Hero mark** `.hero__mark` | — | `.is-in` (entrance) · `.is-settled` (transform handed to `--spin`) |
+| **Page grid** `.page-grid` | — | `.drawn` (lines wipe down) · `.toned` (resting weight) |
+| **Work card** `.card` | `--1` · `--2` · `--3` | armed `.pre` + `.framed` (clipped) · frame opens · copy follows. Two of three carry an mp4 over a png poster. |
+| **Card tag** `.pill` | — | static |
+| **Case-study cursor** `.cs-cursor` | — | off · `.on` (over a card image) |
+| **Ticker** `.ticker` | — | armed `.pre` · revealed · running |
+| **Expertise area** `.area` | four items | armed `.pre` · loop opening · copy in at 50% of its loop |
+| **Stat** `.stat` | `data-row` 0 · 1 | armed `.pre` · counting · landed |
+| **Footer mark** `.pf__mark` | — | `.is-in` |
+| **Tweak panel** `#tweak` | — | closed · open (`T`). Prototype tooling — not for production. |
+
+---
+
+## Interactions & animation
+
+**Live prototype:** https://sfujita-thelab.github.io/thelab-2026/homepage/approved/
+
+### The page intro — runs on every load, including reload
+
+| At | What | Duration · easing |
+|---|---|---|
+| 380ms | Grid lines wipe down, 70ms apart | .70s `cubic-bezier(.62,.02,.34,1)` |
+| 380ms | Mark turns in and fades up, with the grid | opacity .98s `cubic-bezier(.62,.02,.34,1)` · transform .9s |
+| 380ms | **Topbar slides down**, resting ~930ms | .55s `cubic-bezier(.22,.61,.36,1)` |
+| 480ms | Hero gradient fades up — a beat after the lines, so they are not lost | 1100ms smoothstep |
+| 1290ms | Lines reach resting weight; circle fill begins | 520ms |
+| 1410ms | Halo | 820ms |
+| **1610ms** | Hero type — both headline lines, body and CTA **together**, not cascaded | .82s `cubic-bezier(.16,1,.3,1)` transform · .5s ease opacity |
+| 2710ms | `hp:intro-done` fires | — |
+
+Timing lives in `INTRO` in `app.js`. `INTRO.navStart` is the topbar's one number.
+
+### Rolling hero headline
+
+Starts only on `hp:intro-done`, so the first swap cannot begin while the word is still
+arriving. Hold is **2133ms + 63ms per character + up to 333ms random**; the hand-over is
+**890ms** (230ms delay + 660ms travel) and is pinned to the stylesheet — changing it in
+the JS alone commits the swap before the words have finished moving.
+
+### Scroll entrances — all reversible
+
+Each re-arms when it leaves through the bottom and plays again on the way back. An
+element that has left through the **top** keeps its finished state.
+
+| Section | Enters at | Sequence |
+|---|---|---|
+| Work header | 0.78 vh (+0.12 hysteresis) | eyebrow 0 · headline 95 · body 235 · CTA 335ms |
+| Work cards | 0.86 vh | 110ms per card; frame opens +60ms over .95s `cubic-bezier(.62,.02,.28,1)`; copy +420ms then 110ms steps |
+| Ticker | 0.92 vh | single |
+| Expertise | — | eyebrow 0 · headline 110 · body 330 · CTA 760ms. The four loops: 140ms hold, 175ms apart, 560ms each, 1225ms end to end; each loop's copy appears at 50% of its own progress |
+| Proof | head 0.80, rows 0.84 (exit 0.94 / 0.98) | headline 0 · body 180 · CTA 280ms. Row 2 follows row 1 by 260ms, 110ms per stat within a row; numbers count up over **1150ms**, eased `1-(1-p)³` so they decelerate onto the value |
+
+**Cold start.** The first pass after load ignores the entry threshold and reveals
+anything on screen at all. Without it, reloading at a position that put a row inside the
+hysteresis band left it armed and invisible until the reader happened to scroll.
+
+### Topbar on scroll
+
+Hides on scroll down past 120px, returns on scroll up. 8px of travel before a direction
+change counts, so trackpad noise cannot strobe it. **No fade in either direction** — the
+movement is the whole gesture. The curves are deliberately asymmetric: it leaves on an
+ease-in (.4s `cubic-bezier(.5,0,.78,.25)`), because going away should not ask for
+attention, and returns on an ease-out (.55s `cubic-bezier(.22,.61,.36,1)`), because
+coming back is a response to something the reader just did.
+
+### The rule behind all of it
+
+**Arming never animates.** Every armed state declares `transition: none`, so the hidden
+state lands instantly and only the reveal has a transition. A transition is chosen from
+the *end* state of a change, so removing the class still reads the base rule and keeps
+its full duration. Without this the type played its entrance backwards on reload.
+
+### Reduced motion
+
+`prefers-reduced-motion: reduce` and `?intro=0` both skip the intro entirely — the page
+renders finished, the topbar is simply present, and the rolling headline still starts.
+
+---
+
+## Responsive notes
+
+**Two breakpoints, deliberately different.** Tokens switch at **767**; the layout stacks
+at **1023**. So 768–1023 gets the stacked layout with desktop-range type.
+
+`config.js` (`grid.mobileAt: 1023`) has to agree with the stylesheet, or the grid changes
+column count at a different width than the CSS does.
+
+| Width | What changes |
 |---|---|
-| `--font-h-48` (+ `-i`) | Prototype headlines moved to `--font-h-56`. Existing live uses were remapped to `--font-h-40` — the affected components are listed in `NEW-TOKENS.md`. |
-| `--font-h-64-xl` / `-i-xl` | The ≥1920px jump to 80. Nothing changes below 1920; above it those headlines drop 80→64. 80 lives in `--font-h-80` now. |
+| **≤767** | Token `-sm` values apply: `--font-h-80` 48, `--font-h-56` 40, `--font-h-64` 40, body 16, buttons 14/12. |
+| **≤1023** | Layout stacks to a single column. Section headers go `position: static` at full width. `.hero` uses `height: 100svh` — `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar, so the bottom-anchored copy jumped mid-scroll. |
+| **768–1439** | `--font-h-56` sits on its `-md` step: **48**. |
+| **≥1024** | Desktop layout. `--font-h-56` reaches 56. |
+| **≥1440** | The only `min-width: 1440` rule: `.area` steps from `--font-h-24` to `--font-h-32`. |
+| **≥1920** | Nothing, now that `--font-h-64`'s `-xl` step is removed. |
 
-**Page**
+**The layout is not responsive in tokens.** Every position is a design unit —
+`--u = width / 1440` — so the artboard scales proportionally, with `--m` (page margin,
+40px) and `--col` (340px) holding the grid. Type does not scale that way, which is why
+the layout stacks at 1023 rather than 767: by 768 the body token occupies 30 design units
+where the layout budgeted 18.
 
-- **All tracking.** Headlines carried −0.012em to −0.035em and the uppercase labels
-  carried positive tracking. Both are gone; thelab.co sets none. `text-transform:
-  uppercase` stays on the eyebrows, pills, nav and CTA labels.
-- **Three dead rules** — `.pf__body` and `.pf__offices`, left from the five-column footer
-  that `.pf__locations` replaced, and `.hero__head`, left from the hand-built lockup
-  before the mark and wordmark became one SVG. None was in the markup.
-  *(`.hero__dot` looks dead and is not — `hero-type.js` creates it at runtime.)*
-- **Most of the tweak panel.** It was 18 groups and ~128 sliders across colour, shape,
-  flow, cursor, wander, pointer lens, smear, eclipse, circle and blur. Nothing is lost:
-  every value is still named and commented in `config.js`, and editing it there does what
-  dragging its slider did.
+**Known trade-off.** The stacked layout runs a single full-width column, so the body
+measure at 900–1023 is long — about 760px at 900. A purpose-built tablet layout would
+constrain it.
 
 ---
 
-## Browser workarounds — port the behaviour, not the numbers
+## Appendix — browser workarounds
 
-These exist because an engine misbehaves. They carry no design intent, and a build on a
-different stack may not need them — but it will need whatever gets the same result. Each
-was bisected in the browser that showed it.
+*Outside the outline above; kept because it is the detail most likely to cost someone a
+day. Port the behaviour, not the numbers — each was bisected in the browser that showed
+it, and a different stack may not need them.*
 
 | Where | What | Why |
 |---|---|---|
-| `.expertise` | **No `overflow` at all**; `--cover-h` sizes the dome to the gradient it has to finish rather than to a full circle | Safari has no `overflow-clip-margin`, and its `overflow: clip` painted a black band across Proof wherever the clipped layer reached. Measured at twelve widths from 320 to 2560: scroll height is identical with the clip and without it. |
-| `.expertise` | `--exp-guard` plus a negative `margin-top` and matching `padding-top` | Room for the dome's overhang inside the section's own box. `expertise.js` reads that padding back in — five of its measurements are against the section's old top edge. |
-| `.hero-glow`, `.pf__glow` | `transform: translateZ(0)` | WebKit rasterises a `position: fixed` element clipped to the viewport *before* filtering, so `blur(44px)` sampled transparency along the bottom edge and the hero's orange washed out. Its own compositing layer fixed it; 400px of bleed did not. |
-| `.proof` | `z-index: 3` | With `z-index: auto` it opened no stacking context, so `#halogl` and its copy landed in the root one and interleaved with the page's fixed layers. |
-| `.hero` (≤1023) | `height: 100svh` | `inset: 0` made its box the *visual* viewport, which grows when a phone hides its bottom bar — the bottom-anchored copy and the ring jumped mid-scroll. |
-| `app.js` | `viewH()` and `requestLayout()` | Everything geometric reads the *layout* viewport, and a height-only resize no longer triggers a relayout. |
-| `<head>` | `format-detection` meta + `a[x-apple-data-detectors]` | WebKit finds the office addresses and phone numbers and wraps each in its own underlined, system-blue anchor. The numbers are already our `tel:` links. |
+| `.expertise` | **No `overflow` at all**; `--cover-h` sizes the dome to the gradient it has to finish | Safari has no `overflow-clip-margin`, and its `overflow: clip` painted a black band across Proof. Measured at twelve widths from 320 to 2560: scroll height is identical with and without the clip. |
+| `.expertise` | `--exp-guard` + negative `margin-top` and matching `padding-top` | Room for the dome's overhang. `expertise.js` reads that padding back in — five of its measurements are against the section's old top edge. |
+| `.hero-glow`, `.pf__glow` | `transform: translateZ(0)` | WebKit rasterises a `position: fixed` element clipped to the viewport *before* filtering, so `blur(44px)` sampled transparency along the bottom edge and the orange washed out. Its own compositing layer fixed it; 400px of bleed did not. |
+| `.proof` | `z-index: 3` | With `z-index: auto` it opened no stacking context, so `#halogl` landed in the root one and interleaved with the page's fixed layers. |
+| `<head>` | `format-detection` meta + `a[x-apple-data-detectors]` | WebKit wraps the office addresses and phone numbers in its own underlined, system-blue anchors. The numbers are already our `tel:` links. |

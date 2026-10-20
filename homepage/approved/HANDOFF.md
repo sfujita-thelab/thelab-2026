@@ -185,7 +185,7 @@ Timing is in `INTRO` in `app.js`. The topbar's beat is `INTRO.navStart`.
 ### Rolling hero headline
 
 Starts on `hp:intro-done`. Hold is 2133ms + 63ms per character + up to 333ms random.
-Hand-over is 890ms, split 230ms delay + 660ms travel in the stylesheet.
+Hand-over is 890ms, split 120ms delay + 770ms travel in the stylesheet.
 
 ### Scroll animations
 

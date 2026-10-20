@@ -501,12 +501,19 @@
     transition: transform .45s cubic-bezier(.22,.61,.36,1),
                 opacity .35s ease;
   }
-  /* The incoming word is lifted out of flow so the two can overlap: the old one fades
-     until 350ms and the new one begins at 230, a ~110ms window where both carry
-     opacity, which is what makes it read as a hand-over rather than a hole. 230 + 660
-     is the 890ms hero-type.js commits the swap on. An absolutely positioned child is
-     placed against the PADDING box, so this top has to repeat the mask's own .16em
-     rather than sitting at 0. */
+  /* The incoming word is lifted out of flow so the two can overlap. THE DELAY IS 120ms,
+     not the 230 it was: the outgoing fades on `ease`, which is front-loaded -- it is
+     already at 52% by 100ms and 7% by 230 -- so starting the new word at 230 handed
+     over to something nobody could still see, and the line read as empty for about
+     130ms. Measured at 375, 900 and 1440, the hole was the same at every width; it is
+     not a narrow-screen bug, it is just easier to catch where the type is largest.
+
+     At 120 the two cross at ~175ms with both near 20%, which is the hand-over the old
+     numbers only described. 120 + 770 is still the 890ms hero-type.js commits the swap
+     on, so the JS is untouched.
+
+     An absolutely positioned child is placed against the PADDING box, so this top has
+     to repeat the mask's own .16em rather than sitting at 0. */
   /* right:auto and nowrap, NOT right:0. With right:0 the incoming word was stretched
      to the box -- and the box is only as wide as the word currently in flow -- so a
      longer phrase arriving after a shorter one ("digital platform" after "commerce")
@@ -519,8 +526,8 @@
        while the headline could not wrap at all; now it would set the arriving phrase on
        one line and the landed phrase on two. */
     position: absolute; left: 0; right: 0; white-space: normal; top: .16em;
-    transition: transform .66s cubic-bezier(.16,1,.3,1) .23s,
-                opacity .33s ease .23s;
+    transition: transform .77s cubic-bezier(.16,1,.3,1) .12s,
+                opacity .33s ease .12s;
   }
   /* The real, readable list. The rolling line is aria-hidden. */
   .hero__sr { position: absolute; width: 1px; height: 1px; overflow: hidden;

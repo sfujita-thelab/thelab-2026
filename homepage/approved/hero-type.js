@@ -152,7 +152,7 @@
        about four seconds and now sits for a bit under three.
 
        `roll` is deliberately NOT scaled with them. It is the hand-over's own duration
-       and it is pinned to the stylesheet -- .hero__w--in's 230ms delay plus its 660ms
+       and it is pinned to the stylesheet -- .hero__w--in's 120ms delay plus its 770ms
        travel is this number -- so changing it here alone would commit the swap before
        the words had finished moving. The pace is the gap between changes; the change
        itself still takes as long as it takes. */
@@ -217,7 +217,13 @@
   const cs   = getComputedStyle(line);
   const padT = parseFloat(cs.paddingTop)    || 0;
   const padB = parseFloat(cs.paddingBottom) || 0;
-  const boxFor = el => el.offsetHeight + padT + padB;
+  /* getBoundingClientRect, NOT offsetHeight: offsetHeight is rounded to an integer, so
+     a box whose real height is 157.64 measured 158. roll() writes that measurement as
+     the line's inline height for the whole swap, and land() clears it -- which handed
+     the box back its true 157.64 in a single frame. A third of a pixel is not what
+     anyone reported, but it is the only discontinuity at the commit, and a fractional
+     measurement makes clearing the height an exact no-op. */
+  const boxFor = el => el.getBoundingClientRect().height + padT + padB;
 
   /* Measured once and re-measured on resize, not per swap: the box cannot change size
      between phrases here, only when the viewport does and the clamp()ed font size with

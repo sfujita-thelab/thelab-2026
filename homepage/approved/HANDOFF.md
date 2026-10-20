@@ -123,8 +123,7 @@ A line of body copy runs about 760px at a 900px viewport.
 ## Components
 
 **Carried over from thelab.co unchanged:** the bar's arrangement (wordmark left, Menu
-right), the nav's underline-on-hover, the mobile menu's open state (measured off
-thelab.co at 375), zero letter-spacing.
+right), the nav's underline-on-hover, zero letter-spacing.
 
 **Changed here:** the nav, buttons and card tags move onto different type tokens (see
 *Token changes*); the topbar gains an entrance and a scroll behaviour; every section
@@ -145,6 +144,20 @@ is not repeated per row below; the mechanism is under *Interactions*.
 | **Logo ticker** | — | scrolls continuously |
 | **Expertise area** | four | loop graphic opens, then title and description |
 | **Stat** | two rows of two | number, suffix, caption; the number counts up when its row arrives |
+
+**Mobile menu** — thelab.co's panel, updated. Measured against it at 375:
+
+| | Live | Here |
+|---|---|---|
+| Panel background | `#f0ece7` | `#f4f4f4` |
+| Row labels | thelab.co's | this site's four |
+| Row height | 84 | 74–75 |
+| Row label size | 32 | 24, on `--font-h-32`, which is 24 at ≤767 |
+| Arrow at the row's right | yes | none |
+
+Unchanged: the full-bleed 1px `rgba(34,34,34,.2)` hairline between rows only, and the
+foot links at 14. The trigger is on `--font-button-1`, so it reads 14 here where it was
+16 before that token came down a step.
 
 `#tweak`, the palette panel on `T`, is prototype tooling.
 

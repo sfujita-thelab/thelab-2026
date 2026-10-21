@@ -3311,9 +3311,12 @@
     .area__desc { margin-top: var(--spacer-12); }
     .area { position: static; width: auto; margin: 0; transform: none;
             padding-left: var(--inset); padding-right: var(--spacer-16); }
+    /* LEFT ALIGNED, on the items' own text edge: the page margin plus the 8 inset, less
+       the mask's 2px clip guard so the PILL, not its mask, lands on that line. It was
+       centred, which left it floating under a column of left-set copy. Phone only. */
     .expertise .sec-head__cta { position: static; display: block; width: fit-content; left: auto;
                 bottom: auto; top: auto; transform: none;
-                margin: calc(var(--spacer-40) - 2px) auto 0; }
+                margin: calc(var(--spacer-40) - 2px) 0 0 calc(var(--m) + var(--inset) - 2px); }
   }
 
 

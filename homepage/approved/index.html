@@ -2857,7 +2857,11 @@
                width: 100%; margin: 0; }
     .pf__grid { display: none; }
     /* 28 -> --spacer-40 (24 here). */
-    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: var(--spacer-40) 0; }
+    /* margin-top --spacer-16: stacked, the offices sat straight under the band's CTA
+       with only the band's own padding between; this gives them air. Tablet and phone
+       both -- the tablet block below changes the grid, not the margin. */
+    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: var(--spacer-40) 0;
+                     margin-top: var(--spacer-16); }
     /* The eyebrows are set in design units like the headlines, so they would keep
        shrinking past legibility here -- the clamp they replaced had a 10px floor.
        Matched to the specificity of the desktop rule: .featuredwork .sec-head .sec-head__eyebrow is
@@ -3295,11 +3299,13 @@
                           calc(var(--spacer-32) - 114.2 * var(--area-k))
                           calc(var(--m) - 40 * var(--area-k)); }
 
-    /* 2x2, with a row gap -- the row of four at tablet needs none. */
+    /* STACKED, one item per row, --spacer-16 between. It was 2x2 with --spacer-32
+       rows; each item now has the page's full measure, so its title and line set on
+       fewer lines. The row of four at tablet is unchanged. */
     .areas__row { position: static; left: auto; right: auto; top: auto;
                   margin: 0 var(--m);
-                  display: grid; grid-template-columns: repeat(2, 1fr);
-                  column-gap: 0; row-gap: var(--spacer-32); }
+                  display: grid; grid-template-columns: 1fr;
+                  column-gap: 0; row-gap: var(--spacer-16); }
     .area { position: static; width: auto; margin: 0; transform: none;
             padding-left: var(--inset); padding-right: var(--spacer-16); }
     .expertise .sec-head__cta { position: static; display: block; width: fit-content; left: auto;

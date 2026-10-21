@@ -3270,11 +3270,14 @@
        vline 3, which is both columns, where tablet holds it to 70% -- and the four
        items are a 2x2 grid rather than a row of four. */
     .exp__inner { height: auto; padding: var(--spacer-400) 0 0; }
-    .expertise .sec-head { position: relative; width: auto;
+    /* LEFT ALIGNED on a phone, where it is centred above. The four items under it are
+       a left-set column now, and so is the CTA; a centred header over them was the one
+       block on the section's other axis. Same box and inset -- only the setting moves. */
+    .expertise .sec-head { position: relative; width: auto; text-align: left;
                            margin: 0 var(--m); padding: 0 var(--inset); }
     /* Full width on a phone: 80% of two columns is a 268 measure at 375, which was
        breaking a 16px line every four or five words. */
-    .expertise .sec-head__body { width: 100%; margin: 0 auto; }
+    .expertise .sec-head__body { width: 100%; margin: 0; }
 
     /* TALLER AGAIN ON THE PHONE. --cover-h is how far the dome has to reach to finish
        the Work gradient off, and that distance does not scale with --u: the stacked Work

@@ -119,7 +119,25 @@
      means there is no aspect ratio to notice it with. */
   const VBH = parseFloat((svg.getAttribute('viewBox') || '').split(/\s+/)[3]) || 1234.2;
 
+  /* ---- THE PHONE: larger, centred, and still ------------------------------------
+     On a phone the graphic is two columns wide, so the desktop's 380-unit mass came out
+     a small spot, and the only "pointer" is a finger dragging the page -- it slid the
+     mass about while you scrolled. So at 767 and below it is pinned on the figure's own
+     centre (the axis, the band's middle), ignores the pointer, and its radius is 1.53x
+     the desktop's -- double, then 15% and 10% back -- 581 units: about 145px at 375. The
+     gradient's falloff is unchanged, only its size. */
+  const PHONE = matchMedia('(max-width: 767px)');
+  const R_DESK = parseFloat(grad.getAttribute('r')) || 380;
+  const R_PHONE = R_DESK * 1.53;
+  function fitPhone() {
+    grad.setAttribute('r', String(PHONE.matches ? R_PHONE : R_DESK));
+    if (PHONE.matches) { tx = cx = AXIS; ty = cy = CY; }
+  }
+  fitPhone();
+  PHONE.addEventListener ? PHONE.addEventListener('change', fitPhone) : PHONE.addListener(fitPhone);
+
   addEventListener('pointermove', ev => {
+    if (PHONE.matches) return;
     const r = svg.getBoundingClientRect();
     if (!r.width || !r.height) return;
     tx = (ev.clientX - r.left) / r.width  * 1440;

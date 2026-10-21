@@ -212,7 +212,7 @@ and behaves differently by width. `expertise-halo.js`.
 |---|---|---|
 | Position | follows the pointer: 62% of the way across, 42% up and down, clamped to ±400 / ±129 design units of the figure's centre | pinned on the figure's centre; the pointer is ignored (on a phone it is a finger dragging the page) |
 | Lag | 0.045 per frame | — |
-| Radius | 380 design units | 581 (1.53×) · about 145px at 375 |
+| Radius | 380 design units | 640 (1.683×) · about 160px at 375 |
 
 ### Topbar on scroll
 

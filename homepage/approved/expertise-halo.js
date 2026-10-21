@@ -123,12 +123,12 @@
      On a phone the graphic is two columns wide, so the desktop's 380-unit mass came out
      a small spot, and the only "pointer" is a finger dragging the page -- it slid the
      mass about while you scrolled. So at 767 and below it is pinned on the figure's own
-     centre (the axis, the band's middle), ignores the pointer, and its radius is 1.683x
-     the desktop's -- 640 units: about 160px at 375. The
+     centre (the axis, the band's middle), ignores the pointer, and its radius is 2.02x
+     the desktop's -- 768 units: about 190px at 375. The
      gradient's falloff is unchanged, only its size. */
   const PHONE = matchMedia('(max-width: 767px)');
   const R_DESK = parseFloat(grad.getAttribute('r')) || 380;
-  const R_PHONE = R_DESK * 1.683;
+  const R_PHONE = R_DESK * 2.02;
   function fitPhone() {
     grad.setAttribute('r', String(PHONE.matches ? R_PHONE : R_DESK));
     if (PHONE.matches) { tx = cx = AXIS; ty = cy = CY; }

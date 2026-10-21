@@ -109,7 +109,7 @@ Values read from `thelab-tokens.css` and confirmed against computed style in the
 column count at a different width than the CSS does.
 
 **Spacing is tokenised.** Every gap, pad and margin between elements is a `--spacer-*`
-token — 16 distinct tokens, 103 references — and `--inset` is one too.
+token — 16 distinct tokens, 105 references — and `--inset` is one too.
 
 **The page's side margin is not a token.** `--m` steps 40 · 32 · 20 on the same
 1023 / 767 boundaries, where production's `--container-margin` is 64 · 48 · 16. Decided
@@ -202,6 +202,17 @@ element that has left through the top keeps its finished state.
 
 **Cold start.** The first pass after load ignores the entry threshold and reveals
 anything on screen.
+
+### Expertise glow
+
+The orange mass under the four loops. It lights once the loops have finished opening,
+and behaves differently by width. `expertise-halo.js`.
+
+| | ≥768 | ≤767 |
+|---|---|---|
+| Position | follows the pointer: 62% of the way across, 42% up and down, clamped to ±400 / ±129 design units of the figure's centre | pinned on the figure's centre; the pointer is ignored (on a phone it is a finger dragging the page) |
+| Lag | 0.045 per frame | — |
+| Radius | 380 design units | 581 (1.53×) · about 145px at 375 |
 
 ### Topbar on scroll
 

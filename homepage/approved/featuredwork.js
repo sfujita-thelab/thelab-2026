@@ -272,6 +272,25 @@
   // NB: .featuredwork .sec-head has absolutely-positioned children, so its own box is zero
   // height and can never satisfy an intersection test. Watch the headline instead.
   const header = section.querySelector('.sec-head__title');
+
+  /* ---- TULA SITS ON THE HEADLINE'S LAST LINE --------------------------------------
+     Side by side (1024 and up) the Tula card's top is the headline's bottom, measured
+     against the section's inner box and written as --fw-c1, which the stylesheet stacks
+     Elliman and the ticker from. Re-measured whenever the headline changes size -- a
+     resize, the webfont arriving, the copy breaking onto another line. Stacked, the cards
+     are in flow and the variable is cleared. */
+  const fwInner = section.querySelector('.featuredwork__inner');
+  function alignTula() {
+    if (!fwInner || !header) return;
+    if (innerWidth <= 1023) { fwInner.style.removeProperty('--fw-c1'); return; }
+    const b = header.getBoundingClientRect().bottom - fwInner.getBoundingClientRect().top;
+    fwInner.style.setProperty('--fw-c1', b.toFixed(1) + 'px');
+  }
+  alignTula();
+  addEventListener('resize', alignTula);
+  addEventListener('hp:layout', alignTula);
+  if ('ResizeObserver' in window && header) new ResizeObserver(alignTula).observe(header);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignTula);
   const cards  = [...section.querySelectorAll('[data-card]')];
   const ticker = section.querySelector('.ticker');
 

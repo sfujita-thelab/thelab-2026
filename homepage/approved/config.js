@@ -482,7 +482,10 @@ const FEATUREDWORK = {
      scale is a fraction of the CANVAS HEIGHT, so it has to be re-derived whenever
      the canvas height changes or the blob changes size in absolute pixels:
      0.34 on the old 2200u canvas = 0.239 on the 3130u one. */
-  scale:   0.239,
+  /* 0.36, up from 0.239 (2026-10-22): the whole dome half as large again, the same shape,
+     so its sides run past both edges of the screen instead of fading out short of them
+     and leaving pale patches at the left and right of the ticker. */
+  scale:   0.36,
   offsetX: 0.00,   // from the tweak panel
   /* offsetY is in canvas-height units: the canvas is the 1880u section plus the
      420u overhang = 2300u tall, so 1 unit of offsetY is 2300 design px and
@@ -497,7 +500,7 @@ const FEATUREDWORK = {
      y1300 and 0.51 at its bottom edge, where this sat at 0.19 and 0.29. The mass was
      simply too low. One unit here is the canvas height, 2904 design px, so this lifts
      it 151. */
-  offsetY: 0.008,   // from the tweak panel
+  offsetY: 0.06,    // 0.008 from the tweak panel, then lowered (2026-10-22) so the blue starts at the Elliman card
 
   colorSpread:  1.00,   // NB this scales with the poles' own spread, so pushing it
                         // past ~1.2 at this blob scale throws most of the tones

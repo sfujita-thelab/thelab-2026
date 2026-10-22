@@ -1023,7 +1023,15 @@
      content was still most of a screen below the fold. Halving that tail to 208 brings
      the circle and the Expertise content up with it; the trigger itself is unchanged.
      featuredwork.js sizes its canvas off this element's rect, so the overhang follows. */
-  .featuredwork__inner { position: relative; z-index: 3; height: calc(1454 * var(--u)); }
+  /* --fw-c1 IS THE TULA CARD'S TOP, and it is the section header's HEADLINE BOTTOM: the
+     card's top edge lines up with the headline's last line however many lines it breaks
+     onto. featuredwork.js measures the headline and writes it; 196u is the artboard's own
+     value, kept as the fallback. Everything stacked under Tula -- Elliman, the ticker, the
+     section's own height -- is written from it, so the stagger and the tail below the
+     ticker hold while it moves. */
+  .featuredwork__inner { position: relative; z-index: 3;
+                         --fw-c1: calc(196 * var(--u));
+                         height: calc(var(--fw-c1) + 1258 * var(--u)); }
 
   /* anchored to the grid line itself, exactly like the hero headline, rather
      than to independent section padding */
@@ -1190,7 +1198,7 @@
      every top below it is measured from, and the frame is object-fit: cover, so a
      frame 1.5% off square at 1920 crops rather than distorts. */
   .card { position: absolute; width: calc(2 * var(--col)); height: calc(340 * var(--u)); }
-  .card--1    { left: calc(var(--m) + 2 * var(--col)); top: calc(196 * var(--u)); }
+  .card--1    { left: calc(var(--m) + 2 * var(--col)); top: var(--fw-c1); }
   /* The second and third cards come up 40 from the artboard's 511 and 719, which
      tightens the stagger against the first card without moving it. */
   /* card 2 has no left/top of its own: it is in the left column's flow, under the
@@ -1199,7 +1207,7 @@
      the gap below it is the token, so the pair reads as a declared space rather than as
      the difference between two absolute tops. 688 at 1440, where it used to be 679. */
   .card--3 { left: calc(var(--m) + 2 * var(--col));
-                   top: calc((196 + 340) * var(--u) + var(--spacer-120)); }
+                   top: calc(var(--fw-c1) + 340 * var(--u) + var(--spacer-120)); }
 
   .card__img {
     position: absolute; left: 0; top: 0;
@@ -1280,7 +1288,7 @@
        Card 3 and not card 2, because SKS is in the left column's flow and its
        bottom depends on the header's height; it stays clear of this at every width. */
     position: absolute; z-index: 2; left: 0;
-    top: calc((536 + 340) * var(--u) + var(--spacer-120) + var(--spacer-104));
+    top: calc(var(--fw-c1) + 680 * var(--u) + var(--spacer-120) + var(--spacer-104));
     width: 100%; overflow: hidden;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
             mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);

@@ -1998,11 +1998,13 @@
        needs a token of its own. */
     font: var(--font-h-64);
     font-variant-numeric: tabular-nums;   /* so the width does not jitter while counting */
+      letter-spacing: -0.04em;      /* Figma's -4% */
   }
   .stat__suffix {
     font: var(--font-h-40);
     /* --spacer-4: the suffix sits close on the number, read as one figure. */
     margin-left: var(--spacer-4);
+    letter-spacing: 0;            /* the -4% is the number's only */
   }
   .stat__sub {
     font: var(--font-p-18);

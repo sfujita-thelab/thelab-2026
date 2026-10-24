@@ -312,7 +312,6 @@
      resolved font's real metrics and nudges the headline so its ink lands on the
      grid — which keeps it correct if the brand face is swapped in later.          */
   const HEADLINE_CAP_TOP = 505 / 810;   // measured off hero.png
-  const FOOT_BOTTOM      = 744 / 810;   // the CTA pill's bottom edge
 
   function alignHeadlineInk() {
     const h1 = document.querySelector('h1');
@@ -349,16 +348,18 @@
        as a whole. */
     const markY = L.cssH * CONFIG.circle.centerY;
 
-    // The right-hand column: its bottom edge used to be the shared baseline.
+    /* The right-hand column, ALWAYS CENTRED on the mark like the headline below, with no
+       floor. It was Math.min(footBottom - fh, markY - fh / 2), the CTA's bottom held on
+       744/810 as a floor -- which on a short or wide viewport kept the block above the
+       centre while the headline sat on it. Both blocks are on the viewport's centre now. */
     const foot = document.querySelector('.hero__aside');
-    const footBottom = L.cssH * FOOT_BOTTOM;
     if (foot) {
       /* marginTop, not top: .hero__aside is static now and a static box ignores `top`.
          Zeroed first for the same reason it always was -- the height has to be read
          with the block at rest, not at wherever the last pass left it. */
       foot.style.marginTop = '0px';
       const fh = foot.getBoundingClientRect().height;
-      foot.style.marginTop = Math.min(footBottom - fh, markY - fh / 2).toFixed(2) + 'px';
+      foot.style.marginTop = (markY - fh / 2).toFixed(2) + 'px';
     }
 
     /* Measure a CLONE, not the live headline. The live one may be armed or

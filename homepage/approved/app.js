@@ -1213,8 +1213,29 @@
 
      requestLayout is shared with the ResizeObserver below, so both go through the same
      test and the same debounce. */
+  /* THE HERO FOLLOWS THE WINDOW LIVE on desktop. layout() waits for the drag to pause
+     and skips height changes under a fifth of the viewport, so the two hero blocks used
+     to hold still while the window was dragged and only jump to the centre afterwards
+     (or not at all, dragging the height in small steps). This is the cheap part of
+     alignHeadlineInk -- both blocks centred on the mark from their live heights -- run
+     on every resize event, with the headline's `top` transition off for the frame. */
+  function centreHero() {
+    if (window.innerWidth <= CONFIG.grid.mobileAt) return;
+    const h1 = document.querySelector('h1');
+    const foot = document.querySelector('.hero__aside');
+    const markY = viewH() * CONFIG.circle.centerY;
+    if (h1) {
+      const wasPlaced = h1.classList.contains('is-placed');
+      if (wasPlaced) h1.classList.remove('is-placed');
+      h1.style.top = (markY - h1.offsetHeight / 2).toFixed(2) + 'px';
+      if (wasPlaced) requestAnimationFrame(() => h1.classList.add('is-placed'));
+    }
+    if (foot) foot.style.marginTop = (markY - foot.offsetHeight / 2).toFixed(2) + 'px';
+  }
+
   let lastW = window.innerWidth, lastH = viewH();
   function requestLayout() {
+    centreHero();
     const w = window.innerWidth, h = viewH();
     const worthIt = w !== lastW || Math.abs(h - lastH) > lastH * 0.2;
     lastW = w; lastH = h;

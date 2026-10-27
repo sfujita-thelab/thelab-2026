@@ -580,12 +580,8 @@
                   spacer scale: 120 (104 on a tablet) */
                --slide-edge: var(--spacer-64);
                padding: var(--slide-edge) 0; }
-  /* v1/c: each slide's name is the headline (--font-h-56) and its line under it a subhead (--font-h-24) */
+  /* v1/c: each slide's name is the headline (--font-h-56: 56 / 48 / 40) and its line under it a subhead (--font-h-24) */
   .slide__copy .sec-head__title { margin-bottom: var(--spacer-32); }
-  /* v1/c: the slide headline 48 on desktop (h-56's tablet size; 48 on a tablet, 40 on a phone, as before) */
-  @media (min-width: 1024px) {
-    .slides__viewport > .slide .slide__copy .sec-head__title { font: var(--font-h-56-md); }
-  }
   .slide__subhead { margin: 0 0 var(--spacer-16); font: var(--font-h-24); }
   /* ...the same width as the headline: it takes the left header title's right padding too */
   @media (min-width: 1024px) {

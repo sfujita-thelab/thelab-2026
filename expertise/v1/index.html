@@ -956,21 +956,17 @@
   @media (min-width: 768px) and (max-width: 1023px) {
     .slides__viewport > .slide > .slide__media { aspect-ratio: 16 / 9; }
   }
-  /* v1/c: a slide with no picture (AI Workflows) drops the empty picture space below desktop;
-     its project info follows the header in flow */
-  @media (max-width: 1023px) {
-    .slides__viewport > .slide > .slide__media--placeholder { display: none; }
-    .slides__viewport > .slide:has(> .slide__media--placeholder) .project { position: static; margin-top: var(--spacer-40);
-                                                                           padding-left: var(--inset); padding-right: var(--inset); }
-  }
   /* ...and the fade and the white project info on a phone too */
   @media (max-width: 1023px) {
     .slides__viewport > .slide > .slide__media { background: none; }
-    .slides__viewport > .slide > .slide__media:not(.slide__media--placeholder)::after {
+    .slides__viewport > .slide > .slide__media::after {
       content: ""; position: absolute; inset: 25% 0 0; z-index: 1; pointer-events: none;
       background: linear-gradient(to bottom, rgb(var(--black-base) / 0), rgb(var(--black-base) / .55) 45%, rgb(var(--black-base) / .8)); }
-    .slides__viewport > .slide:has(.slide__media:not(.slide__media--placeholder)) .project { color: var(--white); }
-    .slides__viewport > .slide:has(.slide__media:not(.slide__media--placeholder)) .cta.project__link { background: var(--light-gray); color: var(--black); }
+    .slides__viewport > .slide .project { color: var(--white); }
+    .slides__viewport > .slide .cta.project__link { background: var(--light-gray); color: var(--black); }
+    /* v1/c: a slide with no picture yet (AI Workflows) keeps the picture's space as a
+       placeholder block, sized and placed like every other slide's picture */
+    .slides__viewport > .slide > .slide__media--placeholder { background: #3d3f42; }
   }
 </style>
 </head>

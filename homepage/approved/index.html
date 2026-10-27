@@ -1158,6 +1158,9 @@
      The stacked blocks still take it to full width -- they are two classes inside a
      media query and outrank this. */
   .sec-head__body { width: 80%; }
+  /* GLOBAL: a header body with nothing after it (no CTA, no pills) ends the header, so it
+     carries no margin below -- the space after a header belongs to what follows it */
+  .sec-head .sec-head__body:last-child { margin-bottom: 0; }
 
   .featuredwork .sec-head__body {
     /* 231.2, back down a line. It was 169.6 for as long as "From ambition to execution"

@@ -90,6 +90,7 @@ html {
   --font-h-32-lg: 400 32px / 110% Beausite;  --font-h-32-sm: 400 24px / 110% Beausite;
   --font-h-32-i-lg: italic 400 32px / 110% Recife; --font-h-32-i-sm: italic 400 24px / 110% Recife;
   --font-h-24-lg: 400 24px / 110% Beausite;  --font-h-24-sm: 400 20px / 110% Beausite;
+  --font-h-20-lg: 400 20px / 110% Beausite;  --font-h-20-sm: 400 18px / 110% Beausite;   /* v1/c: new, 20 / 20 / 18 */
   --font-h-24-i-lg: italic 400 24px / 110% Recife; --font-h-24-i-sm: italic 400 20px / 110% Recife;
   --font-p-24-lg: 400 24px / 170% Beausite;  --font-p-24-sm: 400 20px / 150% Beausite;
   --font-p-20-lg: 400 20px / 150% Beausite;  --font-p-20-sm: 400 18px / 150% Beausite;
@@ -117,6 +118,7 @@ html {
   --font-h-40: var(--font-h-40-lg);    --font-h-40-i: var(--font-h-40-i-lg);
   --font-h-32: var(--font-h-32-lg);    --font-h-32-i: var(--font-h-32-i-lg);
   --font-h-24: var(--font-h-24-lg);    --font-h-24-i: var(--font-h-24-i-lg);
+  --font-h-20: var(--font-h-20-lg);
   --font-p-24: var(--font-p-24-lg);  --font-p-20: var(--font-p-20-lg);
   --font-p-18: var(--font-p-18-lg);  --font-p-16: var(--font-p-16-lg);
   --font-p-14: var(--font-p-14-lg);
@@ -131,6 +133,7 @@ html {
     --font-h-40: var(--font-h-40-xl, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-xl, var(--font-h-40-i-lg));
     --font-h-32: var(--font-h-32-xl, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-xl, var(--font-h-32-i-lg));
     --font-h-24: var(--font-h-24-xl, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-xl, var(--font-h-24-i-lg));
+    --font-h-20: var(--font-h-20-xl, var(--font-h-20-lg));
   }
 }
 @media (max-width: 1023px) {
@@ -143,6 +146,7 @@ html {
     --font-h-40: var(--font-h-40-md, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-md, var(--font-h-40-i-lg));
     --font-h-32: var(--font-h-32-md, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-md, var(--font-h-32-i-lg));
     --font-h-24: var(--font-h-24-md, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-md, var(--font-h-24-i-lg));
+    --font-h-20: var(--font-h-20-md, var(--font-h-20-lg));
     --font-p-24: var(--font-p-24-md, var(--font-p-24-lg));  --font-p-20: var(--font-p-20-md, var(--font-p-20-lg));
     --font-p-18: var(--font-p-18-md, var(--font-p-18-lg));  --font-p-16: var(--font-p-16-md, var(--font-p-16-lg));
     --font-p-14: var(--font-p-14-md, var(--font-p-14-lg));
@@ -161,6 +165,7 @@ html {
     --font-h-40: var(--font-h-40-sm, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-sm, var(--font-h-40-i-md));
     --font-h-32: var(--font-h-32-sm, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-sm, var(--font-h-32-i-md));
     --font-h-24: var(--font-h-24-sm, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-sm, var(--font-h-24-i-md));
+    --font-h-20: var(--font-h-20-sm, var(--font-h-20-lg));
     --font-p-24: var(--font-p-24-sm, var(--font-p-24-lg));  --font-p-20: var(--font-p-20-sm, var(--font-p-20-lg));
     --font-p-18: var(--font-p-18-sm, var(--font-p-18-lg));  --font-p-16: var(--font-p-16-sm, var(--font-p-16-lg));
     --font-p-14: var(--font-p-14-sm, var(--font-p-14-lg));

@@ -58,7 +58,7 @@
   // then its pills, one every 60ms from where the homepage's CTA would land
   const HEAD_SEQ = [0, 95, 235, 335];
   // a panel's copy, on the locked panels, is played by expertise-page.js's copy layer
-  const pinned = innerWidth > 767;
+  const pinned = innerWidth > 1023;   // v1/c: the panels are pinned on desktop only
   document.querySelectorAll('[data-head]').forEach(head => {
     if (pinned && head.closest('.slides .slide')) return;
     const parts = [...head.querySelectorAll('[data-rv]')];

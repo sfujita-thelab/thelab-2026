@@ -660,10 +660,10 @@ const FEATUREDWORK = {
    alpha scales its whole glow.
    ========================================================================= */
 const PAGEGLOW = {
-  heroAlpha:   0.60,           // peak alpha of a mass in the HERO
+  heroAlpha:   0.96,           // peak alpha of a mass in the HERO
   footerAlpha: 0.30,           // and in the FOOTER, which is half as strong
   families: [
-    { core: '#ea521a', light: '#ffa385' },   // orange
+    { core: '#ea521a', light: '#ff4000' },   // orange
     { core: '#0587c1', light: '#6cccf9' },   // blue  -- Work's base
     { core: '#289581', light: '#60f0df' }    // green -- Proof's
   ]
@@ -694,7 +694,7 @@ const EXPERTISE = {
   warm:  '#f0421a',   // one step out
   mid:   '#eb501b',   // the body of the glow -- three stops share it
   tail:  '#e7521d',   // the long fade, six stops to transparent
-  alpha: 0.593        // peak opacity at the centre; the ramp scales off this (the homepage's 0.494, +20% here, 2026-10-25)
+  alpha: 1.000        // peak opacity at the centre -- the ceiling; the ramp scales off this (2026-10-27)
 };
 
 

@@ -541,11 +541,42 @@
      Stacked (phone) the panels are in flow and none of this runs. */
   const areasEl = document.querySelector('.slides');
   const panels = [...document.querySelectorAll('.slide')];
-  const ENTRY = 0.6, PIN_HOLD = 0.3, STEP = 1.2, COVER = 22, SCRUB = 0.3;   // SCRUB: seconds to ease most of the way
+  const ENTRY = 0.6, PIN_HOLD = 0.3, STEP = 0.9, COVER = 22, SCRUB = 0.3;   // SCRUB: seconds to ease most of the way; v1/c: STEP 0.9 (was 1.2)
   // the case rises CASE_LIFT of a screen more than its panel as the panel is covered
-  const CASE_LIFT = 35;
+  const CASE_LIFT = 0;    // v1/c: no parallax on the copy (was 28)
+  const EXPAND_END = 0.85;   // the first panel is full bleed by 85% of its entry
+  const OPEN_AT = 0.92;      // ...and its copy plays once it is 92% of the way open
+  let opened = 1;            // how far open the first panel is, 0..1 (1 where it does not expand)
   const cases = panels.map(p => p.querySelector('.project'));
-  const desk = () => innerWidth > 767;
+  const desk = () => innerWidth > 1023;   // v1/c: pinned on desktop only; tablet and phone scroll in flow
+
+  /* THE HERO'S SCROLL BUTTON: in once the hero's text has landed; on a click it lands the
+     first area fully open -- halfway through its hold, before the next panel starts up. Stacked (phone) the link's own
+     #digital-experiences anchor does it. */
+  const scrollBtn = document.querySelector('.page-head__scroll');
+  if (scrollBtn) {
+    const btnIn = () => scrollBtn.classList.add('is-in');
+    /* v1/c: in WITH the copy -- the moment app.js reveals the hero's text (its masks lose
+       .hpre), not after the whole intro has landed */
+    const copy = document.querySelector('.page-head [data-hv]');
+    // app.js arms the intro before this file runs: copy not hidden now means no intro to wait for
+    if (window.__hpIntroDone || !copy || !copy.classList.contains('hpre')) btnIn();
+    else {
+      const mo = new MutationObserver(() => {
+        if (copy.classList.contains('hpre')) return;
+        mo.disconnect(); btnIn();
+      });
+      mo.observe(copy, { attributes: true, attributeFilter: ['class'] });
+      addEventListener('hp:intro-done', btnIn, { once: true });
+    }
+    setTimeout(btnIn, 3000);   // and regardless, should the intro never announce itself (no WebGL)
+    scrollBtn.addEventListener('click', e => {
+      if (!areasEl || !desk()) return;
+      e.preventDefault();
+      const at = areasEl.getBoundingClientRect().top + scrollY + (ENTRY + PIN_HOLD / 2) * innerHeight;
+      scrollTo({ top: at, behavior: XP.reduced ? 'auto' : 'smooth' });
+    });
+  }
   function sizeAreas() {
     if (!areasEl) return;
     if (!desk()) { areasEl.style.removeProperty('--slides-h'); return; }
@@ -553,11 +584,48 @@
   }
   sizeAreas();
   addEventListener('resize', sizeAreas);
+
+  /* v1/c: ONE SCROLL, ONE SLIDE. From the hero to the last panel a wheel or trackpad
+     GESTURE goes a whole step: to the next panel fully up (or back), as a jump from the
+     bar lands it. A gesture is a stream of wheel events; it ends with SETTLE ms of quiet,
+     or when the deltas jump back up after GLIDE ms (a trackpad's momentum only ever fades,
+     so a rise is a fresh swipe). The rest of a gesture that has taken its step is swallowed
+     -- on the last panel too -- so a flick cannot run past a panel, and a fresh swipe is
+     never mistaken for momentum, so the page is never stuck. A step taken while the last
+     is still gliding counts on from where that one is headed. Past the last panel, and
+     above the hero, a gesture that has taken no step scrolls as ever. */
+  const SETTLE = 200, GLIDE = 450;   // ms
+  const MIN_DELTA = 4;   // px: the slow start of a trackpad crawl, held until it means it
+  const stops = () => [0, ...panels.map((_, k) => ENTRY + PIN_HOLD + STEP * k)];   // in screens
+  let used = false, wheelT = 0, wheelAbs = 0, stepAt = 0, aim = null;
+  addEventListener('wheel', e => {
+    if (!areasEl || !desk() || e.ctrlKey || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+    const now = performance.now(), a = Math.abs(e.deltaY) * (e.deltaMode ? 16 : 1);
+    const fresh = now - wheelT > SETTLE || (now - stepAt > GLIDE && a > wheelAbs * 1.6 + MIN_DELTA);
+    wheelT = now; wheelAbs = a;
+    if (fresh) used = false;
+    if (used) { e.preventDefault(); return; }
+    const vh = innerHeight, top0 = areasEl.getBoundingClientRect().top + scrollY;
+    // still gliding to the last stop? count on from there, not from part-way
+    const gliding = aim !== null && Math.abs(scrollY - (top0 + aim * vh)) > 2;
+    const s = gliding ? aim : (scrollY - top0) / vh;
+    const S = stops(), last = S[S.length - 1], eps = 0.02;
+    const dir = Math.sign(e.deltaY);
+    if (!dir || s < -eps || s > last + eps || (dir > 0 && s >= last - eps)) { aim = null; return; }
+    e.preventDefault();
+    if (a < MIN_DELTA) return;
+    const to = dir > 0 ? S.find(v => v > s + eps) : [...S].reverse().find(v => v < s - eps);
+    if (to === undefined) { aim = null; return; }
+    aim = to; used = true; stepAt = now;
+    scrollTo({ top: top0 + to * vh, behavior: XP.reduced ? 'auto' : 'smooth' });
+  }, { passive: false });
+
   let r = -1, lastT = 0;
   function parallax() {
     if (!areasEl) return;
     if (!desk()) {
-      panels.forEach(p => p.style.removeProperty('--ty'));
+      panels.forEach(p => { p.style.removeProperty('--ty'); p.style.removeProperty('--py'); p.style.removeProperty('--xk'); p.style.opacity = ''; });
+      opened = 1;
       cases.forEach(c => c && c.style.removeProperty('--cy'));
     } else {
       const vh = innerHeight, s = -areasEl.getBoundingClientRect().top / vh;
@@ -567,9 +635,30 @@
       lastT = now;
       r = (still || XP.CAPTURE) ? target : r + (target - r) * (1 - Math.exp(-dt / SCRUB));
       if (Math.abs(target - r) < 0.0005) r = target;
+      /* rising, a panel travels from the screen's foot to its place: its own height when it
+         fills the screen, more when it is shorter and centred (v1/c, 90%). Read once, before
+         any write, so the frame does not re-lay itself out per panel. */
+      const p0 = panels[0], rise = (vh - p0.offsetTop) / p0.offsetHeight * 100;
+      // ...and the share of that rise before the next panel reaches this one's foot: the
+      // covered drift waits for it, so the drifting picture never opens a gap at the bottom
+      const t0 = Math.max(0, vh - p0.offsetTop - p0.offsetHeight) / (rise / 100 * p0.offsetHeight);
       panels.forEach((p, i) => {
         const a = r - i;
-        p.style.setProperty('--ty', (a < 0 ? -a * 100 : -a * COVER).toFixed(3) + '%');
+        /* covered, the BOX holds still and its CONTENTS drift up inside it (--py): a shorter,
+           centred panel would otherwise rise out above the one covering it (v1/c) */
+        p.style.setProperty('--ty', (a < 0 ? -a * rise : 0).toFixed(3) + '%');
+        const c = a > t0 ? Math.min(1, (a - t0) / (1 - t0)) : 0;   // how far it is covered
+        p.style.setProperty('--py', (-c * COVER).toFixed(3) + '%');
+        // ...and it FADES OUT as the next panel comes up over it, gone once covered
+        p.style.opacity = (1 - c).toFixed(3);
+        /* THE FIRST PANEL EXPANDS as it rises over the hero: 80% of the grid's width
+           at the start of its entry, full bleed by EXPAND_END of the way up (smoothstep) */
+        if (i === 0) {
+          const k = Math.max(0, Math.min(1, (1 + a) / EXPAND_END));
+          const e = k * k * (3 - 2 * k);
+          p.style.setProperty('--xk', (1 - e).toFixed(4));
+          opened = e;
+        }
         if (cases[i]) cases[i].style.setProperty('--cy', (a > 0 ? -Math.min(a, 1) * CASE_LIFT : 0).toFixed(3) + 'vh');
       });
     }
@@ -584,11 +673,11 @@
      235, pills every 60ms from 335) -- the case card fading up after it. A panel that has
      gone back below the screen re-arms, so it plays again. Desktop only: on a phone
      expertise-sections.js reveals the copy on its own watcher. */
-  const SEQ = [0, 95, 235, 335], CASE_AT = 520, REVEAL_AT = 0.78;
+  const SEQ = [0, 95, 235, 335], CASE_AT = 200, REVEAL_AT = 0.78;   // v1/c: case card at 200 (was 520), so it is up longer
   const own = desk() && !XP.CAPTURE && !still;
   const sets = panels.map(p => {
     const text = p.querySelector('.slide__copy'), card = p.querySelector('.project');
-    return { text, card, shown: false, timers: [],
+    return { text, card, inner: p.querySelector('.slide__inner'), shown: false, timers: [],
              parts: text ? [...text.querySelectorAll('[data-rv]')] : [],
              pills: text ? [...text.querySelectorAll('.pill')] : [] };
   });
@@ -600,19 +689,59 @@
   }
   function play(c) {
     clear(c);
+    unfade(c);
     const at = (ms, fn) => c.timers.push(setTimeout(fn, ms));
     c.parts.forEach(e => at(SEQ[+e.dataset.rv] || 0, () => e.classList.remove('pre')));
     c.pills.forEach((e, j) => at(335 + j * 60, () => e.classList.remove('pre')));
     if (c.card) at(CASE_AT, () => c.card.classList.remove('is-wait'));
   }
   if (own) sets.forEach(arm);
+  /* v1/c: FADE OUT, the way back up -- the copy (header and case) simply fades, FADE ms, and
+     only once it is out of sight is it re-armed for the next reveal. Scrolled down again
+     before the fade ends, play() takes the fade back off. */
+  const FADE = 450;
+  function fadeOut(c) {
+    clear(c);
+    if (!c.inner) { arm(c); return; }
+    c.inner.style.transition = 'opacity ' + FADE + 'ms ease';
+    c.inner.style.opacity = '0';
+    c.timers.push(setTimeout(() => { arm(c); unfade(c, true); }, FADE));
+  }
+  // the copy back to full opacity: at once when it is already re-armed (out of sight), else
+  // fading back in
+  function unfade(c, now) {
+    if (!c.inner || !c.inner.style.opacity) return;
+    if (now) {
+      c.inner.style.transition = 'none'; c.inner.style.opacity = '';
+      c.inner.offsetWidth;   // commit, so the next transition does not run from 0
+      c.inner.style.transition = '';
+    } else {
+      c.inner.style.transition = 'opacity ' + FADE + 'ms ease'; c.inner.style.opacity = '';
+    }
+  }
 
+  /* the scroll is going back UP (the last way it moved, held while it rests) and is above the
+     first panel's entry, so that panel has started down over the hero */
+  let lastS = null, goingUp = false;
+  function backUp() {
+    if (!areasEl) return false;
+    const s = -areasEl.getBoundingClientRect().top / innerHeight;
+    if (lastS !== null && Math.abs(s - lastS) > 1e-4) goingUp = s < lastS;
+    lastS = s;
+    return goingUp && s < ENTRY - 0.01;
+  }
   function stepCopy(tops) {
     if (!own) return;
-    const vh = innerHeight;
+    const vh = innerHeight, up = backUp();
     sets.forEach((c, i) => {
-      if (!c.shown && tops[i] < vh * REVEAL_AT) { c.shown = true; play(c); }
-      else if (c.shown && tops[i] > vh) { c.shown = false; arm(c); }
+      // the first panel waits until it has nearly finished expanding
+      const ready = tops[i] < vh * REVEAL_AT && (i > 0 || (opened >= OPEN_AT && !up));
+      if (!c.shown && ready) { c.shown = true; play(c); }
+      /* ...and goes again on the way back: once the panel is back below the screen -- or,
+         for the first panel (v1/c), the moment the scroll goes back above its entry, as
+         it starts down over the hero, so scrolling back up takes its copy off with the
+         reveal run backwards rather than carrying it, whole, down the closing panel */
+      else if (c.shown && (tops[i] > vh || (i === 0 && up))) { c.shown = false; if (i === 0 && up) fadeOut(c); else arm(c); }
     });
   }
 

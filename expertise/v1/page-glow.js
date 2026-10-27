@@ -49,7 +49,19 @@
   }, { passive: true });
 
   const instant = XP && (XP.skipIntro || XP.CAPTURE);
-  setTimeout(() => glow.classList.add('is-on'), instant ? 0 : 1605);
+  /* IT FADES OUT WITH THE HERO (2026-10-26): the hero copy's own fade -- over the first 80%
+     of a screen, on its smoothstep (expertise-page.js) -- written as the glow's opacity once
+     it has lit. The .9s light-up transition is dropped after it has run (.is-set), so from
+     then on the fade follows the scroll exactly. */
+  let lit = false;
+  setTimeout(() => {
+    glow.classList.add('is-on'); lit = true;
+    setTimeout(() => glow.classList.add('is-set'), 950);
+  }, instant ? 0 : 1605);
+  const heroFade = () => {
+    const hk = Math.min(1, Math.min(1, scrollY / (innerHeight * 0.8)) * 1.05);
+    return 1 - hk * hk * (3 - 2 * hk);
+  };
 
   (function frame() {
     const r = fig.getBoundingClientRect();
@@ -72,6 +84,7 @@
     const x = Math.max(ox - REACH * u, Math.min(ox + REACH * u, cx));
     const y = Math.max(oy - RISE * u, Math.min(oy + RISE * u, cy));
     glow.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+    if (lit) glow.style.opacity = heroFade().toFixed(3);
     requestAnimationFrame(frame);
   })();
 })();

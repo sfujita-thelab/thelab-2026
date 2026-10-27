@@ -965,8 +965,12 @@
     .slides__viewport > .slide .project { color: var(--white); }
     .slides__viewport > .slide .cta.project__link { background: var(--light-gray); color: var(--black); }
     /* v1/c: a slide with no picture yet (AI Workflows) keeps the picture's space as a
-       placeholder block, sized and placed like every other slide's picture */
-    .slides__viewport > .slide > .slide__media--placeholder { background: #3d3f42; }
+       LIGHT GREY placeholder block, sized and placed like every other slide's picture --
+       no fade, and its project info stays dark */
+    .slides__viewport > .slide > .slide__media--placeholder { background: #e4e4e4; }
+    .slides__viewport > .slide > .slide__media--placeholder::after { display: none; }
+    .slides__viewport > .slide:has(> .slide__media--placeholder) .project { color: var(--black); }
+    .slides__viewport > .slide:has(> .slide__media--placeholder) .cta.project__link { background: var(--black); color: var(--color-text-contrast); }
   }
 </style>
 </head>

@@ -694,7 +694,7 @@ const EXPERTISE = {
   warm:  '#f0421a',   // one step out
   mid:   '#eb501b',   // the body of the glow -- three stops share it
   tail:  '#e7521d',   // the long fade, six stops to transparent
-  alpha: 0.593        // peak opacity at the centre; the ramp scales off this (the homepage's 0.494, +20% here, 2026-10-25)
+  alpha: 0.800        // peak opacity at the centre; the ramp scales off this (matches homepage/approved, 2026-10-27)
 };
 
 

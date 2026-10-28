@@ -1,0 +1,46 @@
+# Publishes the site to GitHub Pages on every push to main.
+#
+# It publishes the repo as it is, with one change: expertise/v1/c is ALSO copied up into
+# expertise/v1, so the page lives at /expertise/v1/ online while the working copy keeps
+# it in c (beside a and b). /expertise/v1/c/ keeps working too.
+#
+# Folders starting with _ (_archive, _review) and dotfiles stay unpublished, as they
+# were under the old branch build.
+name: Publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the site folder
+        run: |
+          rsync -a --exclude '.*' --exclude '_*' ./ _site/
+          # expertise/v1/c -> expertise/v1, one level up, so its link home loses a ../
+          rsync -a --exclude '.*' expertise/v1/c/ _site/expertise/v1/
+          sed -i 's|href="../../../homepage/approved/"|href="../../homepage/approved/"|' _site/expertise/v1/index.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

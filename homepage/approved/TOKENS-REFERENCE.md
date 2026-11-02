@@ -31,7 +31,7 @@ Source: live www.thelab.co (pulled 2026-10-15) + redesign changes marked ★ (se
 | `--spacer-104` | 48 | 88 | 69 | 104 |
 | `--spacer-120` | 56 | 104 | 80 | 120 |
 | `--spacer-152` | 64 | 120 | 97.5 | 152 |
-| `--spacer-200` | 80 | 152 | 126 | 200 |
+| `--spacer-200` ★ mobile 104 since 2026-11-02 (was 80) | **104** | 152 | 141 | 200 |
 | `--spacer-248` | 104 | 200 | 159 | 248 |
 | `--spacer-320` | 152 | 248 | 216 | 320 |
 | `--spacer-400` | 200 | 320 | 276 | 400 |
@@ -54,7 +54,7 @@ All Beausite 400; `-i` versions are Recife italic at the same sizes.
 | `--font-h-104` | 56 | 80 | 74 | 104 | 100% (mobile 110%) |
 | `--font-h-80` ★ new | 48 | 64 | 60 | 80 | 110% |
 | `--font-h-64` ★ no 80 at ≥1920 | 40 | 56 | 49 | 64 | 110% |
-| `--font-h-56` ★ new | 40 | 48 | 41 | 56 | 110% |
+| `--font-h-56` ★ new (mobile 32 since 2026-11-02, was 40) | 32 | 48 | 41 | 56 | 110% |
 | ~~`--font-h-48`~~ ★ removed | — | — | — | — | use `--font-h-56` or `--font-h-40` |
 | `--font-h-40` | 32 | 40 | 35 | 40 | 110% |
 | `--font-h-32` | 24 | 32 | 27 | 32 | 110% |

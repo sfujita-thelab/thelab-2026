@@ -57,7 +57,8 @@ redeploys. When it does, the faces 404 and the page falls back to `--font`.
 ## Summary
 
 - Built on thelab.co's token names. Nothing is renamed.
-- Among the tokens, only type changes. Colour and spacing are production's.
+- Among the tokens, type changes, plus one spacing value (`--spacer-200` on mobile, 2026-11-02).
+  Colour is production's.
 - Animation is of two kinds: the intro animation on load, and scroll animations per
   section, which replay on scroll-back.
 - Breakpoints are the live site's.
@@ -76,9 +77,10 @@ in the token file's `REDESIGN` notes.
 | `--font-eyebrow` | flat 12 | 16 · 14 | Becomes the section eyebrow's token | `.featuredwork .sec-head__eyebrow`, `.expertise .sec-head__eyebrow`. Its old flat 12 becomes `--font-tag`. |
 | `--font-button-1` | 18 · 16 | 16 · 14 | Down one step | `.nav a`, `.navtoggle`, `.cta`, `.pf__cta` |
 | `--font-button-2` | 16 · 14 | 14 · 12 | Down one step | `.cs-cursor span` |
+| `--spacer-200` | 200 · 152 · 80 | 200 · 152 · **104** | Mobile was too tight as the gap between page sections; 104 is `--spacer-248`'s mobile value. **Changed 2026-11-02.** | Any live use of `--spacer-200` gains 24px on a phone. Here: `.exp__inner`'s top padding (the Expertise section, 80 → 104 on a phone), and the gap between the four areas on the Expertise page. |
 
-Everything else in `thelab-tokens.css` matches production, including all spacing and
-colour tokens.
+Everything else in `thelab-tokens.css` matches production, including all other spacing
+tokens and all colour tokens.
 
 ---
 
@@ -87,7 +89,7 @@ colour tokens.
 | Token | Value (desktop · tablet · mobile) | Where it's used |
 |---|---|---|
 | `--font-h-80` (+ `-i`) | 80 · 64 · 48 | `h1`, the hero headline. One use. |
-| `--font-h-56` (+ `-i`) | 56 · 48 · 40 | Three section headlines only: `.featuredwork .sec-head__title`, `.expertise .sec-head__title`, `.proof .sec-head__title` |
+| `--font-h-56` (+ `-i`) | 56 · 48 · 32 | Three section headlines only: `.featuredwork .sec-head__title`, `.expertise .sec-head__title`, `.proof .sec-head__title`. **Changed 2026-11-02:** mobile 40 → 32. Section headlines step further down from the hero on a phone, and the token now matches the Expertise page, where 40 had made them the same size as its `--font-h-64` hero. |
 | `--font-p-14` | flat 14 | `.pf__legal`, `.menu__foot p` |
 | `--font-tag` | flat 12 | `.pill`, the card tags. The flat 12 `--font-eyebrow` used to be. |
 

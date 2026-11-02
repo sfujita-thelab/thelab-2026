@@ -22,8 +22,8 @@
     --font-h-80-i: italic 400 clamp(3rem, 0.7143rem + 4.7619vw, 5rem) / 110% Recife;                /* 48px @768 → 80px @1440+ */
     --font-h-64: 400 clamp(2.5rem, 0.7857rem + 3.5714vw, 4rem) / 110% Beausite;                     /* 40px @768 → 64px @1440+ */
     --font-h-64-i: italic 400 clamp(2.5rem, 0.7857rem + 3.5714vw, 4rem) / 110% Recife;              /* 40px @768 → 64px @1440+ */
-    --font-h-56: 400 clamp(2.5rem, 1.3571rem + 2.381vw, 3.5rem) / 110% Beausite;                    /* 40px @768 → 56px @1440+ */
-    --font-h-56-i: italic 400 clamp(2.5rem, 1.3571rem + 2.381vw, 3.5rem) / 110% Recife;             /* 40px @768 → 56px @1440+ */
+    --font-h-56: 400 clamp(2rem, 0.2857rem + 3.5714vw, 3.5rem) / 110% Beausite;                     /* 32px @768 → 56px @1440+ (2026-11-02: was 40 @768) */
+    --font-h-56-i: italic 400 clamp(2rem, 0.2857rem + 3.5714vw, 3.5rem) / 110% Recife;              /* 32px @768 → 56px @1440+ (2026-11-02: was 40 @768) */
     --font-h-40: 400 clamp(2rem, 1.4286rem + 1.1905vw, 2.5rem) / 110% Beausite;                     /* 32px @768 → 40px @1440+ */
     --font-h-40-i: italic 400 clamp(2rem, 1.4286rem + 1.1905vw, 2.5rem) / 110% Recife;              /* 32px @768 → 40px @1440+ */
     --font-h-32: 400 clamp(1.5rem, 0.9286rem + 1.1905vw, 2rem) / 110% Beausite;                     /* 24px @768 → 32px @1440+ */

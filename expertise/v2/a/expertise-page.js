@@ -488,7 +488,9 @@
   const more = bar && bar.querySelector('.xsub__more');
   const current = bar && bar.querySelector('.xsub__current');
   const pillBox = bar && bar.querySelector('.xsub__pill');
-  const REST = 40, LOCK = 32;
+  // the spacer tokens, read live: they step down at the tablet and phone breakpoints
+  const sp = n => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--spacer-' + n)) || n;
+  const REST = () => sp(40), LOCK = () => sp(32);   // --spacer-40 over the resting hero, --spacer-32 once it moves
   const PHONE_BAR = matchMedia('(max-width: 1023px)');   // phone AND tablet: the closed subnav, one place
   const HOME_PHONE = 'Explore our expertise';   // the closed pill's words over the hero, phone and tablet
   let onPhone = null;   // px above the screen's foot: over the resting hero, then once the page moves
@@ -515,9 +517,9 @@
     const h = bar.offsetHeight;
     /* a PHONE has one place: LOCK above the foot from the first screen, so the pill never
        shifts as the page starts to move -- it only grows UP from that foot when opened */
-    const rest = PHONE_BAR.matches ? LOCK : REST;
+    const rest = PHONE_BAR.matches ? LOCK() : REST();
     // the gap under it: the pill is anchored to the foot, so its height never enters here
-    const b = off ? -(h + 16) : (scrollY > 4 ? LOCK : rest);
+    const b = off ? -(h + 16) : (scrollY > 4 ? LOCK() : rest);
     const v = b + 'px';
     if (bar.style.getPropertyValue('--xsub-b') !== v) bar.style.setProperty('--xsub-b', v);
   }
@@ -586,7 +588,7 @@
     /* the bar's FULL height whether or not it is showing now: it hides scrolling down and
        comes back scrolling up, so a jump up the page would otherwise land under it */
     const top = document.querySelector('.topbar');
-    const clear = (top ? top.offsetTop + top.offsetHeight : 0) + 40;
+    const clear = (top ? top.offsetTop + top.offsetHeight : 0) + sp(40);   // --spacer-40 under the bar
     // measured on the headline: below desktop the header box steps aside (display: contents)
     const head = copy.querySelector('.sec-head__title') || copy;
     scrollTo({ top: Math.max(0, head.getBoundingClientRect().top + scrollY - clear),

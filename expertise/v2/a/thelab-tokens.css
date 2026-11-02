@@ -192,7 +192,7 @@ html {
   :root {
     --spacer-12: 8px; --spacer-16: 12px; --spacer-24: 16px; --spacer-32: 24px; --spacer-40: 24px;
     --spacer-56: 32px; --spacer-64: 32px; --spacer-80: 40px; --spacer-104: 48px; --spacer-120: 56px;
-    --spacer-152: 64px; --spacer-200: 80px; --spacer-248: 104px; --spacer-320: 152px; --spacer-400: 200px;
+    --spacer-152: 64px; --spacer-200: 104px; /* v2, 2026-11-02: was 80 */ --spacer-248: 104px; --spacer-320: 152px; --spacer-400: 200px;
   }
 }
 

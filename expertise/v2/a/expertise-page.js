@@ -489,8 +489,8 @@
   const current = bar && bar.querySelector('.xsub__current');
   const pillBox = bar && bar.querySelector('.xsub__pill');
   const REST = 40, LOCK = 32;
-  const PHONE_BAR = matchMedia('(max-width: 767px)');
-  const HOME_PHONE = 'Explore our expertise';   // the closed pill's words over the hero, phone only
+  const PHONE_BAR = matchMedia('(max-width: 1023px)');   // phone AND tablet: the closed subnav, one place
+  const HOME_PHONE = 'Explore our expertise';   // the closed pill's words over the hero, phone and tablet
   let onPhone = null;   // px above the screen's foot: over the resting hero, then once the page moves
   let on = -1;
   /* THE SIZE GLIDES between the four and the one: read the pill's width and height, make

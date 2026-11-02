@@ -271,10 +271,15 @@
   /* A PHONE keeps the FULL names -- never trimmed -- so the four go in a VERTICAL LIST, one
      to a row, each row the list's full width; the pill rounds its corners (20) rather than
      capping its ends */
-  @media (max-width: 767px) {
+  /* ...and a TABLET takes the phone's subnav too (closed, a vertical list when open), at
+     its own type size: --font-p-16 is 16 on a tablet, the phone's 14 below 768 */
+  @media (max-width: 1023px) {
     .xsub__list { flex-direction: column; align-items: stretch; gap: 4px; }
-    .xsub__list a { padding-left: 12px; padding-right: 12px; font: var(--font-p-14); text-align: left; }
+    .xsub__list a { padding-left: 12px; padding-right: 12px; font: var(--font-p-16); text-align: left; }
     .xsub__pill { border-radius: 20px; }
+  }
+  @media (max-width: 767px) {
+    .xsub__list a { font: var(--font-p-14); }
   }
   /* CLOSED DOWN (in the areas): the current area's name and the + */
   /* --spacer-16 from the pill's edge to the name (the pill's 4 + 12 here), matching the
@@ -1062,8 +1067,8 @@
        with the 8 inset, the title 80 clear of the right (.sec-head--left), the body 80% */
     /* 40 from the text block to the picture: .slide__inner's padding-bottom alone */
     .slides__viewport > .slide .slide__copy .sec-head__body { width: 80%; margin-bottom: 0; }
-    /* 248 between the areas: from one picture's foot to the next area's title */
-    .slides__viewport > .slide > .slide__inner { padding-top: var(--spacer-248); padding-bottom: var(--spacer-40); }
+    /* --spacer-200 between the areas: from one picture's foot to the next area's title */
+    .slides__viewport > .slide > .slide__inner { padding-top: var(--spacer-200); padding-bottom: var(--spacer-40); }
   }
   /* UNDER THE PICTURE, TABLET AND PHONE: the slide reads headline, body, pills, PICTURE,
      then the project info. The project info is markup-last in the header, so the header
@@ -1076,6 +1081,10 @@
     .slides__viewport > .slide .slide__copy > * { order: 1; align-self: stretch;
       margin-left: calc(var(--m) + var(--inset)); margin-right: calc(var(--m) + var(--inset)); }
     .slides__viewport > .slide .slide__copy > .sec-head__title { margin-top: calc(2 * var(--spacer-24) + 24px + var(--spacer-24)); }
+    /* ...and between one area and the next, --spacer-200 (152 tablet, 104 phone), from the
+       project info under the picture to the next area's title; the first keeps its room
+       under the hero */
+    .slides__viewport > .slide + .slide .slide__copy > .sec-head__title { margin-top: var(--spacer-200); }
     .slides__viewport > .slide .slide__copy > .pills { margin-bottom: var(--spacer-40); }
     /* body to pills is the pills' --spacer-24 alone, as on desktop -- here the pieces sit in a
        flex column, where the body's own bottom margin would ADD to it rather than collapse */
@@ -1089,6 +1098,16 @@
   @media (min-width: 768px) and (max-width: 1023px) {
     .slides__viewport > .slide .slide__copy > *:not(.project) { max-width: calc(3 * var(--col) - 2 * var(--inset)); }
     /* ...the project info the full width under the picture, 8 in from v1 */
+  }
+  /* THE PICTURE OPENS OUT (expertise-sections.js): held at 80% of its width, centred -- 10%
+     clipped off each side -- until it scrolls into view, then opened to the full width of
+     the grid over a second. A clip, not a scale, so the picture itself never stretches. */
+  .slides__viewport > .slide > .slide__media { clip-path: inset(0); transition: clip-path 1s cubic-bezier(.22,.61,.36,1); }
+  .slides__viewport > .slide > .slide__media.pre { clip-path: inset(0 10% 0 10%); }
+  /* ...and the project card over it waits until it is open, then fades up */
+  @media (min-width: 1024px) {
+    .slides__viewport > .slide .slide__copy > .project { transition: opacity .5s ease .6s; }
+    .slides__viewport > .slide:has(> .slide__media.pre) .slide__copy > .project { opacity: 0; transition: opacity .2s ease; }
   }
 </style>
 </head>

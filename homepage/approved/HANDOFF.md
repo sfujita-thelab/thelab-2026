@@ -77,7 +77,7 @@ in the token file's `REDESIGN` notes.
 | `--font-eyebrow` | flat 12 | 16 · 14 | Becomes the section eyebrow's token | `.featuredwork .sec-head__eyebrow`, `.expertise .sec-head__eyebrow`. Its old flat 12 becomes `--font-tag`. |
 | `--font-button-1` | 18 · 16 | 16 · 14 | Down one step | `.nav a`, `.navtoggle`, `.cta`, `.pf__cta` |
 | `--font-button-2` | 16 · 14 | 14 · 12 | Down one step | `.cs-cursor span` |
-| `--spacer-200` | 200 · 152 · 80 | 200 · 152 · **104** | Mobile was too tight as the gap between page sections; 104 is `--spacer-248`'s mobile value. **Changed 2026-11-02.** | Any live use of `--spacer-200` gains 24px on a phone. Here: `.exp__inner`'s top padding (the Expertise section, 80 → 104 on a phone), and the gap between the four areas on the Expertise page. |
+| `--spacer-200` | 200 · 152 · 80 | 200 · 152 · **104** | Mobile was too tight as the gap between page sections; 104 is `--spacer-248`'s mobile value. **Changed 2026-11-02.** | Any live use of `--spacer-200` gains 24px on a phone. **No visible change on this homepage:** its one use, `.exp__inner`'s top padding, is replaced below desktop by `--spacer-320` (tablet) and `--spacer-400` (phone). It is the gap between the four areas on the Expertise page. |
 
 Everything else in `thelab-tokens.css` matches production, including all other spacing
 tokens and all colour tokens.

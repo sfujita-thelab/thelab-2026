@@ -658,6 +658,8 @@
   /* THE ACTION: the homepage's filled CTA pill (.cta, #222 with the rolling label), 16
      under the title. On a dark panel it inverts to --light-gray with #222 type. */
   .cta.project__link { margin-top: var(--spacer-24); }
+  /* the case link is the FAQ's text link (.acc__link: label + stretching arrow), 16 under the title */
+  .acc__link.project__link { margin-top: var(--spacer-16); }
   .slide:not(.slide--ink):not(.slide--light) .cta.project__link { background: var(--light-gray); color: var(--black); }
 
   /* ============================================================ REASONS + ACCORDION */
@@ -952,7 +954,7 @@
     .slide__inner { padding-top: var(--spacer-120); padding-bottom: var(--spacer-40); row-gap: var(--spacer-56); }
   }
   /* v1/c: the project title on a tablet and a phone is --font-h-20 (20, 18 on a phone) */
-  .slides__viewport > .slide .project__title { font: var(--font-h-20); }   /* h-20 on every screen */
+  .slides__viewport > .slide .project__title { font: var(--font-h-24); }   /* h-24 on every screen */
   /* v1/c: below desktop a LEFT header's body runs the header's full width, as homepage/approved's
      Featured Work and Proof do; a centred one keeps its 80% */
   @media (max-width: 1023px) {
@@ -1001,13 +1003,13 @@
     .slides__viewport > .slide .slide__copy > .project .project__title { width: auto; }
     .slides__viewport > .slide .slide__copy .cta.project__link { margin-top: var(--spacer-16);
                                                                  background: var(--black); color: var(--color-text-contrast); }
-    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, 8 short of
-       vline 5 and 8 up from the picture's foot -- the picture's bottom-right */
+    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, flush to
+       vline 5 and to the picture's foot -- the picture's bottom-right */
     @media (min-width: 1024px) {
       .slides__viewport > .slide .slide__copy > .project {
-        position: absolute; left: auto; right: calc(var(--m) + var(--spacer-8)); top: auto; bottom: var(--spacer-8); z-index: 2;
-        width: calc(var(--col) - var(--spacer-8)); max-width: none; margin: 0;
-        padding: var(--spacer-16); background: var(--white); }   /* #FFF */
+        position: absolute; left: auto; right: calc(var(--m) - 1px); top: auto; bottom: 0; z-index: 2;
+        width: calc(var(--col) + 1px);   /* 1px past vline 5, as the picture is, so the line never shows beside it */ max-width: none; margin: 0;
+        padding: var(--spacer-24); background: var(--white); }   /* #FFF */
       /* the button keeps its own width and its 56 each side wherever the card has room; on a
          narrower desktop the sides give way (a % of padding is of the card's inner width; 144
          is the label) so it never runs out of the card */
@@ -1099,15 +1101,39 @@
     .slides__viewport > .slide .slide__copy > *:not(.project) { max-width: calc(3 * var(--col) - 2 * var(--inset)); }
     /* ...the project info the full width under the picture, 8 in from v1 */
   }
+  /* A 10% DARK OVERLAY on every picture (the project card sits outside the picture, so it
+     stays clean #FFF); it replaces the fade and the light pictures' none */
+  .slides__viewport > .slide > .slide__media::after,
+  .slides__viewport > .slide > .slide__media--light::after,
+  .slides__viewport > .slide > .slide__media--placeholder::after {
+    content: ""; display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: rgb(var(--black-base) / .1); }
   /* THE PICTURE OPENS OUT (expertise-sections.js): held at 80% of its width, centred -- 10%
      clipped off each side -- until it scrolls into view, then opened to the full width of
      the grid over a second. A clip, not a scale, so the picture itself never stretches. */
   .slides__viewport > .slide > .slide__media { clip-path: inset(0); transition: clip-path 1s cubic-bezier(.22,.61,.36,1); }
   .slides__viewport > .slide > .slide__media.pre { clip-path: inset(0 10% 0 10%); }
-  /* ...and the project card over it waits until it is open, then fades up */
+  /* ...and the project card over it comes in as its OWN beat once the picture has opened:
+     the white card wipes up from the picture's foot, then its lines (client, title, link)
+     rise in one after another -- so it reads as a separate block laid on the picture */
   @media (min-width: 1024px) {
-    .slides__viewport > .slide .slide__copy > .project { transition: opacity .5s ease .6s; }
-    .slides__viewport > .slide:has(> .slide__media.pre) .slide__copy > .project { opacity: 0; transition: opacity .2s ease; }
+    .slides__viewport > .slide .slide__copy > .project {
+      clip-path: inset(0); transition: clip-path .7s cubic-bezier(.65,0,.35,1) .75s; }
+    .slides__viewport > .slide .slide__copy > .project > * {
+      transition: opacity .5s ease, transform .7s cubic-bezier(.16,1,.3,1); }
+    .slides__viewport > .slide .slide__copy > .project > :nth-child(1) { transition-delay: 1.15s; }
+    .slides__viewport > .slide .slide__copy > .project > :nth-child(2) { transition-delay: 1.23s; }
+    .slides__viewport > .slide .slide__copy > .project > :nth-child(3) { transition-delay: 1.31s; }
+    /* while the picture is held (.pre): the card wiped down to nothing, its lines low and
+       hidden; going back there is quick and all at once */
+    .slides__viewport > .slide:has(> .slide__media.pre) .slide__copy > .project {
+      clip-path: inset(100% 0 0 0); transition: clip-path .25s ease; }
+    .slides__viewport > .slide:has(> .slide__media.pre) .slide__copy > .project > * {
+      opacity: 0; transform: translateY(calc(16 * var(--u))); transition: opacity .2s ease, transform 0s .25s; }
+  }
+  @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+    .slides__viewport > .slide .slide__copy > .project,
+    .slides__viewport > .slide .slide__copy > .project > * { transition: none; }
   }
 </style>
 </head>
@@ -1216,9 +1242,8 @@
             <li class="pill">SEO &amp; AI Search Optimization</li>
           </ul>
           <div class="project">
-            <p class="project__client">SKS</p>
-            <h3 class="project__title">Turning innovation into Technicurean desire</h3>
-            <a class="cta project__link" href="#"><span class="cta__clip"><span class="cta__roll"><span>View Case Study</span><span aria-hidden="true">View Case Study</span></span></span></a>
+            <h3 class="project__title">Turning SKS innovation into Technicurean desire</h3>
+            <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
           </div>
         </div>
       </div>
@@ -1242,9 +1267,8 @@
             <li class="pill">Measurement &amp; Optimization</li>
           </ul>
           <div class="project">
-            <p class="project__client">Tula</p>
-            <h3 class="project__title">Bringing prebiotics to a new generation of wellness seekers</h3>
-            <a class="cta project__link" href="#"><span class="cta__clip"><span class="cta__roll"><span>View Case Study</span><span aria-hidden="true">View Case Study</span></span></span></a>
+            <h3 class="project__title">Bringing Tula’s prebiotics to a new generation of wellness seekers</h3>
+            <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
           </div>
         </div>
       </div>
@@ -1268,9 +1292,8 @@
             <li class="pill">Measurement &amp; Governance</li>
           </ul>
           <div class="project">
-            <p class="project__client">Wellcom HOME</p>
-            <h3 class="project__title">Bringing a global network's work into one place</h3>
-            <a class="cta project__link" href="#"><span class="cta__clip"><span class="cta__roll"><span>View Case Study</span><span aria-hidden="true">View Case Study</span></span></span></a>
+            <h3 class="project__title">Bringing a global network’s work into one place with Wellcom HOME</h3>
+            <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
           </div>
         </div>
       </div>
@@ -1294,9 +1317,8 @@
             <li class="pill">Post-Production</li>
           </ul>
           <div class="project">
-            <p class="project__client">Douglas Elliman</p>
-            <h3 class="project__title">Launching a new world of luxury real estate</h3>
-            <a class="cta project__link" href="#"><span class="cta__clip"><span class="cta__roll"><span>View Case Study</span><span aria-hidden="true">View Case Study</span></span></span></a>
+            <h3 class="project__title">Launching Douglas Elliman’s new world of luxury real estate</h3>
+            <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
           </div>
         </div>
       </div>

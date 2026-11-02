@@ -488,30 +488,38 @@
   const more = bar && bar.querySelector('.xsub__more');
   const current = bar && bar.querySelector('.xsub__current');
   const pillBox = bar && bar.querySelector('.xsub__pill');
-  const REST = 40, LOCK = 32;   // px above the screen's foot: over the resting hero, then once the page moves
+  const REST = 40, LOCK = 32;
+  const PHONE_BAR = matchMedia('(max-width: 767px)');
+  const HOME_PHONE = 'Explore our expertise';   // the closed pill's words over the hero, phone only
+  let onPhone = null;   // px above the screen's foot: over the resting hero, then once the page moves
   let on = -1;
-  /* THE WIDTH GLIDES between the four and the one: read it, make the change, read it
-     again, and let the pill's width transition run from the first to the second */
+  /* THE SIZE GLIDES between the four and the one: read the pill's width and height, make
+     the change, read them again, and let its width and height transitions run from the
+     first to the second. Anchored at the foot, a taller pill grows UP. */
   function morph(change) {
     if (!pillBox) { change(); return; }
-    const w0 = pillBox.offsetWidth;
-    pillBox.style.width = '';
+    const w0 = pillBox.offsetWidth, h0 = pillBox.offsetHeight;
+    pillBox.style.width = ''; pillBox.style.height = '';
     change();
-    const w1 = pillBox.offsetWidth;
-    if (Math.abs(w1 - w0) < 1 || XP.reduced) return;
-    pillBox.style.width = w0 + 'px';
+    const w1 = pillBox.offsetWidth, h1 = pillBox.offsetHeight;
+    if ((Math.abs(w1 - w0) < 1 && Math.abs(h1 - h0) < 1) || XP.reduced) return;
+    pillBox.style.width = w0 + 'px'; pillBox.style.height = h0 + 'px';
     void pillBox.offsetWidth;
-    pillBox.style.width = w1 + 'px';
-    const done = e => { if (e.propertyName !== 'width') return; pillBox.style.width = ''; pillBox.removeEventListener('transitionend', done); };
-    pillBox.addEventListener('transitionend', done);
+    pillBox.style.width = w1 + 'px'; pillBox.style.height = h1 + 'px';
+    clearTimeout(morph.t);
+    morph.t = setTimeout(() => { pillBox.style.width = ''; pillBox.style.height = ''; }, 760);
   }
   /* WHERE IT SITS: REST above the foot while the page is at rest; LOCK above it once it
      moves; below the screen once Reasons is up */
   function placeBar(off) {
     const h = bar.offsetHeight;
-    const y = off ? innerHeight + 16
-            : innerHeight - (scrollY > 4 ? LOCK : REST) - h;
-    bar.style.setProperty('--xsub-y', y.toFixed(1) + 'px');
+    /* a PHONE has one place: LOCK above the foot from the first screen, so the pill never
+       shifts as the page starts to move -- it only grows UP from that foot when opened */
+    const rest = PHONE_BAR.matches ? LOCK : REST;
+    // the gap under it: the pill is anchored to the foot, so its height never enters here
+    const b = off ? -(h + 16) : (scrollY > 4 ? LOCK : rest);
+    const v = b + 'px';
+    if (bar.style.getPropertyValue('--xsub-b') !== v) bar.style.setProperty('--xsub-b', v);
   }
   // the glide only once it has been placed, so the first paint does not fly in
   if (bar) requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.add('is-ready')));
@@ -593,13 +601,17 @@
     placeBar(off);
     const i = Math.round(XP.state());
     const n = i >= 1 && i <= 4 ? i - 1 : -1;
-    if (n === on) return;
-    on = n;
-    // in an area: closed down to its name; over the hero: the four
+    const phone = PHONE_BAR.matches;
+    if (n === on && phone === onPhone) return;
+    on = n; onPhone = phone;
+    /* in an area: closed down to its name and the +. Over the hero: the four -- except on a
+       PHONE, where the four would stand four rows tall over the hero copy, so it stays
+       closed there too, as HOME_PHONE and the + */
     if (n < 0) setOpen(false);
     morph(() => {
-      bar.classList.toggle('is-compact', n >= 0);
-      if (n >= 0 && current) current.textContent = links[n].querySelector('.xsub__long').textContent;
+      bar.classList.toggle('is-compact', n >= 0 || phone);
+      if (current) current.textContent = n >= 0 ? links[n].querySelector('.xsub__long').textContent
+                                                : (phone ? HOME_PHONE : '');
     });
     links.forEach((a, j) => {
       a.classList.toggle('is-on', j === n);

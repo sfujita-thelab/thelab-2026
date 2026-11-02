@@ -229,13 +229,15 @@
      screen, centred. Over the hero it holds all four areas as links; once the page is in
      the areas it closes down to the area you are in and a +, which opens the four again
      (the + turning to a x). expertise-page.js runs it. */
-  /* WHERE IT SITS (expertise-page.js writes --xsub-y): over the resting hero, 40 above the
-     screen's foot; once the page moves, locked 32 above it; gone below it as Reasons
-     arrives. One transform, so every move between the three is the same eased glide. */
-  .xsub { position: fixed; left: 50%; top: 0; z-index: 5; pointer-events: auto;
-          transform: translate(-50%, var(--xsub-y, 100vh)); max-width: calc(100vw - 2 * var(--m));
+  /* WHERE IT SITS (expertise-page.js writes --xsub-b, the gap under it): ANCHORED TO THE
+     SCREEN'S FOOT, so a change of its own height (opening, closing down) grows or shrinks
+     it upward from a bottom edge that does not move, and a phone's browser bar coming and
+     going cannot shift it. Over the resting hero 40 above the foot (32 on a phone); once
+     the page moves 32; below the screen as Reasons arrives. Only those moves glide. */
+  .xsub { position: fixed; left: 50%; top: auto; bottom: var(--xsub-b, -200px); z-index: 5; pointer-events: auto;
+          transform: translateX(-50%); max-width: calc(100vw - 2 * var(--m));
           opacity: 0; transition: opacity .6s ease; }
-  .xsub.is-ready { transition: transform .7s cubic-bezier(.22,.61,.36,1), opacity .6s ease; }
+  .xsub.is-ready { transition: bottom .7s cubic-bezier(.22,.61,.36,1), opacity .6s ease; }
   .xsub.is-in { opacity: 1; }
   .xsub.is-off { opacity: 0; pointer-events: none; }
   /* WHITE, with the area you are in in #222; when it closes down or opens up its width
@@ -244,7 +246,7 @@
                 padding: var(--spacer-4); border-radius: 999px; overflow: hidden; white-space: nowrap;
                 background: var(--white); color: var(--black);
                 box-shadow: 0 4px 24px rgb(var(--black-base) / .10);
-                transition: width .5s cubic-bezier(.22,.61,.36,1); }
+                transition: width .7s cubic-bezier(.22,.61,.36,1), height .7s cubic-bezier(.22,.61,.36,1); }
   /* the four (over the hero, or opened from the +): the pill's 4 all round, so a highlight
      sits 4 inside it on every side -- 20 from the pill's edge to the first and last label
      (4 + the label's own 16; 12 on a phone) */
@@ -252,7 +254,8 @@
   /* ...and it may run to 8 from the screen's edges rather than the 20 margin: the four are
      346 wide, which a 375 screen's margins (335) would clip */
   @media (max-width: 767px) { .xsub { max-width: calc(100vw - 16px); } }
-  .xsub__pill > * { animation: xsub-in .4s ease both; }
+  /* what it shows fades in behind the glide: a beat late, and slower */
+  .xsub__pill > * { animation: xsub-in .6s ease .1s both; }
   @keyframes xsub-in { from { opacity: 0; } }
   /* the four, each a pill inside the pill; the area you are in inverted */
   /* the active and hover pills: 16 each side of the label, and a 4 GAP between items so
@@ -265,10 +268,13 @@
   .xsub__list a:hover { background: rgb(var(--black-base) / .06); }
   .xsub__list a.is-on { background: var(--black); color: var(--white); }
   .xsub__short { display: none; }
+  /* A PHONE keeps the FULL names -- never trimmed -- so the four go in a VERTICAL LIST, one
+     to a row, each row the list's full width; the pill rounds its corners (20) rather than
+     capping its ends */
   @media (max-width: 767px) {
-    .xsub__list a { padding-left: 8px; padding-right: 8px; font: var(--font-p-14); }
-    .xsub__long { display: none; }
-    .xsub__short { display: inline; }
+    .xsub__list { flex-direction: column; align-items: stretch; gap: 4px; }
+    .xsub__list a { padding-left: 12px; padding-right: 12px; font: var(--font-p-14); text-align: left; }
+    .xsub__pill { border-radius: 20px; }
   }
   /* CLOSED DOWN (in the areas): the current area's name and the + */
   /* --spacer-16 from the pill's edge to the name (the pill's 4 + 12 here), matching the
@@ -1056,8 +1062,8 @@
        with the 8 inset, the title 80 clear of the right (.sec-head--left), the body 80% */
     /* 40 from the text block to the picture: .slide__inner's padding-bottom alone */
     .slides__viewport > .slide .slide__copy .sec-head__body { width: 80%; margin-bottom: 0; }
-    /* 200 between the areas: from one picture's foot to the next area's title */
-    .slides__viewport > .slide > .slide__inner { padding-top: var(--spacer-200); padding-bottom: var(--spacer-40); }
+    /* 248 between the areas: from one picture's foot to the next area's title */
+    .slides__viewport > .slide > .slide__inner { padding-top: var(--spacer-248); padding-bottom: var(--spacer-40); }
   }
   /* UNDER THE PICTURE, TABLET AND PHONE: the slide reads headline, body, pills, PICTURE,
      then the project info. The project info is markup-last in the header, so the header

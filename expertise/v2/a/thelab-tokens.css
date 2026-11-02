@@ -83,8 +83,8 @@ html {
   --font-h-64-lg: 400 64px / 110% Beausite; --font-h-64-md: 400 56px / 110% Beausite; --font-h-64-sm: 400 40px / 110% Beausite;
   --font-h-64-i-lg: italic 400 64px / 110% Recife; --font-h-64-i-md: italic 400 56px / 110% Recife; --font-h-64-i-sm: italic 400 40px / 110% Recife;
   /* REDESIGN: new. 56 desktop / 48 tablet / 40 mobile. Replaces h-48, which is removed. */
-  --font-h-56-lg: 400 56px / 110% Beausite;  --font-h-56-md: 400 48px / 110% Beausite;  --font-h-56-sm: 400 40px / 110% Beausite;
-  --font-h-56-i-lg: italic 400 56px / 110% Recife; --font-h-56-i-md: italic 400 48px / 110% Recife; --font-h-56-i-sm: italic 400 40px / 110% Recife;
+  --font-h-56-lg: 400 56px / 110% Beausite;  --font-h-56-md: 400 48px / 110% Beausite;  --font-h-56-sm: 400 32px / 110% Beausite;   /* v2: 32 on a phone (was 40, the same as h-64) */
+  --font-h-56-i-lg: italic 400 56px / 110% Recife; --font-h-56-i-md: italic 400 48px / 110% Recife; --font-h-56-i-sm: italic 400 32px / 110% Recife;
   --font-h-40-lg: 400 40px / 110% Beausite;  --font-h-40-sm: 400 32px / 110% Beausite;
   --font-h-40-i-lg: italic 400 40px / 110% Recife; --font-h-40-i-sm: italic 400 32px / 110% Recife;
   --font-h-32-lg: 400 32px / 110% Beausite;  --font-h-32-sm: 400 24px / 110% Beausite;

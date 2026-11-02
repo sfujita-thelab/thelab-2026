@@ -990,12 +990,12 @@
     .slides__viewport > .slide .slide__copy > .project .project__title { width: auto; }
     .slides__viewport > .slide .slide__copy .cta.project__link { margin-top: var(--spacer-16);
                                                                  background: var(--black); color: var(--color-text-contrast); }
-    /* DESKTOP: the card is the grid's first column, vline 1 to vline 2, 8 inside each line,
-       8 up from the picture's foot */
+    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, 8 short of
+       vline 5 and 8 up from the picture's foot -- the picture's bottom-right */
     @media (min-width: 1024px) {
       .slides__viewport > .slide .slide__copy > .project {
-        position: absolute; left: calc(var(--m) + 8px); right: auto; top: auto; bottom: 8px; z-index: 2;
-        width: calc(var(--col) - 16px); max-width: none; margin: 0;
+        position: absolute; left: auto; right: calc(var(--m) + 8px); top: auto; bottom: 8px; z-index: 2;
+        width: calc(var(--col) - 8px); max-width: none; margin: 0;
         padding: var(--spacer-16); background: var(--light-gray); }
       /* the button keeps its own width and its 56 each side wherever the card has room; on a
          narrower desktop the sides give way (a % of padding is of the card's inner width; 144

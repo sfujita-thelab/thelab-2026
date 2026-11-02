@@ -953,7 +953,7 @@
     .slides__viewport > .slide { position: relative; inset: auto; transform: none; top: auto; }
     .slide__inner { padding-top: var(--spacer-120); padding-bottom: var(--spacer-40); row-gap: var(--spacer-56); }
   }
-  /* v1/c: the project title on a tablet and a phone is --font-h-20 (20, 18 on a phone) */
+  /* the project title is --font-h-24 (24, 20 on a phone) */
   .slides__viewport > .slide .project__title { font: var(--font-h-24); }   /* h-24 on every screen */
   /* v1/c: below desktop a LEFT header's body runs the header's full width, as homepage/approved's
      Featured Work and Proof do; a centred one keeps its 80% */
@@ -1101,13 +1101,14 @@
     .slides__viewport > .slide .slide__copy > *:not(.project) { max-width: calc(3 * var(--col) - 2 * var(--inset)); }
     /* ...the project info the full width under the picture, 8 in from v1 */
   }
-  /* A 10% DARK OVERLAY on every picture (the project card sits outside the picture, so it
-     stays clean #FFF); it replaces the fade and the light pictures' none */
+  /* A LIGHT DARK FADE up from every picture's foot -- 16% at the bottom, gone by halfway up
+     (the project card sits outside the picture, so it stays clean #FFF); it replaces the
+     old fade and the light pictures' none */
   .slides__viewport > .slide > .slide__media::after,
   .slides__viewport > .slide > .slide__media--light::after,
   .slides__viewport > .slide > .slide__media--placeholder::after {
     content: ""; display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: rgb(var(--black-base) / .1); }
+    background: linear-gradient(to top, rgb(var(--black-base) / .16), rgb(var(--black-base) / 0) 50%); }
   /* THE PICTURE OPENS OUT (expertise-sections.js): held at 80% of its width, centred -- 10%
      clipped off each side -- until it scrolls into view, then opened to the full width of
      the grid over a second. A clip, not a scale, so the picture itself never stretches. */

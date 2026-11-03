@@ -287,6 +287,8 @@
   @media (max-width: 767px) {
     .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
     .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+    /* ...and OPEN, the same 16 each side: the pill's 4 plus each item's --spacer-16 (12) */
+    .xsub__list a { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
   }
   @media (max-width: 767px) {
     .xsub__list a { font: var(--font-p-14); }

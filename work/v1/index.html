@@ -276,6 +276,15 @@
        list takes the 20 */
     .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
   }
+  /* PHONE, CLOSED: 16 from the pill's edge to the label on the left (the pill's 4 plus the
+     label's --spacer-16, 12 on a phone) and to the + on the right (--spacer-24, 16 on a
+     phone) -- as the Work page's filter */
+  @media (max-width: 767px) {
+    .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
+    .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+    /* ...and OPEN, the same 16 each side: the pill's 4 plus each item's --spacer-16 (12) */
+    .xsub__list a { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
+  }
   @media (max-width: 767px) {
     .xsub__list a { font: var(--font-p-14); }
   }
@@ -701,6 +710,8 @@
   @media (max-width: 767px) {
     .wh .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
     .wh .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+    /* ...and OPEN, the same 16 each side: the pill's 4 plus each item's --spacer-16 (12) */
+    .wh .xsub__list button { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
   }
   /* the items are BUTTONS here (they filter; they go nowhere), dressed as the subnav's links */
   .xsub__list button { display: block; padding: var(--spacer-8) var(--spacer-16); border: 0; border-radius: 999px;
@@ -1021,7 +1032,8 @@
      under the hero copy, and does not close down as the page scrolls. On desktop it
      always holds All and the six industries. On a tablet and a phone, where the seven
      would stand seven rows tall, it is closed as there -- the one chosen (or HOME_PHONE
-     while All is on) and a +, which opens them; its size glides between the two.
+     while All is on) and a +, which opens them (on hover, with a mouse); its size glides
+     between the two.
      An item FILTERS the grid -- a button, not a link: nothing scrolls.
 
      THE FILTERS: All Work shows everything; an industry only its work.
@@ -1097,6 +1109,17 @@
     if (bar) {
       requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.add('is-ready')));
       if (more) more.addEventListener('click', () => setOpen(!bar.classList.contains('is-open')));
+      /* WITH A MOUSE IT OPENS ON HOVER, as the Expertise subnav: in over the closed pill opens
+         the list, out closes it after a short grace (so a brush past the edge does not snap
+         it shut). Touch keeps the +. Only where it is closed -- a tablet-width window. */
+      if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        let shut = 0;
+        bar.addEventListener('mouseenter', () => {
+          clearTimeout(shut);
+          if (bar.classList.contains('is-compact')) setOpen(true);
+        });
+        bar.addEventListener('mouseleave', () => { shut = setTimeout(() => setOpen(false), 250); });
+      }
       // IN WITH THE HERO COPY: the moment app.js reveals it (its masks lose .hpre)
       const barIn = () => bar.classList.add('is-in');
       const copy = document.querySelector('.page-head [data-hv]');

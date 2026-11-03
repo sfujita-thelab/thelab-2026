@@ -8,6 +8,8 @@ v2/
 # ...except the Expertise page's v1 and v2, which are published
 !expertise/v1/
 !expertise/v2/
+# ...and the Work page's v1 (2026-11-03)
+!work/v1/
 _archive/
 
 # Measurement screenshots from the build sessions. 54MB of PNGs, none of it source.

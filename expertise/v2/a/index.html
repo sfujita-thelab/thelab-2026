@@ -281,6 +281,13 @@
        list takes the 20 */
     .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
   }
+  /* PHONE, CLOSED: 16 from the pill's edge to the label on the left (the pill's 4 plus the
+     label's --spacer-16, 12 on a phone) and to the + on the right (--spacer-24, 16 on a
+     phone) -- as the Work page's filter */
+  @media (max-width: 767px) {
+    .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
+    .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+  }
   @media (max-width: 767px) {
     .xsub__list a { font: var(--font-p-14); }
   }

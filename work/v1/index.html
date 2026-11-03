@@ -695,11 +695,12 @@
     /* CLOSED, it is always a full pill (9999); only the open list takes the subnav's 20 */
     .wh .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
   }
-  /* PHONE, CLOSED: 12 from the pill's edge to the label on the left (the pill's 4 plus the
-     label's 8) and to the + on the right (the pill's --spacer-16, which is 12 on a phone) */
+  /* PHONE, CLOSED: 16 from the pill's edge to the label on the left (the pill's 4 plus the
+     label's --spacer-16, 12 on a phone) and to the + on the right (the pill's --spacer-24,
+     16 on a phone) -- as the Expertise subnav */
   @media (max-width: 767px) {
-    .wh .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-16); }
-    .wh .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-8); }
+    .wh .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
+    .wh .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
   }
   /* the items are BUTTONS here (they filter; they go nowhere), dressed as the subnav's links */
   .xsub__list button { display: block; padding: var(--spacer-8) var(--spacer-16); border: 0; border-radius: 999px;

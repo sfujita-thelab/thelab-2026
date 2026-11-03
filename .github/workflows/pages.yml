@@ -40,7 +40,8 @@ jobs:
           sed -i 's|href="../../../homepage/approved/"|href="../../homepage/approved/"|' _site/expertise/v1/index.html
           # expertise/v2/a -> expertise/v2, the same way
           rsync -a --exclude '.*' expertise/v2/a/ _site/expertise/v2/
-          sed -i 's|href="../../../homepage/approved/"|href="../../homepage/approved/"|' _site/expertise/v2/index.html
+          # ...every link out of it loses a ../ too (the logo, and the nav's Work)
+          sed -i 's|href="\.\./\.\./\.\./|href="../../|g' _site/expertise/v2/index.html
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

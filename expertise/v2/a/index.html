@@ -277,6 +277,9 @@
     .xsub__list { flex-direction: column; align-items: stretch; gap: var(--spacer-4); }
     .xsub__list a { padding-left: var(--spacer-12); padding-right: var(--spacer-12); font: var(--font-p-16); text-align: left; }
     .xsub__pill { border-radius: 20px; }
+    /* CLOSED, it is always a full pill (9999), as the Work page's filter; only the open
+       list takes the 20 */
+    .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
   }
   @media (max-width: 767px) {
     .xsub__list a { font: var(--font-p-14); }
@@ -1177,8 +1180,8 @@
         </svg>
       </a>
       <nav class="nav">
-        <a href="#">Work</a>
-        <a href="#" aria-current="page">Expertise</a>
+        <a href="../../../work/v1/">Work</a>
+        <a href="./" aria-current="page">Expertise</a>
         <a href="#">Careers</a>
         <a href="#">Get connected</a>
       </nav>
@@ -1187,8 +1190,8 @@
 
   <div class="menu" id="menu" aria-hidden="true">
     <nav class="menu__nav">
-      <a href="#"><span>Work</span></a>
-      <a href="#" aria-current="page"><span>Expertise</span></a>
+      <a href="../../../work/v1/"><span>Work</span></a>
+      <a href="./" aria-current="page"><span>Expertise</span></a>
       <a href="#"><span>Careers</span></a>
       <a href="#"><span>Get connected</span></a>
     </nav>

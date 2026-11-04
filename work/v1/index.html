@@ -600,26 +600,27 @@
      homepage's rises from the foot of its section. In Proof's green -- #289581, the
      homepage's green family core, and its light, #60f0df -- with a pale mint at the edges.
      Four soft masses, each ANIMATING ON ITS OWN -- no pointer: a loop of five stops that
-     travels, turns and swells (11-17s, never in step, so the field never repeats the
-     same shape), and the whole field breathes a little in strength over 9s. So it moves
+     travels, turns and swells (7-10s, faster than
+     before and with about twice the reach, never in step, so the field never repeats the
+     same shape), and the whole field breathes in strength over 6s. So it moves
      like the homepage's without being a copy of it. Multiplied onto the page, and gone
      by two-thirds of the way down. */
   .wh__glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: multiply; overflow: hidden;
-               animation: wh-breathe 9s ease-in-out infinite alternate;
+               animation: wh-breathe 6s ease-in-out infinite alternate;
                /* NO EDGES: the field fades out top to bottom as a whole, so what ends it is
                   this long fade, not the dome's outline */
-               -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 78%);
-                       mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 78%); }
+               -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 90%);
+                       mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 90%); }
   /* THE DOME: one tall ellipse hung from well above the hero, its lower curve the canopy's
      edge -- its crown about two-thirds of the way down the hero, rising a clear fifth of the hero toward
-     each side, so it reads as a ROUND dome. It is wider than the screen (1.8x, --dw), so
+     each side, so it reads as a ROUND dome. It is only a little wider than the screen (1.25x, --dw), so
      its ends stay off it: the curve meets the screen's sides a third of the way down, with
      no edge showing. The four masses move INSIDE it (clipped to it), placed from the
      screen (--off is how far the dome reaches past its left side). THE EDGE IS FELT, NOT
      SEEN: no hard clip -- a deep blur (64px) on the dome, and a mask that fades its lower
      curve out over its last third, so the green dissolves into the page rather than stopping on a line.
      A pale mint fills it evenly, so the shape holds to its ends. */
-  .wh__dome { --dw: 320vw; --off: calc((var(--dw) - 100vw) / 2);
+  .wh__dome { --dw: 125vw; --off: calc((var(--dw) - 100vw) / 2);
               position: absolute; left: 50%; top: -118%; width: var(--dw); height: 190%;
               transform: translateX(-50%); border-radius: 50%;
               background: rgb(150 222 206 / .6);
@@ -633,48 +634,52 @@
      under it, the bright mint kept, so the field runs light to deep with no mud. */
   .wh__dome > span:nth-child(1) { left: calc(var(--off) + 10vw); top: 36%; width: 120vw; height: 72%;
     background: radial-gradient(closest-side, rgb(var(--teal-base) / 1), rgb(var(--teal-base) / .6) 55%, rgb(var(--teal-base) / 0));
-    transform: rotate(-12deg); animation: wh-a 13s ease-in-out infinite alternate; }
+    transform: rotate(-12deg); animation: wh-a 8s ease-in-out infinite alternate; }
   /* the light: the family's bright mint, over the core's left shoulder */
   .wh__dome > span:nth-child(2) { left: calc(var(--off) - 24vw); top: 40%; width: 100vw; height: 66%;
     background: radial-gradient(closest-side, rgb(96 240 223 / .9), rgb(96 240 223 / .45) 60%, rgb(96 240 223 / 0));
-    animation: wh-b 17s ease-in-out infinite alternate; }
+    animation: wh-b 10s ease-in-out infinite alternate; }
   /* the far edge: a pale mint wash across the whole top, so the field has no hard rim */
   .wh__dome > span:nth-child(3) { left: calc(var(--off) - 20vw); top: 50%; width: 140vw; height: 56%;
     background: radial-gradient(closest-side, rgb(176 232 220 / .7), rgb(176 232 220 / 0));
-    animation: wh-c 15s ease-in-out infinite alternate; }
+    animation: wh-c 9s ease-in-out infinite alternate; }
   /* a deep EMERALD pocket, right -- saturated (#16a487), so the right side has depth and
      still answers the left's brightness (a dark, greyed #127060 here went to mud) */
   .wh__dome > span:nth-child(4) { right: calc(var(--off) - 10vw); top: 38%; width: 90vw; height: 66%;
     background: radial-gradient(closest-side, rgb(14 138 110 / .65), rgb(14 138 110 / .3) 45%, rgb(14 138 110 / .08) 80%, rgb(14 138 110 / 0));
-    animation: wh-d 11s ease-in-out infinite alternate; }
+    animation: wh-d 7s ease-in-out infinite alternate; }
   /* each loop: five stops, travelling, turning and swelling -- the core along the diagonal,
      the light across under it, the wash side to side, the pocket round the right */
   @keyframes wh-a {
     0%   { transform: rotate(-12deg) translate(0, 0) scale(1); }
-    25%  { transform: rotate(-4deg) translate(-12vw, 6vh) scale(1.12); }
-    50%  { transform: rotate(-18deg) translate(-20vw, 2vh) scale(.94); }
-    75%  { transform: rotate(-8deg) translate(-6vw, 10vh) scale(1.08); }
-    100% { transform: rotate(-14deg) translate(6vw, 4vh) scale(1); } }
+    25%  { transform: rotate(2deg) translate(-20vw, 10vh) scale(1.22); }
+    50%  { transform: rotate(-24deg) translate(-32vw, 0) scale(.86); }
+    75%  { transform: rotate(-4deg) translate(-10vw, 16vh) scale(1.16); }
+    100% { transform: rotate(-18deg) translate(12vw, 6vh) scale(.96); } }
   @keyframes wh-b {
     0%   { transform: translate(0, 0) scale(1); }
-    25%  { transform: translate(16vw, 8vh) scale(1.15); }
-    50%  { transform: translate(30vw, 2vh) scale(.92); }
-    75%  { transform: translate(12vw, 12vh) scale(1.1); }
-    100% { transform: translate(-4vw, 6vh) scale(1.02); } }
+    25%  { transform: translate(26vw, 12vh) scale(1.25); }
+    50%  { transform: translate(46vw, 2vh) scale(.84); }
+    75%  { transform: translate(20vw, 18vh) scale(1.18); }
+    100% { transform: translate(-8vw, 8vh) scale(1.04); } }
   @keyframes wh-c {
     0%   { transform: translate(0, 0); }
-    33%  { transform: translate(-8vw, 4vh) scale(1.06); }
-    66%  { transform: translate(8vw, 2vh) scale(.96); }
-    100% { transform: translate(-2vw, 6vh) scale(1.04); } }
+    33%  { transform: translate(-14vw, 6vh) scale(1.12); }
+    66%  { transform: translate(14vw, 2vh) scale(.92); }
+    100% { transform: translate(-4vw, 10vh) scale(1.08); } }
   @keyframes wh-d {
     0%   { transform: translate(0, 0) scale(1); }
-    25%  { transform: translate(-10vw, 10vh) scale(1.2); }
-    50%  { transform: translate(-22vw, 4vh) scale(.9); }
-    75%  { transform: translate(-8vw, 14vh) scale(1.1); }
-    100% { transform: translate(4vw, 6vh) scale(.95); } }
-  @keyframes wh-breathe { from { opacity: .82; } to { opacity: 1; } }
+    25%  { transform: translate(-18vw, 14vh) scale(1.3); }
+    50%  { transform: translate(-36vw, 4vh) scale(.82); }
+    75%  { transform: translate(-14vw, 20vh) scale(1.18); }
+    100% { transform: translate(8vw, 8vh) scale(.92); } }
+  @keyframes wh-breathe { from { opacity: .74; } to { opacity: 1; } }
   @media (max-width: 767px) {
-    .wh__dome { --dw: 560vw; }
+    /* a PHONE's dome narrower (1.7x), so its curve shows across the short hero -- it read
+       flat at 5.6x -- and the field's fade starts lower, so the curve is not faded out */
+    .wh__dome { --dw: 170vw; }
+    .wh__glow { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent 92%);
+                        mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent 92%); }
     .wh__dome > span:nth-child(1) { left: calc(var(--off) - 10vw); width: 170vw; }
     .wh__dome > span:nth-child(2) { left: calc(var(--off) - 50vw); width: 150vw; }
     .wh__dome > span:nth-child(4) { right: calc(var(--off) - 30vw); width: 140vw; }
@@ -1021,7 +1026,7 @@
 
   <script src="config.js?v=20261103"></script>
   <script src="shaders.js?v=20261103"></script>
-  <script src="app.js?v=20261103b"></script>
+  <script src="app.js?v=20261103"></script>
   <script src="footer.js?v=20261103"></script>
   <script src="footer-glow.js?v=20261103"></script>
   <script>
@@ -1109,16 +1114,26 @@
     if (bar) {
       requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.add('is-ready')));
       if (more) more.addEventListener('click', () => setOpen(!bar.classList.contains('is-open')));
-      /* WITH A MOUSE IT OPENS ON HOVER, as the Expertise subnav: in over the closed pill opens
-         the list, out closes it after a short grace (so a brush past the edge does not snap
-         it shut). Touch keeps the +. Only where it is closed -- a tablet-width window. */
+      /* WITH A MOUSE IT OPENS ON HOVER, as the Expertise subnav: in over the PILL opens the
+         list, out of it closes it after a short grace (so a brush past the edge does not snap
+         it shut). The pill, not the bar: here the bar spans the page, and the empty row either
+         side of the pill must not react. Touch keeps the +. Only where it is closed -- a
+         tablet-width window. */
       if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
         let shut = 0;
-        bar.addEventListener('mouseenter', () => {
+        pillBox.addEventListener('mouseenter', () => {
           clearTimeout(shut);
           if (bar.classList.contains('is-compact')) setOpen(true);
         });
-        bar.addEventListener('mouseleave', () => { shut = setTimeout(() => setOpen(false), 250); });
+        /* the way OUT is quicker than the way in: a 120ms grace (was 250) and the pill's size
+           gliding shut over .4s (opening keeps the subnav's .7s) */
+        pillBox.addEventListener('mouseleave', () => {
+          shut = setTimeout(() => {
+            pillBox.style.transitionDuration = '.4s';
+            setOpen(false);
+            setTimeout(() => { pillBox.style.transitionDuration = ''; }, 450);
+          }, 120);
+        });
       }
       // IN WITH THE HERO COPY: the moment app.js reveals it (its masks lose .hpre)
       const barIn = () => bar.classList.add('is-in');

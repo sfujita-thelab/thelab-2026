@@ -1019,12 +1019,12 @@
     .slides__viewport > .slide > .slide__inner ~ .project .project__title { width: auto; }
     .slides__viewport > .slide > .slide__inner ~ .project .cta.project__link { margin-top: var(--spacer-16);
                                                                  background: var(--black); color: var(--color-text-contrast); }
-    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, flush to
-       vline 5 and to the picture's foot -- the picture's bottom-right */
+    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, up to
+       vline 5 (not over it) and flush to the picture's foot -- the picture's bottom-right */
     @media (min-width: 1024px) {
       .slides__viewport > .slide > .slide__inner ~ .project {
-        position: absolute; left: auto; right: calc(var(--m) - 1px); top: auto; bottom: 0; z-index: 2;
-        width: calc(var(--col) + 1px);   /* 1px past vline 5, as the picture is, so the line never shows beside it */ max-width: none; margin: 0;
+        position: absolute; left: auto; right: var(--m); top: auto; bottom: 0; z-index: 2;
+        width: var(--col);   /* ends AT vline 5, not over it: the line stays drawn beside the card */ max-width: none; margin: 0;
         padding: var(--spacer-24); background: #f4f4f4; }
       /* the button keeps its own width and its 56 each side wherever the card has room; on a
          narrower desktop the sides give way (a % of padding is of the card's inner width; 144
@@ -1130,13 +1130,13 @@
   }
   /* THE MARGINS: the AREA (.slide, the parent container) carries the page margin, --m a side
      -- the header and the project info inside it carry no side margins of their own (the
-     picture alone reaches 1px past the right, so it covers vline 5). The header
+     picture sits between vline 1 and vline 5, leaving both lines drawn). The header
      (.slide__copy, the .sec-head) keeps only the 8 inset inside it, as homepage/approved's
      left headers do. */
   .slides__viewport > .slide { padding-left: var(--m); padding-right: var(--m); }
   .slides__viewport > .slide > .slide__inner,
   .slides__viewport > .slide > .slide__inner > .slide__copy { margin-left: 0; margin-right: 0; }
-  .slides__viewport > .slide > .slide__media { margin-left: 0; margin-right: -1px; }
+  .slides__viewport > .slide > .slide__media { margin-left: 1px; margin-right: 0; }   /* BETWEEN vline 1 and vline 5, over neither */
   @media (max-width: 1023px) {
     .slides__viewport > .slide > .slide__inner ~ .project { margin-left: 0; margin-right: 0;
       padding-left: var(--inset); padding-right: var(--inset); }
@@ -1492,7 +1492,7 @@
   <script src="footer.js?v=20261027b"></script>
   <script src="footer-glow.js?v=20261027b"></script>
   <script src="expertise-sections.js?v=20261027b"></script>
-  <script src="expertise-page.js?v=20261027b"></script>
+  <script src="expertise-page.js?v=20261103c"></script>
   <script src="page-glow.js?v=20261027b"></script>
   <script src="halo.js?v=20261027b"></script>
 </body>

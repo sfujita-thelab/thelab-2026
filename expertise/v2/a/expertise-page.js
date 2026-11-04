@@ -542,7 +542,15 @@
       clearTimeout(shut);
       if (bar.classList.contains('is-compact')) setOpen(true);
     });
-    bar.addEventListener('mouseleave', () => { shut = setTimeout(() => setOpen(false), 250); });
+    /* the way OUT is quicker than the way in, as the Work page's filter: a 120ms grace (was
+       250) and the pill's size gliding shut over .4s (opening keeps its .7s) */
+    bar.addEventListener('mouseleave', () => {
+      shut = setTimeout(() => {
+        if (pillBox) pillBox.style.transitionDuration = '.4s';
+        setOpen(false);
+        setTimeout(() => { if (pillBox) pillBox.style.transitionDuration = ''; }, 450);
+      }, 120);
+    });
   }
   /* IN WITH THE HERO COPY: the moment app.js reveals the hero's text (its masks lose
      .hpre), as the Explore More button it replaces did */

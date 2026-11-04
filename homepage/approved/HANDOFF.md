@@ -60,7 +60,8 @@ redeploys. When it does, the faces 404 and the page falls back to `--font`.
 - Among the tokens, type changes, plus one spacing value (`--spacer-200` on mobile, 2026-11-02).
   Colour is production's.
 - Animation is of two kinds: the intro animation on load, and scroll animations per
-  section, which replay on scroll-back.
+  section. Text replays on scroll-back; the Work cards, with their image, play once per
+  page load (2026-11-04).
 - Breakpoints are the live site's.
 
 ---
@@ -191,13 +192,20 @@ Hand-over is 890ms, split 120ms delay + 770ms travel in the stylesheet.
 
 ### Scroll animations
 
-Each re-arms when it leaves through the bottom and plays again on the way back. An
+Text re-arms when it leaves through the bottom and plays again on the way back. An
 element that has left through the top keeps its finished state.
+
+**Images play once (changed 2026-11-04).** The Work cards (the card rising, its image's
+frame opening, and the card's copy) play the first time each card arrives and then stay
+in their finished state. Scrolling back up past them does not re-arm them; they play again
+only after a page reload. In `featuredwork.js` the cards' exit handler is now empty. Before
+this they re-armed on a bottom exit like the text. The same rule applies to the image
+reveals on the Expertise page and the case study pages.
 
 | Section | Enters at | Sequence |
 |---|---|---|
 | Work header | 0.78 vh (+0.12 hysteresis) | eyebrow 0 · headline 95 · body 235 · CTA 335ms |
-| Work cards | 0.86 vh | 110ms per card; frame opens +60ms over .95s `cubic-bezier(.62,.02,.28,1)`; copy +420ms then 110ms steps |
+| Work cards | 0.86 vh, **once** | 110ms per card; frame opens +60ms over .95s `cubic-bezier(.62,.02,.28,1)`; copy +420ms then 110ms steps. No replay until reload |
 | Ticker | 0.92 vh | single |
 | Expertise | — | eyebrow 0 · headline 110 · body 330 · CTA 760ms. Four loops: 140ms hold, 175ms apart, 560ms each, 1225ms end to end; each loop's copy at 50% of its own progress |
 | Proof | head 0.80, rows 0.84 (exit 0.94 / 0.98) | headline 0 · body 180 · CTA 280ms. Row 2 follows row 1 by 260ms, 110ms per stat within a row; numbers count up over 1150ms, eased `1-(1-p)³` |

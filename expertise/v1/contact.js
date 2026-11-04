@@ -54,7 +54,7 @@
   .FormField_inputs_input .react-aria-Label { position: absolute; left: var(--padding); top: var(--padding); z-index: 1;
     font: var(--font-eyebrow); font-size: 12px; text-transform: uppercase; translate: 0 calc(var(--padding) / -2); transition: translate .1s, font .1s;
     color: var(--black); }
-  .FormField_inputs_input:not(.is-filled) .FormField_inputs_fieldWrapper:not(:has(> :focus-visible)) .react-aria-Label { font: var(--font-p-18); text-transform: none; translate: 0; }
+  .FormField_inputs_input:not(.is-filled) .FormField_inputs_fieldWrapper:not(:has(> :focus-visible)) .react-aria-Label { font: var(--font-p-18); font-size: 18px; text-transform: none; translate: 0; }
   .FormField_inputs_input .FormField_inputs_fieldWrapper:not(:has(> :focus-visible, > :hover)) .react-aria-Label { color: var(--color-text-secondary); }
   .FormField_inputs_input[data-required] .react-aria-Label::after { content: "*"; }
   .FormField_inputs_dropdown .react-aria-Label::after { content: none !important; }
@@ -62,7 +62,7 @@
   .FormField_inputs_textField .react-aria-Input,
   .FormField_inputs_textField .react-aria-TextArea { display: block; width: 100%; margin: 0;
     border: 1px solid var(--color-border-pale); border-radius: var(--border-radius); outline: 0;
-    font: var(--font-p-18); padding: 28px var(--padding) 8px; background: var(--white); color: var(--black); }
+    font: var(--font-p-18); font-size: 18px; padding: 28px var(--padding) 8px; background: var(--white); color: var(--black); }
   .FormField_inputs_textField .react-aria-Input { height: 56px; }
   .FormField_inputs_textField .react-aria-TextArea { height: 156px; resize: none; }
   .FormField_inputs_textField .react-aria-Input:not(:focus-visible):not(:hover),
@@ -70,7 +70,7 @@
   .FormField_inputs_textField[data-invalid] .react-aria-Input,
   .FormField_inputs_textField[data-invalid] .react-aria-TextArea { border-color: var(--color-invalid); }
 
-  .FormField_inputs_dropdown { font: var(--font-p-18); }
+  .FormField_inputs_dropdown { font: var(--font-p-18); font-size: 18px; }
   .FormField_inputs_dropdown button { position: relative; display: flex; justify-content: space-between; width: 100%; height: 56px;
     padding: 28px var(--padding) 8px calc(var(--padding) - 1px); line-height: 1; text-align: left; cursor: pointer;
     font: inherit; line-height: 1; border: 1px solid var(--color-border-pale); border-radius: var(--border-radius); outline: 0;
@@ -83,7 +83,7 @@
     box-shadow: 0 1px 8px 0 rgb(var(--black-base) / 16%), 0 4px 8px 0 rgb(var(--black-base) / 16%); }
   .FormField_inputs_dropdownList:not([hidden]) { display: flex; flex-direction: column; gap: var(--spacer-4); }
   .FormField_inputs_dropdownList[hidden] { display: none; }
-  .FormField_inputs_dropdownList > li { padding: 8px 12px; border-radius: var(--border-radius); font: var(--font-p-18); color: var(--black); cursor: pointer; }
+  .FormField_inputs_dropdownList > li { padding: 8px 12px; border-radius: var(--border-radius); font: var(--font-p-18); font-size: 18px; color: var(--black); cursor: pointer; }
   .FormField_inputs_dropdownList > li:hover:not([aria-selected="true"]), .FormField_inputs_dropdownList > li.is-active:not([aria-selected="true"]) { background: var(--light-gray); }
   .FormField_inputs_dropdownList > li[aria-selected="true"] { background: var(--black); color: var(--white); }
 

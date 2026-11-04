@@ -620,14 +620,14 @@
      SEEN: no hard clip -- a deep blur (64px) on the dome, and a mask that fades its lower
      curve out over its last third, so the green dissolves into the page rather than stopping on a line.
      A pale mint fills it evenly, so the shape holds to its ends. */
-  .wh__dome { --dw: 125vw; --off: calc((var(--dw) - 100vw) / 2);
+  .wh__dome { --dw: 150vw; --off: calc((var(--dw) - 100vw) / 2);
               position: absolute; left: 50%; top: -118%; width: var(--dw); height: 190%;
               transform: translateX(-50%); border-radius: 50%;
               background: rgb(150 222 206 / .6);
-              filter: blur(64px);
-              -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 62%, transparent 100%);
-                      mask-image: radial-gradient(50% 50% at 50% 50%, #000 62%, transparent 100%); }
-  .wh__dome > span { position: absolute; border-radius: 50%; filter: blur(50px); will-change: transform; }
+              filter: blur(120px);   /* the homepage Work field's softness: the curve felt, never drawn */
+              -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%);
+                      mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%); }
+  .wh__dome > span { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
   /* LARGE MASSES, not small circles: each is a broad band of the dome (the core and the
      light over a screen wide, half the dome deep), so what moves is the field itself. The
      tones DEEPER, saturated not greyed: the core #289581 full, a deep emerald (#0e8a6e)

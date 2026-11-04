@@ -77,14 +77,15 @@
 
   /* THE PICTURES OPEN OUT: each area's picture block comes in at 80% of the grid's width
      (v1 to v5), centred, and opens to the full width as it scrolls into view -- the
-     headers' watcher and band, so it replays the same way. Reduced motion: no change. */
+     headers' watcher and band -- ONCE: it does not close again when you scroll back up, so
+     it plays only once until the page is reloaded. Reduced motion: no change. */
   if (!reduced) document.querySelectorAll('.slides .slide__media').forEach(m => {
     // armed at once, not animated there: it starts closed rather than closing on load
     m.style.transition = 'none';
     m.classList.add('pre');
     void m.offsetWidth;
     m.style.transition = '';
-    watch(m, 0.9, () => m.classList.remove('pre'), () => m.classList.add('pre'));
+    watch(m, 0.9, () => m.classList.remove('pre'), () => {});   // once: no re-arm
   });
 
   // the questions: one after another, 110ms apart

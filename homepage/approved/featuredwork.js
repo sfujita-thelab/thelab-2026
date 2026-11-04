@@ -382,7 +382,9 @@
       if (el) el.classList.add('pre');
     }));
 
-  // cards: each triggers on its own area, with a small stagger
+  // cards: each triggers on its own area, with a small stagger -- ONCE: a card (its rise,
+  // its picture's frame opening and its copy) plays the first time it arrives and stays
+  // played; scrolling back up does not re-arm it, so it plays only once until reload
   cards.forEach((card, i) => {
     const im = card.querySelector('.card__img');
     const txt = [...card.querySelectorAll('.card__meta .mask')];
@@ -398,11 +400,7 @@
         // the copy follows the frame: client name, headline, then the pill
         txt.forEach((m, j) => later(wv, () => m.classList.remove('pre'), d + 420 + j * 110));
       },
-      () => {
-        card.classList.add('pre', 'framed');
-        txt.forEach(m => m.classList.add('pre'));
-        if (im) im.style.clipPath = 'inset(16% 13% 16% 13%)';
-      });
+      () => {});   // once: no re-arm
   });
 
   watch(ticker, 0.92,

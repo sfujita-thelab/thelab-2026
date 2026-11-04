@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no,address=no,email=no,date=no">
+<title>Kentucky Legend — thelab</title>
+
+<!-- CASE STUDY: KENTUCKY LEGEND.
+
+     The case study from thelab.co/case-studies/kentucky-legend, on the homepage's light page
+     (#f4f4f4, type in #222): the hero (headline, client, film), the role and the intro, the
+     story sections with their films (one of them three tabs of films, one a split block),
+     the highlights, and related work. Everything between the page margins, v1 to v5; only
+     those two grid lines.
+
+     Shared parts (top bar, page grid, type tokens, footer) are expertise/v2/a's, which are
+     the approved homepage's. The copy, films and pictures are thelab.co's. -->
+<link rel="stylesheet" href="thelab-tokens.css?v=20261026175422">
+
+<style>
+  /* ============================================================ homepage: base */
+  :root {
+    --m: 40px;
+    --col: 340px;
+    --u: 1px;
+    --inset: var(--spacer-8);
+    --grain-a: .245;
+    --pad-top: 32px;
+    --pad-bottom: 66px;
+    --font: Beausite, -apple-system, "Segoe UI", Arial, sans-serif;
+    /* the page's one horizontal rule: the grid line's own weight, as the topbar uses it */
+    --rule: rgb(var(--black-base) / var(--grid-a, .13));
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: auto; background: var(--color-primary); overflow: visible; }
+  html, body { overflow-x: clip; }
+  body { font-family: var(--font); color: var(--color-text-primary); -webkit-font-smoothing: antialiased; }
+  ul { list-style: none; }
+
+  #fallback[hidden] { display: none; }
+  #fallback { position: fixed; inset: 0; display: grid; place-items: center;
+              text-align: center; padding: var(--spacer-24); color: var(--color-text-secondary); }
+
+  .page-bg { position: fixed; inset: 0; background: var(--color-primary); z-index: -1; }
+  #stage { display: block; position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; }
+
+  .page-grid { position: fixed; inset: 0; z-index: 2; pointer-events: none;
+               mix-blend-mode: multiply; }
+  .page-grid i { position: absolute; top: 0; bottom: 0; width: 1px;
+                 background: rgb(var(--black-base) / var(--grid-a, .13));
+                 transform-origin: top center; transform: scaleY(0);
+                 transition: transform .70s cubic-bezier(.62,.02,.34,1); }
+  .page-grid.drawn i  { transform: scaleY(1); }
+  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .13)); }
+  .page-grid.settled i { transition: none; transform: none;
+                         background: rgb(var(--black-base) / var(--grid-a, .13)); }
+
+  .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+           background-image: url(assets/grain.png);
+           background-repeat: repeat;
+           background-size: calc(446 * var(--u)) calc(446 * var(--u));
+           mix-blend-mode: hard-light; opacity: var(--grain-a, .245); }
+
+  main { position: relative; }
+
+  /* ==================================================== homepage: topbar + nav */
+  .logo { display: flex; align-items: center; text-decoration: none; color: inherit; }
+  .logo svg { display: block; height: 30px; width: auto; flex: none; }
+
+  .nav { display: flex; gap: var(--spacer-32); }
+  .nav a {
+    position: relative;
+    font: var(--font-button-1); text-transform: uppercase;
+    text-decoration: none; color: inherit; white-space: nowrap;
+    opacity: .92;
+  }
+  /* the underline wipe -- the homepage's one link hover, reused below for every text link */
+  .nav a::after, .tlink::after {
+    content: ""; position: absolute;
+    left: 0; right: 0; bottom: calc(-7 * var(--u)); height: 1px;
+    background: currentColor;
+    transform: scaleX(0); transform-origin: right;
+    transition: transform .18s cubic-bezier(.5, 0, .78, .25);
+  }
+  .nav a:hover::after, .tlink:hover::after, a:hover > .tlink::after {
+    transform: scaleX(1); transform-origin: left;
+    transition: transform .28s cubic-bezier(.22, .61, .36, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav a::after, .nav a:hover::after, .tlink::after, .tlink:hover::after { transition: none; }
+  }
+
+  .navtoggle { display: none; background: none; border: 0; padding: 0; cursor: pointer;
+               font: var(--font-button-1); text-transform: uppercase; color: inherit;
+               letter-spacing: inherit; }
+
+  .menu { position: fixed; inset: 0; z-index: 5; display: none;
+          background: var(--color-primary); color: var(--color-text-primary);
+          flex-direction: column; overflow-y: auto;
+          padding: calc(2 * var(--spacer-24) + 24px + var(--spacer-24))
+                   calc(var(--m) + var(--inset))
+                   var(--spacer-40);
+          opacity: 0; pointer-events: none;
+          transition: opacity .32s cubic-bezier(.22,.61,.36,1); }
+  .menu.is-open { opacity: 1; pointer-events: auto; }
+  .menu::before { content: ""; position: absolute; left: 0; right: 0;
+                  top: calc(2 * var(--spacer-24) + 24px);
+                  height: 1px; background: var(--color-nav-border); }
+  .menu__nav { display: flex; flex-direction: column; }
+  .menu__nav a { display: flex; align-items: center;
+                 padding: var(--spacer-32) 0;
+                 margin-left:  calc(-1 * (var(--m) + var(--inset)));
+                 margin-right: calc(-1 * (var(--m) + var(--inset)));
+                 padding-left:  calc(var(--m) + var(--inset));
+                 padding-right: calc(var(--m) + var(--inset));
+                 color: var(--color-text-primary); text-decoration: none;
+                 font: var(--font-h-32); text-transform: uppercase; }
+  .menu__nav a + a { border-top: 1px solid var(--color-nav-border); }
+  .menu__foot { margin-top: auto; padding-top: var(--spacer-56);
+                display: flex; align-items: center; justify-content: space-between;
+                gap: var(--spacer-16); }
+  .menu__social { display: flex; align-items: center; gap: var(--spacer-12); }
+  .menu__icon { display: grid; place-items: center; flex: none; color: var(--color-text-primary); }
+  .menu__icon svg { width: 24px; height: 24px; display: block; }
+  .menu__foot p { color: var(--color-text-primary); font: var(--font-p-14); margin: 0; }
+  .menu__foot p a { color: inherit; text-decoration: none; }
+  .menu__foot p a:hover { text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) { .menu { transition: none; } }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 6; pointer-events: none;
+    padding: var(--spacer-24) calc(var(--m) + var(--inset));
+    transition: transform .4s cubic-bezier(.5, 0, .78, .25), color .22s ease,
+                background-color .25s ease, border-color .25s ease;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+  .topbar.is-away { transform: translateY(calc(-100% - 10px)); }
+  .topbar.is-back { transition: transform .55s cubic-bezier(.22, .61, .36, 1),
+                                color .22s ease,
+                                background-color .25s ease, border-color .25s ease; }
+  .topbar.is-preload { transform: translateY(calc(-100% - 10px)); transition: none; }
+  .topbar.is-solid { background: var(--color-primary);
+                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .13)); }
+  .topbar.is-solid.on-dark { background: var(--black);
+                             border-bottom-color: rgba(244, 244, 244, .10); }
+  .topbar::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url(assets/grain.png);
+    background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .topbar.is-solid::after { opacity: var(--grain-a, .245); }
+  .topbar > * { position: relative; z-index: 1; }
+  .topbar a, .topbar button { pointer-events: auto; }
+  .topbar a { transition: color .22s ease; }
+  .topbar.on-dark, .topbar.on-dark a { color: var(--color-text-contrast); }
+  .topbar.is-menu, .topbar.is-menu a, .topbar.is-menu .navtoggle { color: var(--color-text-primary); }
+  @media (prefers-reduced-motion: reduce) { .topbar { transition: none; } }
+
+  /* ================================================================== HERO */
+  /* After expertise.png. The homepage's Expertise figure at its own size -- four grid
+     columns by two, the loops tangent to the centre line -- with the copy centred on
+     it: eyebrow, headline at --font-h-64, body, the block two columns wide. The figure
+     and the copy share one grid cell, so the hero is the figure's height (or the copy's,
+     where that is taller) and the bar follows straight under it.
+
+     .page-head__fig is an EMPTY BOX: the figure itself is drawn on .travel, the fixed layer it
+     leaves the hero on, and this box is where expertise-page.js reads its place. */
+  /* ONE SCREEN, the figure centred in it -- the same room above and below, the
+     topbar's height, so it clears the bar on a short screen and the hero grows rather
+     than crowding it. It is a screen LESS the bar's height, so the bar sits on the
+     first screen's bottom edge. A phone keeps a hero as tall as its copy. */
+  /* the hero HOLDS -- sticky -- until the first area slides up over it */
+  /* minmax(0, 1fr): the column is the hero's own width, so the copy's max-width: 100% has
+     something to hold to -- an auto column sized itself to the copy, 469 wide on a 375 phone */
+  .page-head { position: sticky; top: 0; z-index: 3; display: grid; place-items: center;
+        grid-template-columns: minmax(0, 1fr);
+        --xnav-h: 0px;                               /* v1/b: a floating pill, not a bar -- no room kept */
+        min-height: calc(100vh - var(--xnav-h));
+        /* the room UNDER the figure is the bar's height less than the room over it, so the
+           figure's centre is the middle of the SCREEN, not of the screen less the bar */
+        padding: calc(2 * var(--spacer-24) + 24px) var(--m) calc(2 * var(--spacer-24) + 24px - var(--xnav-h)); }
+  @media (max-width: 767px) {
+    .page-head { min-height: 0; padding-bottom: var(--spacer-24); }
+  }
+  .page-head > .page-head__fig, .page-head > .page-head__content { grid-area: 1 / 1; }
+  .page-head__fig { width: calc(4 * var(--col)); aspect-ratio: 2 / 1; }
+  /* v1/c, PHONE: the hero fills the screen (100svh, the height left by the browser's bars)
+     and the figure sits ABOVE the copy rather than behind it, 40 between them, the pair
+     centred in the screen. A tablet keeps the full-measure figure with the copy over it. */
+  @media (max-width: 767px) {
+    .page-head { min-height: 100svh; grid-template-rows: auto auto; align-content: center;
+                 row-gap: var(--spacer-40); padding-bottom: var(--spacer-40); }
+    .page-head > .page-head__fig { grid-area: 1 / 1; }
+    .page-head > .page-head__content { grid-area: 2 / 1; }
+  }
+  /* the headline 70% of the full measure, lines 1 to 5; the body two columns under it */
+  .page-head__content { width: calc(4 * var(--col) * .7); max-width: 100%; text-align: center; }
+  /* v1/c: on a tablet the headline takes 80% of the full measure, line 1 to line 5 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .page-head__content { width: calc(4 * var(--col) * .8); }
+  }
+  .page-head .sec-head__eyebrow { margin-bottom: var(--spacer-16); }
+  h1 { display: flex; flex-direction: column; padding: 0 var(--inset); font: var(--font-h-64); }
+  h1 .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
+  h1 .mask.hpre > span { transform: translateY(118%); }
+  /* the slides block is pulled up over the hero: its empty viewport lets clicks through
+     to the hero below, its panels still take them */
+  .slides, .slides__viewport { pointer-events: none; }
+  .slides__viewport > .slide { pointer-events: auto; }
+  .page-head__body { width: calc(2 * var(--col)); max-width: 100%; margin: var(--spacer-24) auto 0;
+              padding: 0 var(--inset); font: var(--font-p-18); }
+  @media (max-width: 767px) { .page-head__fig { width: calc(2 * var(--col)); } }
+  /* v1/c: on a tablet the body is 70% of the full measure, line 1 to line 5 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .page-head__body { width: calc(4 * var(--col) * .7); }
+  }
+
+  /* THE SUBNAV (v1/b, in place of the bar): one dark pill, FIXED at the foot of the
+     screen, centred. Over the hero it holds all four areas as links; once the page is in
+     the areas it closes down to the area you are in and a +, which opens the four again
+     (the + turning to a x). expertise-page.js runs it. */
+  /* WHERE IT SITS (expertise-page.js writes --xsub-b, the gap under it): ANCHORED TO THE
+     SCREEN'S FOOT, so a change of its own height (opening, closing down) grows or shrinks
+     it upward from a bottom edge that does not move, and a phone's browser bar coming and
+     going cannot shift it. Over the resting hero 40 above the foot (32 on a phone); once
+     the page moves 32; below the screen as Reasons arrives. Only those moves glide. */
+  .xsub { position: fixed; left: 50%; top: auto; bottom: var(--xsub-b, -200px); z-index: 5; pointer-events: auto;
+          transform: translateX(-50%); max-width: calc(100vw - 2 * var(--m));
+          opacity: 0; transition: opacity .6s ease; }
+  .xsub.is-ready { transition: bottom .7s cubic-bezier(.22,.61,.36,1), opacity .6s ease; }
+  .xsub.is-in { opacity: 1; }
+  .xsub.is-off { opacity: 0; pointer-events: none; }
+  /* WHITE, with the area you are in in #222; when it closes down or opens up its width
+     glides between the two (expertise-page.js) */
+  .xsub__pill { display: flex; align-items: center; justify-content: center; gap: var(--spacer-4);
+                padding: var(--spacer-4); border-radius: 999px; overflow: hidden; white-space: nowrap;
+                background: var(--white); color: var(--black);
+                box-shadow: 0 4px 24px rgb(var(--black-base) / .10);
+                transition: width .7s cubic-bezier(.22,.61,.36,1), height .7s cubic-bezier(.22,.61,.36,1); }
+  /* the four (over the hero, or opened from the +): the pill's 4 all round, so a highlight
+     sits 4 inside it on every side -- 20 from the pill's edge to the first and last label
+     (4 + the label's own 16; 12 on a phone) */
+  .xsub:not(.is-compact) .xsub__pill, .xsub.is-open .xsub__pill { padding-left: var(--spacer-4); padding-right: var(--spacer-4); }
+  /* ...and it may run to 8 from the screen's edges rather than the 20 margin: the four are
+     346 wide, which a 375 screen's margins (335) would clip */
+  @media (max-width: 767px) { .xsub { max-width: calc(100vw - 16px); } }
+  /* what it shows fades in behind the glide: a beat late, and slower */
+  .xsub__pill > * { animation: xsub-in .6s ease .1s both; }
+  @keyframes xsub-in { from { opacity: 0; } }
+  /* the four, each a pill inside the pill; the area you are in inverted */
+  /* the active and hover pills: 16 each side of the label, and a 4 GAP between items so
+     they never touch (36 label to label). A phone keeps 8 each side -- the four only just
+     fit its width as it is. */
+  .xsub__list { display: flex; gap: var(--spacer-4); margin: 0; padding: 0; list-style: none; }
+  .xsub__list a { display: block; padding: var(--spacer-8) var(--spacer-16); border-radius: 999px;
+                  color: inherit; text-decoration: none; white-space: nowrap; font: var(--font-p-16);
+                  transition: background-color .2s ease, color .2s ease; }
+  .xsub__list a:hover { background: rgb(var(--black-base) / .06); }
+  .xsub__list a.is-on { background: var(--black); color: var(--white); }
+  .xsub__short { display: none; }
+  /* A PHONE keeps the FULL names -- never trimmed -- so the four go in a VERTICAL LIST, one
+     to a row, each row the list's full width; the pill rounds its corners (20) rather than
+     capping its ends */
+  /* ...and a TABLET takes the phone's subnav too (closed, a vertical list when open), at
+     its own type size: --font-p-16 is 16 on a tablet, the phone's 14 below 768 */
+  @media (max-width: 1023px) {
+    .xsub__list { flex-direction: column; align-items: stretch; gap: var(--spacer-4); }
+    .xsub__list a { padding-left: var(--spacer-12); padding-right: var(--spacer-12); font: var(--font-p-16); text-align: left; }
+    .xsub__pill { border-radius: 20px; }
+    /* CLOSED, it is always a full pill (9999), as the Work page's filter; only the open
+       list takes the 20 */
+    .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
+  }
+  /* PHONE, CLOSED: 16 from the pill's edge to the label on the left (the pill's 4 plus the
+     label's --spacer-16, 12 on a phone) and to the + on the right (--spacer-24, 16 on a
+     phone) -- as the Work page's filter */
+  @media (max-width: 767px) {
+    .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
+    .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+    /* ...and OPEN, the same 16 each side: the pill's 4 plus each item's --spacer-16 (12) */
+    .xsub__list a { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
+  }
+  @media (max-width: 767px) {
+    .xsub__list a { font: var(--font-p-14); }
+  }
+  /* CLOSED DOWN (in the areas): the current area's name and the + */
+  /* --spacer-16 from the pill's edge to the name (the pill's 4 + 12 here), matching the
+     --spacer-16 either side of the + on the right */
+  .xsub__current { display: none; padding: var(--spacer-8) var(--spacer-4) var(--spacer-8) calc(var(--spacer-16) - var(--spacer-4));
+                   white-space: nowrap; font: var(--font-p-16); }
+  /* EQUAL SPACE EACH SIDE OF THE + / x: --spacer-16 from the text to the icon and from the
+     icon to the pill's edge. The button is the icon's own width; the margins make up the
+     16 against what is already there (closed: the name's 4 + the 4 gap; open: the last
+     label's 12 + the gap), and the pill's right padding is the 16. A wider hit area
+     sits around it (::after) without moving anything. */
+  .xsub__more { display: none; flex: none; position: relative; width: 14px; height: 36px;
+                margin-left: calc(var(--spacer-16) - 2 * var(--spacer-4));
+                padding: 0; border: 0;
+                align-items: center; justify-content: center; cursor: pointer;
+                background: none; color: var(--black);   /* v1/b: the bare + and x, no circle */
+                transition: opacity .2s ease; }
+  .xsub__more:hover { opacity: .6; }
+  .xsub__more svg { width: 14px; height: 14px; transition: transform .25s ease; }
+  .xsub.is-compact .xsub__more { display: flex; }
+  .xsub.is-compact:not(.is-open) .xsub__list { display: none; }
+  .xsub.is-compact:not(.is-open) .xsub__current { display: block; }
+  /* OPEN, there is no x: the + goes and the four stand alone. It closes as the pointer
+     leaves, on a pick, on a tap elsewhere, or on Escape (expertise-page.js). */
+  .xsub.is-compact.is-open .xsub__more { display: none; }
+  /* ...and the closed pill's 16 on the right goes with it: open, the pill is 4 all round */
+  .xsub.is-compact.is-open .xsub__pill { padding-right: var(--spacer-4); }
+  .xsub.is-compact .xsub__pill { padding-right: var(--spacer-16); }
+  .xsub__more::after { content: ""; position: absolute; inset: 0 -10px; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  /* ========================================================== homepage: CTA pill */
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--black); color: var(--color-text-contrast); border: 0; cursor: pointer;
+    font: var(--font-button-1); text-transform: uppercase;
+    padding: var(--spacer-8) var(--spacer-56);
+    border-radius: 999px; white-space: nowrap; text-decoration: none;
+    transition: background .25s ease, transform .25s ease;
+  }
+  /* THE OUTLINED PILL, on light. The homepage has it on dark only (.pf__cta, a 1px
+     ring in the ink colour); this is that pill in #222 ink. The ring is an inset
+     shadow rather than a border so the outlined pill is exactly as tall as the filled
+     one beside it -- a border would add 2px. */
+  .cta--line { background: none; color: var(--color-text-primary);
+               box-shadow: inset 0 0 0 1px currentColor; }
+  .cta__clip {
+    display: block; overflow: hidden;
+    height: var(--cta-line, 1.2em); line-height: var(--cta-line, 1.2em);
+  }
+  .cta__roll { display: block; will-change: transform;
+               transition: transform .30s cubic-bezier(.22,.61,.36,1); }
+  .cta__roll > span { display: block; height: var(--cta-line, 1.2em); }
+  .cta:hover .cta__roll,
+  .pf__cta:hover .cta__roll { transform: translateY(calc(-1 * var(--cta-line, 1.16em))); }
+  .cta:active { transform: scale(.985); }
+
+  /* ================================================ homepage: masks + reveals */
+  .mask { display: block; overflow: hidden; }
+  .mask > span {
+    display: block;
+    transition: transform .82s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+  }
+  .mask.pre > span, .mask.hpre > span { opacity: 0; }
+  .mask.pre > span, .mask.hpre > span { transform: translateY(104%); transition: none; }
+  .mask--cta { padding: 2px 2px 3px; margin: -2px -2px -3px; }
+
+  [data-rv], .card {
+    transition: opacity .72s cubic-bezier(.22,.61,.36,1),
+                transform .72s cubic-bezier(.22,.61,.36,1);
+  }
+  [data-rv].pre, .card.pre { opacity: 0; transform: translateY(calc(26 * var(--u)));
+                             transition: none; }
+
+  /* ===================================================== homepage: section header */
+  .sec-head { padding: 0 var(--inset); }
+  .sec-head--left   { text-align: left; }
+  .sec-head--center { text-align: center; }
+  .sec-head__eyebrow { margin: 0 0 var(--spacer-16);
+                       font: var(--font-eyebrow); text-transform: uppercase; }
+  .sec-head__title { display: flex; flex-direction: column;
+                     margin: 0 0 var(--spacer-24); font: var(--font-h-56); }
+  .sec-head__title .mask { overflow: hidden; padding: .16em 0 .12em; margin: -.16em 0 -.12em; }
+  .sec-head__body { width: 80%; margin: 0 0 var(--spacer-24); font: var(--font-p-18); }
+  .sec-head--center .sec-head__body { margin-left: auto; margin-right: auto; }
+  /* GLOBAL: a header body with nothing after it (no CTA, no pills) ends the header, so it
+     carries no margin below -- the space after a header belongs to what follows it */
+  .sec-head .sec-head__body:last-child { margin-bottom: 0; }
+  @media (min-width: 1024px) {
+    .sec-head--left .sec-head__title { padding-right: var(--spacer-80); }
+  }
+
+  /* ========================================================== homepage: footer */
+  .pf { position: relative; z-index: 3; overflow: hidden;
+        display: flex; flex-direction: column;
+        --pf-ink:  var(--white);
+        --pf-sub:  rgba(244,244,244,.72);
+        --pf-dim:  rgba(244,244,244,.56);
+        background: var(--black);
+        color: var(--pf-ink); }
+  .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
+                background: rgba(244, 244, 244, .10); }
+  .pf__glow {
+    position: absolute; left: -80px; top: 0; z-index: 0;
+    width: calc(100% + 160px); height: calc(100% + 80px);
+    transform: translateZ(0);
+    filter: blur(44px);
+    opacity: .5;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to top, #000 0,
+        rgba(0,0,0,.92) calc(80px +  60 * var(--u)),
+        rgba(0,0,0,.62) calc(80px + 140 * var(--u)),
+        rgba(0,0,0,.30) calc(80px + 220 * var(--u)),
+        rgba(0,0,0,.12) calc(80px + 280 * var(--u)),
+        transparent     calc(80px + 330 * var(--u)));
+            mask-image: linear-gradient(to top, #000 0,
+        rgba(0,0,0,.92) calc(80px +  60 * var(--u)),
+        rgba(0,0,0,.62) calc(80px + 140 * var(--u)),
+        rgba(0,0,0,.30) calc(80px + 220 * var(--u)),
+        rgba(0,0,0,.12) calc(80px + 280 * var(--u)),
+        transparent     calc(80px + 330 * var(--u)));
+  }
+  .pf::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url(assets/grain.png);
+    background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .245);
+  }
+  .pf__band { position: relative; z-index: 1; height: auto;
+              margin: 0 calc(var(--m) + var(--inset));
+              padding: var(--spacer-56) 0;
+              display: grid; grid-template-columns: 1fr auto 1fr;
+              align-items: center;
+              pointer-events: none; }
+  .pf__band > * { pointer-events: auto; }
+  .pf { --pf-mark: 240px; }
+  .pf__head { position: static; grid-area: 1 / 1; width: var(--col);
+              font: var(--font-h-40); margin: 0; }
+  .pf__mark { position: static; grid-area: 1 / 2;
+              width: var(--pf-mark); height: var(--pf-mark); z-index: 1;
+              transform: rotate(var(--spin, 0deg))
+                         rotate(var(--enter-rot, -135deg))
+                         scale(var(--enter-s, .45));
+              transition: transform .9s cubic-bezier(.22, .61, .36, 1);
+              --D: calc(var(--pf-mark) * 0.225);
+              --R: calc((var(--pf-mark) - var(--D)) / 2); }
+  .pf__mark.is-in { --enter-rot: 0deg; --enter-s: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .pf__mark { --enter-rot: 0deg; --enter-s: 1; transition: none; }
+  }
+  .pf__dot {
+    position: absolute; left: calc(50% - var(--D) / 2); top: calc(50% - var(--D) / 2);
+    width: var(--D); height: var(--D);
+    border-radius: 50%; background: var(--pf-ink);
+    transform: translate(calc(var(--dx) * var(--R)), calc(var(--dy) * var(--R)));
+  }
+  .pf__cta { position: static; grid-area: 1 / 3; justify-self: end; z-index: 1;
+             display: inline-flex; align-items: center; justify-content: center;
+             background: none; color: var(--pf-ink);
+             border: 1px solid var(--pf-ink); border-radius: 999px;
+             font: var(--font-button-1); text-transform: uppercase;
+             padding: var(--spacer-8) var(--spacer-56);
+             cursor: pointer; white-space: nowrap; }
+  .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
+                   display: grid; grid-template-columns: repeat(4, 1fr);
+                   grid-auto-flow: row; column-gap: 0; row-gap: 0; }
+  .pf__office { padding-left: var(--inset); padding-right: var(--spacer-16); }
+  .pf__legal { position: static; z-index: 1;
+               margin: var(--spacer-56) var(--m) var(--spacer-40);
+               display: flex; justify-content: center; align-items: center;
+               gap: var(--spacer-24);
+               font: var(--font-p-14); color: var(--pf-dim); }
+  .pf__end { display: flex; align-items: center; gap: var(--spacer-16); }
+  .pf__social { display: flex; align-items: center; gap: var(--spacer-12); }
+  .pf__icon { display: grid; place-items: center; flex: none;
+              color: var(--pf-dim); transition: color .25s ease; }
+  .pf__icon:hover { color: var(--pf-ink); }
+  .pf__icon svg { width: calc(21 * var(--u)); height: calc(21 * var(--u)); display: block; }
+  .pf__city { font: var(--font-h-24); color: var(--pf-ink); margin: 0 0 var(--spacer-12); }
+  .pf__addr, .pf__tel { font: var(--font-p-16); color: var(--pf-sub); margin: 0; }
+  .pf__tel { margin-top: var(--spacer-8); }
+  .pf__tel a { color: inherit; text-decoration: none; }
+  .pf__tel a:hover { color: var(--pf-ink); }
+  .pf__addr a, .pf__tel a, a[x-apple-data-detectors] {
+    color: inherit !important;
+    -webkit-text-decoration: none !important;
+            text-decoration: none !important;
+  }
+  .pf__legal nav { display: flex; gap: var(--spacer-16); flex-wrap: wrap; }
+  .pf__legal a { color: inherit; text-decoration: none; }
+  .pf__legal a:hover { color: var(--pf-ink); }
+
+  /* ================================================== STACKED, 1023 and below */
+  @media (max-width: 1023px) {
+    .nav { display: none; }
+    .card { position: static; width: auto; height: auto; }
+    .card__img { position: static; width: 100%; height: auto; aspect-ratio: 1; }
+    .card__meta { position: static; width: auto; margin-top: var(--spacer-24); }
+
+    .pf__band { grid-template-columns: 1fr; }
+    .pf__band > * { grid-area: auto; justify-self: stretch; }
+    .pf__head { position: static; transform: none; width: auto; padding: 0;
+                text-align: center; margin: 0 auto var(--spacer-24); }
+    .pf__mark { position: static; --pf-mark: 200px;
+                width: var(--pf-mark); height: var(--pf-mark);
+                margin: 0 auto var(--spacer-24); }
+    .pf__cta { position: static; display: flex; transform: none;
+               width: fit-content; margin: 0 auto; }
+    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: var(--spacer-40) 0; }
+    .pf__legal { flex-direction: column; align-items: center; }
+    .pf__end   { flex-direction: column; align-items: center; }
+    .pf__legal nav { justify-content: center; }
+    .pf__icon svg { width: 21px; height: 21px; }
+
+    .faq .sec-head { grid-column: 1 / 4; }
+    .acc { grid-column: 1 / -1; margin-top: var(--spacer-56); }
+  }
+  /* v1/c: the homepage Proof section's gap between header and content -- --spacer-56 on a
+     phone (above), --spacer-40 on a tablet */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .acc { margin-top: var(--spacer-40); }
+    .faq { padding: var(--spacer-200) 0 var(--spacer-120); }
+  }
+
+  /* ========================================================== TABLET, 768-1023 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* the homepage's tablet section header: three columns wide, vline 1 to vline 4 --
+       and the case on the same measure, so its lines match the body's */
+    .slides .slide__copy, .slides .project { width: calc(3 * var(--col)); max-width: none; }
+    .nav { display: flex; }
+    .card { display: flex; align-items: flex-start; }
+    .card__img  { width: calc(2 * var(--col)); flex: none; aspect-ratio: 1; }
+    .card__meta { width: calc(2 * var(--col)); flex: none; margin-top: 0;
+                  align-self: flex-end; padding: 0 var(--spacer-24); }
+    .pf__locations { gap: var(--spacer-24) 0; grid-template-columns: repeat(4, 1fr); }
+    .pf__end       { gap: var(--spacer-12); }
+    .pf__legal     { margin-top: var(--spacer-40); }
+  }
+
+  /* ================================================================ PHONE ONLY */
+  @media (max-width: 767px) {
+    .logo svg { height: 24px; }
+    .navtoggle { display: flex; align-items: center; height: 24px; }
+    .menu { display: flex; }
+    .card { display: flex; flex-direction: column; align-items: stretch; }
+    .card__img  { width: 100%; flex: none; aspect-ratio: 1; }
+    .card__meta { width: 100%; flex: none; align-self: auto;
+                  margin-top: var(--spacer-24);
+                  padding-left: var(--inset); padding-right: var(--spacer-16); }
+    .pf__glow {
+      -webkit-mask-image: linear-gradient(to top, #000 0,
+          rgba(0,0,0,.92) calc(75.15px +  6.061%),
+          rgba(0,0,0,.62) calc(68.69px + 14.141%),
+          rgba(0,0,0,.30) calc(62.22px + 22.222%),
+          rgba(0,0,0,.12) calc(57.37px + 28.283%),
+          transparent     calc(53.33px + 33.333%));
+              mask-image: linear-gradient(to top, #000 0,
+          rgba(0,0,0,.92) calc(75.15px +  6.061%),
+          rgba(0,0,0,.62) calc(68.69px + 14.141%),
+          rgba(0,0,0,.30) calc(62.22px + 22.222%),
+          rgba(0,0,0,.12) calc(57.37px + 28.283%),
+          transparent     calc(53.33px + 33.333%));
+    }
+    .pf__mark { --pf-mark: 120px; }
+    .faq__inner { grid-template-columns: 1fr; }
+    .faq .sec-head { grid-column: 1 / -1; }
+    .sec-head__body, .page-head__body { width: 100%; }
+    .acc__body { padding-right: var(--spacer-16); }
+  }
+  /* ======================================================== CASE STUDY: THE LIGHT PAGE (theme-light)
+     The homepage's #f4f4f4 and its grid ink; only the outer two lines, v1 and v5 -- the
+     inner three INVISIBLE, not removed (footer.js reads them). */
+  body.theme-light .page-grid i:not(:first-child):not(:last-child) { visibility: hidden; }
+
+
+  /* ===================================================== A RESKIN OF THE LIVE MARKUP
+     The <main> below IS thelab.co's case study markup (live_main.py), its classes the live
+     ones with the CSS-module hash taken off. THE LAYOUT IS THE LIVE PAGE'S: its 12-column
+     grid (24 gap, 16 at 1023 and below, 4 columns on a phone) and every block's place on
+     it, rule for rule from the live stylesheet. What is this site's is the SKIN -- the
+     dark page, the margins (--m), the type, the buttons, the 8 inset off the lines. */
+  main { --lg-cols: 12; --lg-gap: 24px; }
+  /* THE INK: the type, rules and lines in the page's ink -- #f4f4f4 on the dark page,
+     #222 on the light one -- and the empty media frame a step off the ground */
+  body { --cs-ink: var(--black); --cs-ink-base: var(--black-base); --cs-ground: var(--light-gray); --cs-media-bg: #e4e4e4;
+         --cs-pill-bg: #e7e7e7; }   /* Expertise's pill on its light page: solid #e7e7e7 */
+  body.theme-dark { --cs-ink: var(--light-gray); --cs-ink-base: var(--light-gray-base); --cs-ground: var(--black); --cs-media-bg: #2c2c2c;
+                    --cs-pill-bg: rgb(244 244 244 / .16); }   /* ...and on a dark one */
+  @media (max-width: 1023px) { main { --lg-gap: 16px; } }
+  @media (max-width: 767px)  { main { --lg-cols: 4; } }
+  main i { font-style: inherit; }   /* the live headings' italic half: set roman here */
+  main ul.utility_listReset { list-style: none; margin: 0; padding: 0; }
+  main .thelabnyc_thelabui_Clickable_Clickable_buttonReset { appearance: none; background: none; border: 0; border-radius: 0;
+                                                            padding: 0; color: inherit; font: inherit; cursor: pointer; }
+
+  /* THE GRID AND THE CONTAINER (thelabui's layout): the grid, and the page margins */
+  main .thelabnyc_thelabui_layout_grid { display: grid; grid-template-columns: repeat(var(--lg-cols), minmax(0, 1fr)); gap: var(--lg-gap); }
+  main .thelabnyc_thelabui_layout_container { position: relative; z-index: 3; margin-left: var(--m); margin-right: var(--m); }
+  main .thelabnyc_thelabui_layout_container .thelabnyc_thelabui_layout_container { margin-left: 0; margin-right: 0; }
+
+  /* THE SPACER BLOCKS, on the spacer tokens */
+  .SpacerBlock_xsmall  { height: var(--spacer-40); }
+  .SpacerBlock_small   { height: var(--spacer-64); }
+  .SpacerBlock_large   { height: var(--spacer-104); }
+  .SpacerBlock_xlarge  { height: var(--spacer-152); }
+  .SpacerBlock_xxlarge { height: var(--spacer-200); }
+
+  /* ============================================================== HERO
+     The headline across 9 of the 12 columns (--font-h-64, its italic half on a line of
+     its own), the client (--font-h-40) under it; --spacer-200 above, --spacer-64 below. */
+  .CaseStudyHero_heroText { padding-block: var(--spacer-200) var(--spacer-64); }
+  .CaseStudyHero_heroText > * { grid-column: 1 / -1; }
+  @media (min-width: 1024px) { .CaseStudyHero_heroText .CaseStudyHero_richTextBlock > div { grid-column-end: span 9; } }
+  .CaseStudyHero_heroText h1 { padding: 0; font: var(--font-h-64); }
+  .CaseStudyHero_heroText h1 .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }   /* room for descenders in the clip */
+  .CaseStudyHero_heroText .RichText_rich-text_richText, .CaseStudyHero_heroClient { padding: 0 var(--inset); }
+  .CaseStudyHero_heroClient { margin-top: var(--spacer-24); font: var(--font-h-40); color: rgb(var(--cs-ink-base) / .6); }
+  /* the hero's lines slide up out of their masks on app.js's intro clock (data-hv) */
+
+  /* ============================================================ MEDIA
+     THE HERO FILM (FullWidthMedia) and the showcase films and pictures all run v1 to v5. 16:9 as the live page's own aspect-ratio. */
+  .FullWidthMedia_root { position: relative; z-index: 2; margin: 0 var(--m); }   /* v1 to v5, not full bleed */
+  /* THE PICTURES OPEN OUT, as Expertise v2's (expertise-sections.js): each film and
+     picture is held at 80% of its width AND height, centred -- 10% clipped off every
+     side -- until it scrolls into view, then opens to its full size over a second. A
+     clip, not a scale, so the picture never stretches. cs.js arms and plays it. */
+  .FullWidthMedia_root > .VideoWithPlayPauseButton_root, .ShowcaseBlock_showcaseImage,
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture,
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root,
+  .SplitBlock_mediaWrapper > picture { clip-path: inset(0); transition: clip-path 1s cubic-bezier(.22,.61,.36,1); }
+  .FullWidthMedia_root > .VideoWithPlayPauseButton_root.pre, .ShowcaseBlock_showcaseImage.pre,
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture.pre,
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root.pre,
+  .SplitBlock_mediaWrapper > picture.pre { clip-path: inset(10%); }
+  .VideoWithPlayPauseButton_root { position: relative; overflow: hidden; background: var(--cs-media-bg); aspect-ratio: 16 / 9; }
+  .VideoWithPlayPauseButton_root video,
+  .ShowcaseBlock_picture img, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .VideoWithPlayPauseButton_loaderOverlay, .VideoWithPlayPauseButton_loaderContainer { display: none; }
+  .ShowcaseBlock_container { position: relative; }
+  .ShowcaseBlock_layoutFull { display: grid; grid-template-columns: 1fr; }
+  .ShowcaseBlock_showcaseImage:has(> .ShowcaseBlock_picture),
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel picture { position: relative; display: block; overflow: hidden; background: var(--cs-media-bg); aspect-ratio: 16 / 9; }
+  /* THE PAUSE / PLAY: the live page's own -- a 40 square, #222 at 20%, a 16px white icon,
+     its words for screen readers only -- but 16 in from the film's bottom-RIGHT */
+  .VideoWithPlayPauseButton_controls { position: absolute; right: var(--spacer-16); bottom: var(--spacer-16); gap: var(--spacer-16); display: flex; }
+  .VideoWithPlayPauseButton_button { width: var(--spacer-40); height: var(--spacer-40); z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    background-color: rgb(var(--black-base) / 20%); border: none; cursor: pointer; }
+  .VideoWithPlayPauseButton_button:focus-visible { outline: 2px solid var(--cs-ink); outline-offset: -3px; }
+  .VideoWithPlayPauseButton_icon { width: 16px; height: 16px; color: var(--white); }
+  /* THE CAPTION: on the grid, columns 3 to 10, centred, --spacer-24 under its media */
+  .ShowcaseBlock_fullCaption { margin-top: var(--spacer-24); font: var(--font-p-18); text-align: center; }
+  .ShowcaseBlock_fullCaption > span { grid-column: 3 / span 8; }
+  @media (max-width: 767px) { .ShowcaseBlock_fullCaption > span { grid-column: 1 / -1; padding: 0 var(--inset); } }
+
+  /* ============================================================= PROJECT INTRO
+     OUR ROLE on columns 1-5 -- the label, the roles as pills, the VISIT LIVE SITE
+     button -- the intro (--font-p-24) on columns 6-12. --spacer-80 above, --spacer-104
+     below. A phone runs them in one column, a rule under the roles. */
+  .CaseStudies_case-studies_projectIntro { padding-block: var(--spacer-80) var(--spacer-104); }
+  .CaseStudies_case-studies_projectIntro > * { padding: 0 var(--inset); }
+  .CaseStudies_case-studies_roleListWrapper { grid-column: 1 / span 5; }
+  .CaseStudies_case-studies_projectIntro > p { grid-column: 6 / span 7; font: var(--font-p-24); white-space: pre-line; }
+  /* OUR ROLE as the homepage's section-header eyebrow (.sec-head__eyebrow): --font-eyebrow,
+     uppercase, in the ink; --spacer-16 down to the pills (the list's own top margin) */
+  .CaseStudies_case-studies_roleListWrapper h4 { font: var(--font-eyebrow); text-transform: uppercase; }
+  /* THE ROLES AS PILLS: Expertise v2's capability pills (.pill) -- a frosted ground,
+     #f4f4f4 at 16% over an 8px blur, --font-p-14, 4 by 12, fully round, 4 apart, on
+     the label's 80% measure -- on every screen; the live commas hidden */
+  .CaseStudies_case-studies_roleList { display: flex; flex-wrap: wrap; gap: var(--spacer-4); width: 80%;
+                                       margin: var(--spacer-16) 0 var(--spacer-24) !important; }
+  .CaseStudies_case-studies_roleList li { font: var(--font-p-14); padding: var(--spacer-4) var(--spacer-12);
+    background: var(--cs-pill-bg); border-radius: 999px;
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); white-space: nowrap; }
+  .CaseStudies_case-studies_comma { display: none; }
+  @media (max-width: 767px) {
+    main .CaseStudies_case-studies_projectIntro { display: flex; flex-direction: column; }
+    .CaseStudies_case-studies_roleListWrapper { padding-bottom: var(--spacer-64); margin-bottom: var(--spacer-40);
+                                                border-bottom: 1px solid rgb(var(--cs-ink-base) / .2); }
+    .CaseStudies_case-studies_roleList { width: auto; }
+  }
+  /* THE BUTTON: this site's outlined CTA pill (.cta--line), on the live button's markup */
+  .Clickables_primaryButton { display: inline-flex; align-items: center; justify-content: center;
+    padding: var(--spacer-8) var(--spacer-56); border-radius: 999px; box-shadow: inset 0 0 0 1px currentColor;
+    color: var(--cs-ink); text-decoration: none; white-space: nowrap;
+    font: var(--font-button-1); text-transform: uppercase; transition: background .25s ease, color .25s ease; }
+  .Clickables_primaryButton:hover { background: var(--cs-ink); color: var(--cs-ground); }
+  .Clickables_arrowSpecialWrapper { display: none; }
+
+  /* ============================================================ RICH TEXT
+     The heading (h3, --font-h-56) over its copy (--font-p-18), as one block placed on
+     the grid as the live page places it: _left columns 1-7, _right 6-12, _center 3-10;
+     every one full width at 1023 and below. */
+  .RichText_rich-text_layout > * { grid-column: 1 / -1; }
+  @media (min-width: 1024px) {
+    .RichText_rich-text_layout.RichText_rich-text_left > *   { grid-column: 1 / span 7; }
+    .RichText_rich-text_layout.RichText_rich-text_center > * { grid-column: 3 / span 8; }
+    .RichText_rich-text_layout.RichText_rich-text_right > *  { grid-column: 6 / span 7; }
+  }
+  .RichText_rich-text_richText { padding: 0 var(--inset); }
+  .RichText_rich-text_richText h3 { font: var(--font-h-56); margin-bottom: var(--spacer-24); }
+  .RichText_rich-text_richText p { font: var(--font-p-18); }
+  .RichText_rich-text_richText p:empty { display: none; }
+  .RichText_rich-text_richText p:not(:empty) + p { margin-top: var(--spacer-16); }
+  .RichText_rich-text_center .RichText_rich-text_richText { text-align: center; }
+
+  /* ========================================================== SPLIT BLOCK
+     The live SplitBlock: two equal halves, 24 apart, centred on each other -- the copy
+     (an h2 in --font-h-56 over --font-p-18) and a square picture; _splitAlignmentLeft
+     puts the copy first with 40 to spare on its right, _Right the picture first. Tops
+     aligned at 1023 and below; one column on a phone, the picture first. */
+  .SplitBlock_splitBlock { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--spacer-24); align-items: center; }
+  .SplitBlock_splitBlock picture { display: block; overflow: hidden; background: var(--cs-media-bg); }
+  .SplitBlock_splitBlock img, .SplitBlock_splitBlock video { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+  .SplitBlock_splitBlock h2 { font: var(--font-h-56); margin-bottom: var(--spacer-24); }
+  @media (min-width: 1024px) { .SplitBlock_splitBlock h2 { padding-right: var(--spacer-80); } }
+  .SplitBlock_splitBlock p { font: var(--font-p-18); }
+  .SplitBlock_splitBlock p:empty { display: none; }
+  .SplitBlock_splitBlock p:not(:empty) + p { margin-top: var(--spacer-16); }
+  @media (min-width: 768px) { .SplitBlock_splitAlignmentLeft .SplitBlock_splitBlockText { padding-right: var(--spacer-40); } }
+  .SplitBlock_splitAlignmentRight > div { order: 2; }
+  .SplitBlock_splitAlignmentRight .SplitBlock_mediaWrapper { order: 1; }
+  @media (min-width: 768px) { .SplitBlock_splitAlignmentRight .SplitBlock_splitBlockText { padding-left: var(--spacer-40); } }
+  @media (max-width: 1023px) { .SplitBlock_splitBlock { align-items: start; } }
+  @media (max-width: 767px) {
+    .SplitBlock_splitBlock { grid-template-columns: 1fr; }
+    .SplitBlock_splitBlock > div { order: 2; }
+    .SplitBlock_splitBlock .SplitBlock_mediaWrapper { order: 1; }
+    .SplitBlock_splitBlock .SplitBlock_splitBlockText { padding-top: var(--spacer-24); }
+  }
+
+  /* =============================================================== TABS
+     The tab row across the grid, centred, a hairline under it (the underline container)
+     and the chosen tab's line in full (the underline, slid under it by cs.js);
+     --font-button-1. The panel (a subgrid) under it: its picture across the grid. */
+  .Tabs_Tabs_tabListContainer { grid-column: 1 / -1; position: relative; }
+  .Tabs_Tabs_root .react-aria-TabList { display: flex; justify-content: center; gap: var(--spacer-40); padding: 0 var(--inset); }
+  .Tabs_Tabs_root .react-aria-Tab { padding-bottom: var(--spacer-16); cursor: pointer; outline: none;
+    font: var(--font-button-1); text-transform: uppercase; color: rgb(var(--cs-ink-base) / .5); transition: color .2s ease; }
+  .Tabs_Tabs_root .react-aria-Tab:hover, .Tabs_Tabs_root .react-aria-Tab[aria-selected="true"] { color: var(--cs-ink); }
+  .Tabs_Tabs_root .react-aria-Tab:focus-visible { text-decoration: underline; }
+  .Tabs_Tabs_underlineContainer { position: relative; height: 1px; background: rgb(var(--cs-ink-base) / .16); }
+  .Tabs_Tabs_underline { position: absolute; top: 0; left: 0; width: 0; height: 1px; background: var(--cs-ink);
+    transition: left .45s cubic-bezier(.22,.61,.36,1), width .45s cubic-bezier(.22,.61,.36,1); }
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; row-gap: var(--spacer-24); }
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture,
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root { grid-column: 1 / -1; }
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel :is(img, video) { transition: opacity .3s ease; }
+  .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel :is(img, video).is-swap { opacity: 0; }
+
+  /* ============================================================== STATS
+     The homepage's PROOF section's layout, mirrored onto the live StatsBlock (no field
+     behind it): --spacer-80 above and --spacer-152 below it as there; the
+     header (the rtf, --font-h-56) on the LEFT half, the stats a two-column grid on the
+     RIGHT half, the first figures level with the header. Each stat as the homepage's:
+     the figure in --font-h-64 (its % in --font-h-40, an addition), the line in
+     --font-p-18. No icons. Stacked at 1023 and below, as the homepage. */
+  main .StatsBlock_StatsBlock_container { display: block; padding-block: var(--spacer-80) var(--spacer-152); }
+  .StatsBlock_StatsBlock_container > section { position: relative; z-index: 3; display: flex; align-items: flex-start; }
+  .StatsBlock_StatsBlock_rtf { width: calc(2 * var(--col)); padding: 0 var(--inset); }
+  .StatsBlock_StatsBlock_rtf h3 { font: var(--font-h-56); }
+  @media (min-width: 1024px) { .StatsBlock_StatsBlock_rtf h3 { padding-right: var(--spacer-80); } }
+  .StatsBlock_StatsBlock_statList { flex: 1; display: grid; grid-template-columns: repeat(2, 1fr); row-gap: var(--spacer-32); margin-top: var(--spacer-8) !important; }
+  .StatsBlock_StatsBlock_statContainer { padding-left: var(--inset); padding-right: var(--spacer-16); }
+  .StatsBlock_StatsBlock_stat > div { font: var(--font-h-64); }
+  .StatsBlock_StatsBlock_stat > div > span:not(.stat-num) {   /* the % / + -- the live span, or ours (.stat-suffix) */
+    font: var(--font-h-40); margin-left: var(--spacer-4); letter-spacing: 0; }
+  /* THE COUNT-UP, the homepage proof's (proof.js, ported in cs.js): the header slides up
+     out of its mask; the stats come a row at a time (the second 260 after the first,
+     110 between the two in a row) -- each figure fades and rises 16 and counts up from 0
+     over 1.15s, easing into its value; its line slides up 90 later. Replays when you
+     scroll back up past it and down again. */
+  .StatsBlock_StatsBlock_stat .stat-num { display: inline-block; transition: opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1); }
+  .StatsBlock_StatsBlock_statContainer.pre .stat-num { opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
+  .StatsBlock_StatsBlock_stat > p { margin-top: var(--spacer-8); font: var(--font-p-18); }
+  .StatsBlock_StatsBlock_icon { display: none; }
+  @media (max-width: 1023px) {
+    main .StatsBlock_StatsBlock_container { padding-top: var(--spacer-104); }
+    .StatsBlock_StatsBlock_container > section { flex-direction: column; row-gap: var(--spacer-56); }
+    .StatsBlock_StatsBlock_rtf, .StatsBlock_StatsBlock_statList { width: 100%; }
+  }
+
+  /* ================================================== RELATED CASE STUDIES
+     An addition, after the stats: the heading (--font-h-56, the 8 inset), --spacer-64,
+     then two cards in the Work page's two-column card layout (work/v1's .wg / .wk,
+     as they are there, on the dark page's grey); --spacer-152 to the footer. Each card
+     plays the Work page's entrance as it comes on screen, once. */
+  /* ON THE LIGHT PAGE (#f4f4f4), full bleed, the type in #222: where the dark page ends
+     is its top edge; the outer two grid lines redrawn over it in the light page's ink
+     (the section covers .page-grid) */
+  .cs-related { padding-top: var(--spacer-104) !important; background: var(--light-gray); color: var(--black); }
+  .cs-related::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: calc(var(--m) - 1px); z-index: 0;   /* the right rule ON vline 5, not 1px inside it */ pointer-events: none;
+                        border-left: 1px solid rgb(var(--black-base) / .13); border-right: 1px solid rgb(var(--black-base) / .13);
+                        border-top: 1px solid rgb(var(--black-base) / .13); }   /* a rule across its top, v1 to v5 */
+  .cs-related > * { position: relative; z-index: 1; }
+  .cs-related__head { margin: 0 0 var(--spacer-64); padding: 0 var(--inset); font: var(--font-h-56); text-align: center; }
+  .wg { position: relative; z-index: 3; padding: 0 var(--m) var(--spacer-152); }
+  .wg__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacer-24); row-gap: var(--spacer-80);
+              margin: 0; padding: 0; list-style: none; }
+  .wk[hidden] { display: none; }
+  /* THE ENTRANCE, the homepage's card (featuredwork.js, per card_animation.mov): the card
+     rises 26 and fades in; 60ms on, its picture's FRAME opens outward from its own centre
+     (a clip from 16% / 13% in, so the picture is never scaled); 420ms on, the client and
+     the headline slide up out of their masks, 110 apart. The armed state lands instantly
+     (transition: none), so only the reveal ever animates. The clip's start is written
+     inline by the script, as on the homepage. */
+  .wk { transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
+  .wk.pre { opacity: 0; transform: translateY(calc(26 * var(--u))); transition: none; }
+  .wk__media { transition: clip-path .95s cubic-bezier(.62,.02,.28,1); }
+  .wk.pre .wk__media { transition: none; }
+  .wk__link { display: block; color: inherit; text-decoration: none; }
+  .wk__media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #e4e4e4; }
+  .wk__media > video, .wk__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+                       transition: transform .8s cubic-bezier(.22,.61,.36,1); }
+  .wk__link:hover .wk__media > video, .wk__link:hover .wk__media > img { transform: scale(1.03); }
+  .wk__client, .wk__title { padding-left: var(--inset); padding-right: var(--inset); }
+  .wk__client { margin-top: var(--spacer-16); font: var(--font-eyebrow); text-transform: uppercase; }
+  .wk__client .mask, .wk__title .mask { padding: .12em 0 .14em; margin: -.12em 0 -.14em; }   /* room for descenders in the clip */
+  .wk__title { margin-top: var(--spacer-8); font: var(--font-h-24); }
+  @media (max-width: 767px) {
+    .wg__list { grid-template-columns: minmax(0, 1fr); row-gap: var(--spacer-56); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wk__media > *, .wk__link:hover .wk__media > * { transition: none; transform: none; }
+  }
+
+  /* ======================================================== THE TEXT REVEALS
+     Every block of copy comes in as Expertise's and the homepage's headers do (cs.js):
+     each heading, paragraph and caption slides up out of its own mask (.mask, the shared
+     reveal: 104% down and faded, .82s); the pills and the button rise 16 and fade in, one
+     every 60ms. Heading 95, copy 235 (110 between paragraphs), pills from 335. The masks
+     are added by the script, so the markup stays the live page's. Room is kept round the
+     big type's masks for its descenders. */
+  main :is(h1, h2, h3, h4) > .mask, .cs-related__head > .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
+  main p > .mask, .ShowcaseBlock_fullCaption > span > .mask { padding: .12em 0 .14em; margin: -.12em 0 -.14em; }
+  .CaseStudies_case-studies_roleList li, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton {
+    transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1), background .25s ease, color .25s ease; }
+  .CaseStudies_case-studies_roleList li.pre, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton.pre {
+    opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
+
+  /* ======================================================== SMALLER SCREENS */
+  @media (max-width: 767px) {
+    .Tabs_Tabs_root .react-aria-TabList { justify-content: flex-start; gap: var(--spacer-24); overflow-x: auto; scrollbar-width: none; }
+    .Tabs_Tabs_root .react-aria-TabList::-webkit-scrollbar { display: none; }
+    .Tabs_Tabs_root .react-aria-Tab { white-space: nowrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .Tabs_Tabs_underline, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel img { transition: none; }
+  }
+
+</style>
+</head>
+<body class="theme-light theme-lightGray">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-grid" aria-hidden="true"></div>
+  <canvas id="stage"></canvas>
+
+  <div id="fallback" hidden>
+    <p>This prototype needs WebGL2.<br>Try Chrome, Safari 15+, or Firefox.</p>
+  </div>
+
+  <header class="topbar">
+      <a class="logo" href="../../homepage/approved/" aria-label="thelab, home">
+        <svg viewBox="0 0 599 120" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M59.2444 26.5463C66.5677 26.5463 72.5044 20.6037 72.5044 13.2732C72.5044 5.9426 66.5677 0 59.2444 0C51.9211 0 45.9844 5.9426 45.9844 13.2732C45.9844 20.6037 51.9211 26.5463 59.2444 26.5463ZM13.26 46.024C20.5815 46.024 26.52 51.9627 26.52 59.2971C26.52 66.6259 20.5815 72.5703 13.26 72.5703C5.93849 72.5703 0 66.6259 0 59.2971C0 51.9684 5.93849 46.024 13.26 46.024ZM118.482 59.2971C118.482 66.6277 112.545 72.5703 105.222 72.5703C97.8988 72.5703 91.9621 66.6277 91.9621 59.2971C91.9621 51.9666 97.8988 46.024 105.222 46.024C112.545 46.024 118.482 51.9666 118.482 59.2971ZM59.2444 72.5703C66.5677 72.5703 72.5044 66.6277 72.5044 59.2971C72.5044 51.9666 66.5677 46.024 59.2444 46.024C51.9211 46.024 45.9844 51.9666 45.9844 59.2971C45.9844 66.6277 51.9211 72.5703 59.2444 72.5703ZM72.5044 105.321C72.5044 112.651 66.5677 118.594 59.2444 118.594C51.9211 118.594 45.9844 112.651 45.9844 105.321C45.9844 97.99 51.9211 92.0474 59.2444 92.0474C66.5677 92.0474 72.5044 97.99 72.5044 105.321ZM104.911 26.8682C104.911 34.197 98.9783 40.1414 91.6511 40.1414C84.3296 40.1414 78.3911 34.197 78.3911 26.8682C78.3911 19.5394 84.3296 13.595 91.6511 13.595C98.9726 13.595 104.911 19.5394 104.911 26.8682ZM26.8752 13.6237C19.548 13.6237 13.6152 19.5681 13.6152 26.8969C13.6152 34.2257 19.5536 40.1701 26.8752 40.1701C34.1967 40.1701 40.1352 34.2257 40.1352 26.8969C40.1352 19.5681 34.1967 13.6237 26.8752 13.6237ZM104.906 91.7139C104.906 99.0445 98.9689 104.987 91.6456 104.987C84.3223 104.987 78.3856 99.0445 78.3856 91.7139C78.3856 84.3834 84.3223 78.4408 91.6456 78.4408C98.9689 78.4408 104.906 84.3834 104.906 91.7139ZM26.8189 104.982C34.1422 104.982 40.079 99.039 40.079 91.7084C40.079 84.3778 34.1422 78.4352 26.8189 78.4352C19.4956 78.4352 13.5589 84.3778 13.5589 91.7084C13.5589 99.039 19.4956 104.982 26.8189 104.982ZM256.248 27.5581C242.886 27.5581 235.3 33.6099 231.043 39.7803V1.76331H214.21V117.046H231.043V68.9711C231.043 52.8953 239.234 42.9051 252.421 42.9051C264.727 42.9051 270.97 49.488 270.97 62.473V117.046H287.803V60.3031C287.803 40.1024 275.712 27.5525 256.254 27.5525L256.248 27.5581ZM176.309 91.6299V42.7073H197.116V27.6033H176.309V1.76896H159.809V27.6033H145.329V42.7073H159.476V92.7996C159.476 109.344 167.068 117.052 183.371 117.052H197.444V101.869H186.029C179.12 101.869 176.303 98.9022 176.303 91.6299H176.309ZM301.825 73.1353C301.825 45.0237 317.106 27.5578 341.701 27.5578C364.913 27.5578 379.912 44.4021 379.912 70.4682V78.7237H319.347C319.827 94.0819 328.17 103.196 341.865 103.196C352.714 103.196 359.849 98.721 361.955 90.6012L362.232 89.5332H378.969L378.726 91.1719C376.327 107.293 361.17 118.549 341.865 118.549C317.54 118.549 301.825 101.247 301.825 73.1353ZM341.701 42.9104C335.441 42.9104 320.995 45.0237 319.573 64.2131H362.553C362.045 50.8438 354.329 42.9104 341.701 42.9104ZM413.386 1.76331H396.553V117.046H413.386V1.76331ZM433.477 56.144C433.477 39.3118 447.339 27.5589 467.191 27.5578C477.87 27.5584 486.794 30.6662 492.991 36.5479C498.738 42.0063 501.905 49.7306 501.905 58.3082V117.051H487.352L486.505 106.914C480.821 114.447 471.659 118.555 460.363 118.555C442.079 118.555 429.311 107.146 429.311 90.8046C429.311 84.216 431.947 62.7213 465.856 62.7213H485.405V58.6472C485.405 48.4819 478.597 42.4132 467.188 42.4132C454.577 42.4132 449.943 49.5216 449.807 56.1779L449.779 57.5736H433.477V56.144ZM462.87 104.033C475.718 104.033 485.41 94.8335 485.41 82.6339H485.416V76.729H465.867C452.895 76.729 446.319 81.4077 446.319 90.6294C446.319 99.1505 452.353 104.033 462.87 104.033ZM560.5 27.558C547.144 27.558 539.597 33.638 535.629 38.7009V1.76882H518.795V117.052H533.591L535.177 106.818C539.01 111.983 546.619 118.549 560.5 118.549C583.487 118.549 597.876 101.089 598.045 72.9603C597.859 44.9561 583.475 27.558 560.5 27.558ZM558.169 103.196C552.801 103.196 535.295 101.015 535.295 72.966C535.295 44.9166 552.806 42.9049 558.169 42.9049C578.818 42.9049 581.048 63.9307 581.048 72.966C581.048 99.2693 566.715 103.196 558.169 103.196Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <nav class="nav">
+        <a href="../../work/v1/">Work</a>
+        <a href="../../expertise/v2/">Expertise</a>
+        <a href="#">Careers</a>
+        <a href="#">Get connected</a>
+      </nav>
+      <button class="navtoggle" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <nav class="menu__nav">
+      <a href="../../work/v1/"><span>Work</span></a>
+      <a href="../../expertise/v2/"><span>Expertise</span></a>
+      <a href="#"><span>Careers</span></a>
+      <a href="#"><span>Get connected</span></a>
+    </nav>
+    <div class="menu__foot">
+      <p>&copy;2026 thelab. Part of <a href="#">the wellcom group</a></p>
+      <div class="menu__social">
+        <a class="menu__icon" href="#" aria-label="thelab on Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="4" y="4" width="16" height="16" rx="4.6"/>
+            <circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a class="menu__icon" href="#" aria-label="thelab on LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <rect x="5.2" y="9.6" width="2.7" height="9"/><circle cx="6.55" cy="6.4" r="1.6"/>
+            <path d="M10.1 9.6h2.6v1.25a2.9 2.9 0 0 1 2.6-1.4c2 0 3.2 1.25 3.2 3.75v5.4h-2.7v-4.9c0-1.25-.45-2-1.55-2-.95 0-1.45.63-1.45 2v4.9h-2.7z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- thelab.co's case study markup (live_main.py), the CSS-module hashes off its
+         classes; additions marked data-add. --><div id="maincontent"></div>
+    <section class="CaseStudyHero_heroText layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid">
+    <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_left CaseStudyHero_richTextBlock"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h1><span class="mask" data-hv="1" data-add="reveal"><span>Serving up a</span></span><span class="mask" data-hv="2" data-add="reveal"><span><i>new legendary standard</i></span></span></h1></div></div><div class="CaseStudyHero_heroClient typography_fontHeader32 typography_balance"><span class="mask" data-hv="3" data-add="reveal"><span>Kentucky Legend</span></span></div></section>
+    <section class="FullWidthMedia_root"><div class="VideoWithPlayPauseButton_root" style="aspect-ratio:1.7777777777777777"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/kl-1.mp4" title="Hero for kentucky legend" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></section>
+    <section class="CaseStudies_case-studies_projectIntro layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div class="CaseStudies_case-studies_roleListWrapper"><h4>Our Role</h4><ul class="CaseStudies_case-studies_roleList utility_listReset"><li>Brand Development<span class="CaseStudies_case-studies_comma">, </span></li><li>Social Media Strategy<span class="CaseStudies_case-studies_comma">, </span></li><li>Creative Strategy<span class="CaseStudies_case-studies_comma">, </span></li><li>Art Direction<span class="CaseStudies_case-studies_comma">, </span></li><li>Design<span class="CaseStudies_case-studies_comma">, </span></li><li>Copywriting<span class="CaseStudies_case-studies_comma">, </span></li><li>Motion<span class="CaseStudies_case-studies_comma">, </span></li><li>Content Development</li></ul><a type="button" tabindex="0" target="_blank" href="https://kentuckylegend.com/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent">Visit live site<div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></div><p>There’s ham. And then there’s juicy, savory, real dang delicious Kentucky Legend Ham. Kentucky Legend fans know that its slow-cooked, double-smoked, handcrafted flavor far surpasses any other ham on the block. 
+
+Kentucky Legend came to us to level up their look, feel and marketing to ensure that their next generation of fans also discover all the haaaamazing reasons to fall in love with the quality, variety, and flavor of this time-honored tradition.</p></section>
+    <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_right"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h3>What legendary<i> holidays are made of</i></h3><p>While Kentucky Legend is meticulously hamcrafted to be the perfect canvas for our audience’s holiday spread, it’s not often top of mind during this season. We concepted, shot and produced an artfully-executed ASMR-inspired video to dramatize just how deliciously elevated adding Kentucky Legend to your holiday table can be.</p></div></div>
+    <div aria-hidden="true" class="SpacerBlock_small SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div class="" style="--aspect-ratio:1.7777777777777777"><div class="ShowcaseBlock_layoutFull ShowcaseBlock_showcaseImages layout_container thelabnyc_thelabui_layout_container"><div class="ShowcaseBlock_carousel Carousel_Carousel_root"><div class="react-aria-TabPanel"><div class="ShowcaseBlock_showcaseImage"><div class="VideoWithPlayPauseButton_root ShowcaseBlock_videoWrapper" style="aspect-ratio:var(--aspect-ratio)"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/kl-2.mp4" title="ASMR cooking ham" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></div></div></div></div></div>
+    <div aria-hidden="true" class="SpacerBlock_xlarge SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_left"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h3>More to love, <i>more to share</i></h3><p>During the second year of our Holiday campaign, we shifted our focus to hostesses and introduced new ad formats with a distinctly festive look and feel. On Pinterest, our campaign earned 23.1M hampressions while YouTube saw 7x more hampressions than Pinterest, as well as a 40.7% ad recall lift (CPG avg 17.6%).</p></div></div>
+    <div aria-hidden="true" class="SpacerBlock_small SpacerBlock_transparent" data-spacer-block="true"></div>
+    <template><div class="Tabs_Tabs_tabListContainer"><div class="Tabs_Tabs_underlineContainer"><div class="Tabs_Tabs_underline"></div></div></div></template>
+    <div class="Tabs_Tabs_root CaseStudies_case-studies_tabbedBlock layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid" data-orientation="horizontal"><div class="Tabs_Tabs_tabListContainer"><div class="react-aria-TabList" aria-label="Tabs displaying different avenues of campaigns" role="tablist" aria-orientation="horizontal" data-orientation="horizontal"><div class="react-aria-Tab" tabindex="-1" aria-selected="true" role="tab" data-selected="true">YOUTUBE</div><div class="react-aria-Tab" tabindex="-1" aria-selected="false" role="tab">PINTEREST</div><div class="react-aria-Tab" tabindex="-1" aria-selected="false" role="tab">LANDING PAGE</div></div><div class="Tabs_Tabs_underlineContainer"><div class="Tabs_Tabs_underline"></div></div></div><div tabindex="0" role="tabpanel" class="react-aria-TabPanel"><div class="VideoWithPlayPauseButton_root CaseStudies_case-studies_videoWrapper" style="aspect-ratio:2"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/kl-3.mp4" title="Holiday youtube campaign" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></div></div>
+    <div aria-hidden="true" class="SpacerBlock_xlarge SpacerBlock_transparent" data-spacer-block="true"></div><div class="SplitBlock_splitBlock layout_container thelabnyc_thelabui_layout_container SplitBlock_splitAlignmentLeft"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild SplitBlock_splitBlockText"><h2>A scrum-diddly-<i>ham-tious Easter</i></h2><p>We helped Kentucky Legend GO BIG during the biggest ham holiday of the year with eye-catching creative that inspired fans to share the one… the only… THE LEGEND with family &amp; friends.</p><p>The results? 20.5M impressions and significant traffic to site with a below-industry CPC, confirming that our message landed.</p></div><div class="SplitBlock_mediaWrapper"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/kl-easter-square.webp" loading="lazy" class="thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="KL_thelab_Easter_Square"/></picture></div></div>
+    <div aria-hidden="true" class="SpacerBlock_small SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div class="" style="--aspect-ratio:1.8222222222222222"><div class="ShowcaseBlock_layoutFull ShowcaseBlock_showcaseImages layout_container thelabnyc_thelabui_layout_container"><div class="ShowcaseBlock_carousel Carousel_Carousel_root"><div class="react-aria-TabPanel"><div class="ShowcaseBlock_showcaseImage"><div class="VideoWithPlayPauseButton_root ShowcaseBlock_videoWrapper" style="aspect-ratio:var(--aspect-ratio)"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/kl-6.mp4" title="Easter campaign" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></div></div></div></div></div>
+    <div aria-hidden="true" class="SpacerBlock_xlarge SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_right"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h3>Everyone is sweet on us<i> in organic social too</i></h3><p>We’ve reached over 11.7 M Meta users in a year - and the people we reach reeaaally like what they’re being served. The boost in positive engagement and interactions elevates Kentucky Legend’s credibility with shoppers and retailers.</p></div></div>
+    <div aria-hidden="true" class="SpacerBlock_small SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div class="" style="--aspect-ratio:1.7777777777777777"><div class="ShowcaseBlock_layoutFull ShowcaseBlock_showcaseImages layout_container thelabnyc_thelabui_layout_container"><div class="ShowcaseBlock_carousel Carousel_Carousel_root"><div class="react-aria-TabPanel"><div class="ShowcaseBlock_showcaseImage"><div class="VideoWithPlayPauseButton_root ShowcaseBlock_videoWrapper" style="aspect-ratio:var(--aspect-ratio)"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/kl-7.mp4" title="Brand love video" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></div></div></div></div></div>
+    <div aria-hidden="true" class="SpacerBlock_large SpacerBlock_transparent" data-spacer-block="true"></div>
+    <div></div>
+    <div class="StatsBlock_StatsBlock_container layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid">
+    <section><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild StatsBlock_StatsBlock_rtf"><h3><span class="mask" data-add="reveal"><span>A few of <i>our highlights</i></span></span></h3></div><ul class="StatsBlock_StatsBlock_statList utility_listReset"><li class="StatsBlock_StatsBlock_statContainer"><div class="StatsBlock_StatsBlock_stat">
+    <div><span class="stat-num" data-to="3600" data-add="count">3600</span><span>%</span></div><p><span class="mask" data-add="reveal"><span>lift in reach on Facebook</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-1.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-23-alt"/></picture></div></li><li class="StatsBlock_StatsBlock_statContainer"><div class="StatsBlock_StatsBlock_stat">
+    <div><span class="stat-num" data-to="9900" data-add="count">9900</span><span>%</span></div><p><span class="mask" data-add="reveal"><span>lift in reach on Instagram</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-2.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-1"/></picture></div></li><li class="StatsBlock_StatsBlock_statContainer"><div class="StatsBlock_StatsBlock_stat">
+    <div><span class="stat-num" data-to="11.7" data-add="count">11.7</span>M<span>+</span></div><p><span class="mask" data-add="reveal"><span>happy Meta ham enthusiasts in 2024</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-3.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-4"/></picture></div></li></ul></section></div>
+
+    <!-- ================================================ RELATED WORK (data-add)
+         The Work page's two-column cards (work/v1's .wg / .wk). -->
+    <section class="cs-related wg" data-add="related work">
+      <h2 class="cs-related__head">Related Work</h2>
+      <ul class="wg__list">
+      <li class="wk">
+        <a class="wk__link" href="https://www.thelab.co/case-studies/qdoba/">
+          <div class="wk__media"><img src="assets/related-qdoba.webp" alt=""></div>
+          <p class="wk__client"><span class="mask"><span>Qdoba Mexican Eats</span></span></p>
+          <h3 class="wk__title"><span class="mask"><span>Bringing more flavor to the marketplace</span></span></h3>
+        </a>
+      </li>
+      <li class="wk">
+        <a class="wk__link" href="https://www.thelab.co/case-studies/fritolay/">
+          <div class="wk__media"><img src="assets/related-fritolay.webp" alt=""></div>
+          <p class="wk__client"><span class="mask"><span>Frito-Lay</span></span></p>
+          <h3 class="wk__title"><span class="mask"><span>Building a DTC future where snackers come first</span></span></h3>
+        </a>
+      </li>
+      </ul>
+    </section>
+  </main>
+
+
+  <!-- ================================================================ FOOTER
+       The homepage footer, verbatim. footer.js builds the mark and the grid lines;
+       footer-glow.js paints the gradient. -->
+  <footer class="pf" id="footer">
+    <canvas class="pf__glow" aria-hidden="true"></canvas>
+    <div class="pf__grid" aria-hidden="true"></div>
+    <div class="pf__band">
+      <div class="pf__mark" aria-hidden="true"></div>
+      <h2 class="pf__head">Tell us what you want to build.</h2>
+      <button class="pf__cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start a conversation</span><span aria-hidden="true">Start a conversation</span></span></span></button>
+    </div>
+    <div class="pf__locations">
+      <div class="pf__office">
+        <p class="pf__city">New York</p>
+        <p class="pf__addr">1115 Broadway, 5th fl New York, NY 10010, US</p>
+        <p class="pf__tel"><a href="tel:+12122091333">+1.212.209.1333</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">London</p>
+        <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">Istanbul</p>
+        <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">Sydney</p>
+        <p class="pf__addr">40-50 Francis St, Darlinghurst, NSW 2010, Australia</p>
+        <p class="pf__tel"><a href="tel:+61293104458">+61.2.9310.4458</a></p>
+      </div>
+    </div>
+    <div class="pf__legal">
+      <div class="pf__end">
+        <span>&copy;2026 thelab. Part of <a href="#">the wellcom group</a></span>
+        <nav>
+          <a href="#">Privacy</a>
+          <a href="#">Modern Slavery Statement</a>
+          <a href="#">Whistleblower Protection</a>
+        </nav>
+        <div class="pf__social">
+          <a class="pf__icon" href="#" aria-label="thelab on Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="4" y="4" width="16" height="16" rx="4.6"/>
+              <circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a class="pf__icon" href="#" aria-label="thelab on LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <rect x="5.2" y="9.6" width="2.7" height="9"/><circle cx="6.55" cy="6.4" r="1.6"/>
+              <path d="M10.1 9.6h2.6v1.25a2.9 2.9 0 0 1 2.6-1.4c2 0 3.2 1.25 3.2 3.75v5.4h-2.7v-4.9c0-1.25-.45-2-1.55-2-.95 0-1.45.63-1.45 2v4.9h-2.7z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <script src="config.js?v=20261104"></script>
+  <script src="shaders.js?v=20261103"></script>
+  <script src="app.js?v=20261103b"></script>
+  <script src="footer.js?v=20261103"></script>
+  <script src="footer-glow.js?v=20261103"></script>
+  <script>
+  window.CS_TABS = ["assets/kl-3.mp4", "assets/kl-4.mp4", "assets/kl-5.mp4"];   /* the tab panels' media, in tab order (the live page renders only the chosen one) */
+  /* CASE STUDY: the tabs and the films, on the live page's markup.
+     THE TABS (react-aria's TabList / Tab / TabPanel): the live page renders the chosen
+     tab's panel only, so here the one panel's picture or film is swapped (window.CS_TABS); the underline slides
+     under the chosen tab; arrow keys move along the row.
+     THE FILMS play only while they are on screen; each has the live PAUSE / PLAY, and a
+     film paused by hand stays paused, even back on screen. */
+  (function () {
+    'use strict';
+    const TAB_MEDIA = window.CS_TABS || [];   // per page, from the builder (cases.py)
+    document.querySelectorAll('.Tabs_Tabs_root').forEach(root => {
+      const tabs = [...root.querySelectorAll('.react-aria-Tab')];
+      const line = root.querySelector('.Tabs_Tabs_underline');
+      const box = root.querySelector('.Tabs_Tabs_underlineContainer');
+      // the panel's one picture or film: a picture swaps its src, a film its src and plays
+      const img = root.querySelector('.react-aria-TabPanel img, .react-aria-TabPanel video');
+      let on = Math.max(0, tabs.findIndex(t => t.getAttribute('aria-selected') === 'true'));
+      const place = () => {
+        if (!line || !box) return;
+        const a = tabs[on].getBoundingClientRect(), b = box.getBoundingClientRect();
+        line.style.left = (a.left - b.left) + 'px'; line.style.width = a.width + 'px';
+      };
+      const pick = i => {
+        if (i === on) return;
+        on = i;
+        tabs.forEach((t, j) => {
+          t.setAttribute('aria-selected', String(j === i));
+          if (j === i) t.setAttribute('data-selected', 'true'); else t.removeAttribute('data-selected');
+          t.tabIndex = j === i ? 0 : -1;
+        });
+        place();
+        if (img) {
+          img.classList.add('is-swap');
+          setTimeout(() => {
+            img.src = TAB_MEDIA[i];
+            if (img.tagName === 'VIDEO') { img.load(); if (!img.dataset.held) img.play().catch(() => {}); }
+            else img.alt = tabs[i].textContent;
+            img.classList.remove('is-swap');
+          }, 300);
+        }
+      };
+      TAB_MEDIA.filter(src => !/\.mp4$/.test(src)).forEach(src => { const p = new Image(); p.src = src; });   // pictures ready before they are asked for
+      tabs.forEach((t, i) => {
+        t.tabIndex = i === on ? 0 : -1;
+        t.addEventListener('click', () => pick(i));
+        t.addEventListener('keydown', e => {
+          const n = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (n) { e.preventDefault(); const k = (on + n + tabs.length) % tabs.length; pick(k); tabs[k].focus(); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(i); }
+        });
+      });
+      place();
+      addEventListener('resize', place);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    });
+
+    /* THE RELATED CARDS: the Work page's entrance, as each comes on screen, once -- the
+       card rises and fades in, its picture's frame opens from its centre, then the client
+       and the headline slide up out of their masks */
+    const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cards = [...document.querySelectorAll('.cs-related .wk')];
+    if (!REDUCED && 'IntersectionObserver' in window && cards.length) {
+      const CLIP = 'inset(16% 13% 16% 13%)', OPEN = 'inset(0% 0% 0% 0%)';
+      cards.forEach(c => { c.classList.add('pre'); c.querySelectorAll('.mask').forEach(m => m.classList.add('pre'));
+                           const im = c.querySelector('.wk__media'); if (im) im.style.clipPath = CLIP; });
+      const seen = new IntersectionObserver(es => es.forEach(e => {
+        if (!e.isIntersecting) return;
+        seen.unobserve(e.target);
+        const c = e.target, d = cards.indexOf(c) * 110, im = c.querySelector('.wk__media');
+        setTimeout(() => c.classList.remove('pre'), d);
+        setTimeout(() => { if (im) im.style.clipPath = OPEN; }, d + 60);
+        c.querySelectorAll('.mask').forEach((m, j) => setTimeout(() => m.classList.remove('pre'), d + 420 + j * 110));
+      }), { threshold: 0.2 });
+      cards.forEach(c => seen.observe(c));
+    }
+
+    /* ====== THE SCROLL WATCHER, Expertise v2's (expertise-sections.js): entering the band
+       plays, only a BOTTOM exit re-arms, 0.12 of hysteresis between; the first pass
+       plays anything already on screen. One change: anything whose top is above the line
+       plays, on screen or not, so a fast scroll that jumps a short block cannot leave it
+       hidden. */
+    const HYST = 0.12, watchers = [];
+    const watch = (el, at, onEnter, onExit) => el && watchers.push({ el, at, onEnter, onExit, on: false });
+    let pumped = 0, cold = true;
+    function gates() {
+      if (pumped++ < 1) return;            // never undo the armed state before it paints
+      const vh = innerHeight;
+      for (const w of watchers) {
+        const r = w.el.getBoundingClientRect();
+        // in once its top is above the line -- even if a fast scroll jumped clean past it
+        const inBand  = r.top < vh * (cold ? 1 : w.at);
+        const outBand = r.top > vh * (w.at + HYST);
+        if (!w.on && inBand) { w.on = true; w.onEnter(); }
+        else if (w.on && outBand) { w.on = false; w.onExit(); }
+      }
+      cold = false;
+    }
+
+    /* THE PICTURES OPEN OUT, as Expertise's: armed at once (not animated there), opened
+       as each scrolls into view at 0.9 of the screen -- ONCE: they stay open when you
+       scroll back up, until the page is reloaded */
+    if (!REDUCED) document.querySelectorAll('.FullWidthMedia_root > .VideoWithPlayPauseButton_root, .ShowcaseBlock_showcaseImage, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root, .SplitBlock_mediaWrapper > picture').forEach(m => {
+      m.style.transition = 'none';
+      m.classList.add('pre');
+      void m.offsetWidth;
+      m.style.transition = '';
+      watch(m, 0.9, () => m.classList.remove('pre'), () => {});   // once: no re-arm, until reload
+    });
+
+    /* THE STATS COUNT UP, the homepage proof's (proof.js): the header at 0.80 of the
+       screen; the stats a row at a time at 0.84 (the second row 260 after the first, 110
+       between the two in a row), each figure counting from 0 over 1.15s on an ease-out
+       cubic and landing exactly on its value; a bottom exit re-arms. The figure keeps its
+       target's decimals (8.5 counts in tenths). */
+    const statBox = document.querySelector('.StatsBlock_StatsBlock_container');
+    if (statBox && !REDUCED) {
+      const head = statBox.querySelector('.StatsBlock_StatsBlock_rtf .mask');
+      const stats = [...statBox.querySelectorAll('.StatsBlock_StatsBlock_statContainer')];
+      const rows = [stats.slice(0, 2), stats.slice(2, 4)];
+      const dec = el => ((el.dataset.to.split('.')[1]) || '').length;
+      const setNum = (el, v) => { el.textContent = v.toFixed(dec(el)); };
+      const counters = [];
+      const countUp = (el, dur) => counters.push({ el, to: parseFloat(el.dataset.to) || 0, t0: performance.now(), dur, live: true });
+      function stepCounters(now) {
+        for (let i = counters.length - 1; i >= 0; i--) {
+          const c = counters[i];
+          if (!c.live) { counters.splice(i, 1); continue; }
+          const p = Math.min(1, (now - c.t0) / c.dur);
+          setNum(c.el, c.to * (1 - Math.pow(1 - p, 3)));
+          if (p >= 1) { c.el.textContent = c.el.dataset.to; c.live = false; }
+        }
+      }
+      if (head) head.classList.add('pre');
+      stats.forEach(s => { s.classList.add('pre'); s.querySelectorAll('.mask').forEach(m => m.classList.add('pre'));
+                           const n = s.querySelector('.stat-num'); if (n) setNum(n, 0); });
+      const timers = { r0: [], r1: [] };
+      const later = (key, fn, ms) => timers[key].push(setTimeout(fn, ms));
+      const clearKey = key => { timers[key].forEach(clearTimeout); timers[key] = []; };
+      function setRow(r, on) {
+        const key = 'r' + r; clearKey(key);
+        rows[r].forEach((s, i) => {
+          const n = s.querySelector('.stat-num');
+          if (on) later(key, () => {
+            s.classList.remove('pre');
+            s.querySelectorAll('.mask').forEach((m, j) => later(key, () => m.classList.remove('pre'), 90 + j * 90));
+            if (n) countUp(n, 1150);
+          }, r * 260 + i * 110);
+          else {
+            s.classList.add('pre');
+            s.querySelectorAll('.mask').forEach(m => m.classList.add('pre'));
+            if (n) { counters.forEach(c => { if (c.el === n) c.live = false; }); setNum(n, 0); }
+          }
+        });
+      }
+      if (head) watch(head, 0.80, () => head.classList.remove('pre'), () => head.classList.add('pre'));
+      rows.forEach((g, r) => g.length && watch(g[0], 0.84, () => setRow(r, true), () => setRow(r, false)));
+      (function tick(now) { stepCounters(now || performance.now()); requestAnimationFrame(tick); })();
+      addEventListener('scroll', () => stepCounters(performance.now()), { passive: true });
+    }
+
+    /* ====== THE TEXT REVEALS, Expertise's headers' and the homepage's: each block's
+       heading, copy and captions slide up out of masks (added here, so the markup stays
+       the live page's), pills and button rise in one by one; played as the block's top
+       crosses 0.78 of the screen, re-armed on a bottom exit. Heading 95, copy 235 (+110
+       a paragraph), pills from 335 (+60 each). The hero is app.js's; the stats their own. */
+    const mask = el => {
+      if (!el || (el.firstElementChild && el.firstElementChild.classList.contains('mask') && el.children.length === 1)) return el && el.firstElementChild;
+      const m = document.createElement('span'), s = document.createElement('span');
+      m.className = 'mask';
+      while (el.firstChild) s.appendChild(el.firstChild);
+      m.appendChild(s); el.appendChild(m);
+      return m;
+    };
+    const textBlock = (box, parts) => {   // parts: [[element, delay], ...]
+      parts = parts.filter(p => p[0]);
+      if (!parts.length || REDUCED) return;
+      parts.forEach(([el]) => el.classList.add('pre'));
+      let t = [];
+      watch(box, 0.78,
+        () => { t.forEach(clearTimeout); t = parts.map(([el, d]) => setTimeout(() => el.classList.remove('pre'), d)); },
+        () => { t.forEach(clearTimeout); parts.forEach(([el]) => el.classList.add('pre')); });
+    };
+    // the copy blocks (rich text, the split block's copy), not the hero's nor the stats'
+    document.querySelectorAll('main .RichText_rich-text_richText').forEach(rt => {
+      if (rt.closest('.CaseStudyHero_heroText, .StatsBlock_StatsBlock_container')) return;
+      const heads = [...rt.querySelectorAll(':scope > :is(h1, h2, h3, h4)')].map(h => [mask(h), 95]);
+      const body = [...rt.querySelectorAll(':scope > p')].filter(p => p.textContent.trim())
+                     .map((p, j) => [mask(p), (heads.length ? 235 : 0) + j * 110]);
+      textBlock(rt, heads.concat(body));
+    });
+    // the project intro: Our Role (0), the intro (95), the pills (from 335, 60 apart), the button after them
+    document.querySelectorAll('.CaseStudies_case-studies_projectIntro').forEach(pi => {
+      const pills = [...pi.querySelectorAll('.CaseStudies_case-studies_roleList li')];
+      textBlock(pi, [[mask(pi.querySelector('.CaseStudies_case-studies_roleListWrapper h4')), 0],
+                     ...[...pi.querySelectorAll(':scope > p')].map((p, j) => [mask(p), 95 + j * 110]),
+                     ...pills.map((li, j) => [li, 335 + j * 60]),
+                     [pi.querySelector('.Clickables_primaryButton'), 335 + pills.length * 60]]);
+    });
+    // each caption under a film or picture
+    document.querySelectorAll('.ShowcaseBlock_fullCaption > span').forEach(c => textBlock(c, [[mask(c), 0]]));
+    // the Related Work heading (its cards have the Work page's own entrance)
+    document.querySelectorAll('.cs-related__head').forEach(h => textBlock(h, [[mask(h), 0]]));
+
+    addEventListener('scroll', gates, { passive: true });
+    (function pump() { gates(); if (pumped < 3) requestAnimationFrame(pump); })();
+
+    // the live page's two icons: two bars while it plays, a filled triangle while paused
+    const PATH = { pause: 'M6 2H4v12h2V2Zm6 0h-2v12h2V2Z', play: 'M14.67 8 3.33 15.33V.67L14.66 8Z' };
+    const films = [...document.querySelectorAll('.VideoWithPlayPauseButton_root video')];
+    const cardFilms = [...document.querySelectorAll('.wk__media > video')];
+    films.forEach(v => {
+      v.removeAttribute('autoplay');
+      const btn = v.parentNode.querySelector('.VideoWithPlayPauseButton_button');
+      if (!btn) return;
+      const label = btn.querySelector('div'), path = btn.querySelector('path');
+      const mark = () => {
+        const playing = !v.paused;
+        if (label) label.textContent = (playing ? 'Pause' : 'Play') + ' Video';
+        if (path) path.setAttribute('d', playing ? PATH.pause : PATH.play);
+      };
+      v.addEventListener('play', mark); v.addEventListener('pause', mark);
+      btn.addEventListener('click', () => {
+        if (v.paused) { v.dataset.held = ''; v.play().catch(() => {}); } else { v.dataset.held = '1'; v.pause(); }
+      });
+    });
+    if (!('IntersectionObserver' in window)) { films.concat(cardFilms).forEach(v => v.play().catch(() => {})); return; }
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { if (!e.target.dataset.held) e.target.play().catch(() => {}); } else e.target.pause();
+    }), { rootMargin: '200px 0px' });
+    films.concat(cardFilms).forEach(v => io.observe(v));
+  })();
+
+  </script>
+</body>
+</html>

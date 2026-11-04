@@ -19,6 +19,10 @@
   .ContactUsForm_contactFormOverlay { position: fixed; inset: 0; z-index: 9998; pointer-events: none;
     background-color: rgb(var(--white-base) / 30%); mix-blend-mode: difference; opacity: 0; transition: opacity .2s; }
   .ContactUsForm_contactFormOverlay.ContactUsForm_isOpen { opacity: 1; }
+  /* THE PAGE BLURRED behind the open panel (2026-11-04), under the veil, fading with it */
+  .ContactUsForm_blur { position: fixed; inset: 0; z-index: 9997; pointer-events: none;
+    -webkit-backdrop-filter: blur(7.2px); backdrop-filter: blur(7.2px); opacity: 0; transition: opacity .3s; }
+  .ContactUsForm_blur.ContactUsForm_isOpen { opacity: 1; }
   .ContactUsForm_overlay { position: fixed; inset: 0; z-index: 9999; height: 100dvh; }
   .ContactUsForm_overlay[hidden] { display: none; }
   .ContactUsForm_popover { position: fixed; top: 0; right: 0; z-index: 10000; height: 100dvh; }
@@ -101,6 +105,7 @@
                                 : `<input class="react-aria-Input" id="cf_${name}" type="${type}" name="${name}"${required ? ' required' : ''}>`}</div>
         </div>`;
   const HTML = `
+  <div class="ContactUsForm_blur" aria-hidden="true"></div>
   <div class="ContactUsForm_contactFormOverlay" aria-hidden="true"></div>
   <div class="ContactUsForm_overlay" hidden>
     <div class="ContactUsForm_popover">
@@ -133,6 +138,7 @@
   document.body.appendChild(root);
 
   const veil = root.querySelector('.ContactUsForm_contactFormOverlay');
+  const blur = root.querySelector('.ContactUsForm_blur');
   const overlay = root.querySelector('.ContactUsForm_overlay');
   const popover = root.querySelector('.ContactUsForm_popover');
   const dialog = root.querySelector('.ContactUsForm_dialog');
@@ -153,7 +159,7 @@
     overlay.hidden = false;
     popover.removeAttribute('data-exiting');
     popover.setAttribute('data-entering', '');
-    veil.classList.add('ContactUsForm_isOpen');
+    veil.classList.add('ContactUsForm_isOpen'); blur.classList.add('ContactUsForm_isOpen');
     document.documentElement.classList.add('ContactUsForm_lock');
     dialog.focus({ preventScroll: true });
   };
@@ -162,7 +168,7 @@
     open = false;
     popover.removeAttribute('data-entering');
     popover.setAttribute('data-exiting', '');
-    veil.classList.remove('ContactUsForm_isOpen');
+    veil.classList.remove('ContactUsForm_isOpen'); blur.classList.remove('ContactUsForm_isOpen');
     // put away once it has slid out (the timer in case animationend never comes)
     clearTimeout(hideT);
     hideT = setTimeout(done, 400);

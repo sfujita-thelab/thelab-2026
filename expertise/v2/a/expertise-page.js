@@ -517,7 +517,9 @@
     const h = bar.offsetHeight;
     /* a PHONE has one place: LOCK above the foot from the first screen, so the pill never
        shifts as the page starts to move -- it only grows UP from that foot when opened */
-    const rest = PHONE_BAR.matches ? LOCK() : REST();
+    /* ONE PLACE EVERYWHERE (2026-11-04): over the resting hero it sits where it locks --
+       the 8px drop from REST to LOCK as the page started to move read as a jump */
+    const rest = LOCK();
     // the gap under it: the pill is anchored to the foot, so its height never enters here
     const b = off ? -(h + 16) : (scrollY > 4 ? LOCK() : rest);
     const v = b + 'px';

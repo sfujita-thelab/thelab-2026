@@ -138,7 +138,8 @@
     'growth channels.',
     'AI capabilities.',
     'evergreen campaign.',
-    'conversion strategy.'
+    'conversion strategy.',
+    'AEO discoverability.'
   ];
 
   const T = {
@@ -158,7 +159,7 @@
        itself still takes as long as it takes. */
     hold:   2133,      // ms before a swap starts...
     perChar:  63,      // ...plus this much for every character in the phrase
-    holdVary: 333      // ms of random spread on top
+    holdVary: 0        // no random spread (2026-11-04): a fixed rhythm, in order (was 333)
   };
 
   const rand = (a, b) => a + Math.random() * (b - a);

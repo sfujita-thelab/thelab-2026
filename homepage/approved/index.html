@@ -1235,6 +1235,9 @@
   .card__img:hover video { transform: scale(1.035); }
   /* SKS's picture is wide (2:1) in a square tile: its crop sits 50px left of centre */
   .card--2 .card__img img { object-position: calc(50% - 50px) 50%; }
+  /* Tula's film 30% closer in its tile; the hover's 3.5% grows on top of that */
+  .card--1 .card__img video { transform: scale(1.3); }
+  .card--1 .card__img:hover video { transform: scale(1.346); }
 
   /* right:24 rather than a width. The text block is asked to clear the card's right
      edge by 24, and saying that directly is also what fixes the 4 it used to overhang
@@ -3509,7 +3512,7 @@
            reveal, unchanged) and the roller box (the hand-over), which works because
            h1 .mask already carries exactly the clip padding the roller needs. -->
       <span class="mask hero__head-dyn" data-hv="2" aria-hidden="true"><span>commerce platform.</span></span>
-      <span class="hero__sr">commerce platform., growth channels., AI capabilities., evergreen campaign., or conversion strategy.</span>
+      <span class="hero__sr">commerce platform., growth channels., AI capabilities., evergreen campaign., conversion strategy., or AEO discoverability.</span>
     </h1>
 
       <div class="hero__aside">
@@ -3897,7 +3900,7 @@
   <script src="config.js"></script>
   <script src="shaders.js"></script>
   <script src="app.js"></script>
-  <script src="hero-type.js"></script>
+  <script src="hero-type.js?v=20261104b"></script>
   <script src="hero-glow.js"></script>
   <script src="featuredwork.js?v=20261104"></script>
   <script src="expertise.js"></script>
@@ -3909,7 +3912,7 @@
        footer's headline is static, so footer-glow.js never sees a pf:phrase and simply
        holds one colour family instead of walking them. -->
   <script src="footer-glow.js"></script>
-  <script src="contact.js?v=20261104"></script>
+  <script src="contact.js?v=20261104b"></script>
   <script src="tweak.js"></script>
 </body>
 </html>

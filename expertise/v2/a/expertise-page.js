@@ -277,11 +277,9 @@
     const hk = Math.min(1, Math.min(1, sy / (vh * 0.8)) * 1.05);
     const he = hk * hk * (3 - 2 * hk);
     const heroFade = 1 - he;
-    if (heroCopy) {
-      heroCopy.style.opacity = heroFade.toFixed(3);
-      heroCopy.style.transform = 'translate3d(0,' + (-he * vh * 0.075).toFixed(1) + 'px,0)';
-    }
-    if (travel) travel.style.transform = 'translate3d(0,' + (-he * vh * 0.075).toFixed(1) + 'px,0)';
+    /* THE COPY NO LONGER FADES OR LIFTS (2026-11-04): it scrolls away as it is, at full
+       strength, with the page (the hero is not sticky any more), and the figure's layer
+       keeps to it. heroFade still eases the figure's lines, dots and glow out. */
     const hr = heroBox.getBoundingClientRect(), dr = dxBox.getBoundingClientRect();
     const w = hr.width, h = hr.height;
     const hx = hr.left + w / 2;

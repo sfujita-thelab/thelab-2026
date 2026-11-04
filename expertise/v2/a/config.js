@@ -63,7 +63,7 @@ const CONFIG = {
        pixels. It is kept in this form because ONE number has to feed both the CSS grid
        and the hero shader, and the shader multiplies toward black. The expertise wires
        and the hero circle's rim are set to the same 0.870. */
-    alpha:      0.130,            // was 0.095, measured from hero.png
+    alpha:      0.080,            // 8% (2026-11-04); was 0.130, measured from hero.png
     widthPx:    1                 // line width in CSS px
   },
 

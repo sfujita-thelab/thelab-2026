@@ -28,12 +28,12 @@
     --col: 340px;
     --u: 1px;
     --inset: var(--spacer-8);
-    --grain-a: .245;
+    --grain-a: .08;       /* grain layer opacity, everywhere (light and dark): 8% (2026-11-04); was .124, .131, .138, which was 20% under .172, 30% under .245 (2026-11-04) */
     --pad-top: 32px;
     --pad-bottom: 66px;
     --font: Beausite, -apple-system, "Segoe UI", Arial, sans-serif;
     /* the page's one horizontal rule: the grid line's own weight, as the topbar uses it */
-    --rule: rgb(var(--black-base) / var(--grid-a, .13));
+    --rule: rgb(var(--black-base) / var(--grid-a, .08));
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: auto; background: var(--color-primary); overflow: visible; }
@@ -51,19 +51,19 @@
   .page-grid { position: fixed; inset: 0; z-index: 2; pointer-events: none;
                mix-blend-mode: multiply; }
   .page-grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                 background: rgb(var(--black-base) / var(--grid-a, .13));
+                 background: rgb(var(--black-base) / var(--grid-a, .08));
                  transform-origin: top center; transform: scaleY(0);
                  transition: transform .70s cubic-bezier(.62,.02,.34,1); }
   .page-grid.drawn i  { transform: scaleY(1); }
-  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .13)); }
+  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .08)); }
   .page-grid.settled i { transition: none; transform: none;
-                         background: rgb(var(--black-base) / var(--grid-a, .13)); }
+                         background: rgb(var(--black-base) / var(--grid-a, .08)); }
 
   .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none;
            background-image: url(assets/grain.png);
            background-repeat: repeat;
            background-size: calc(446 * var(--u)) calc(446 * var(--u));
-           mix-blend-mode: hard-light; opacity: var(--grain-a, .245); }
+           mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
 
   main { position: relative; }
 
@@ -149,9 +149,9 @@
                                 background-color .25s ease, border-color .25s ease; }
   .topbar.is-preload { transform: translateY(calc(-100% - 10px)); transition: none; }
   .topbar.is-solid { background: var(--color-primary);
-                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .13)); }
+                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .10); }
+                             border-bottom-color: rgba(244, 244, 244, .04); }
   .topbar::after {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background-image: url(assets/grain.png);
@@ -160,7 +160,7 @@
     mix-blend-mode: hard-light; opacity: 0;
     transition: opacity .25s ease;
   }
-  .topbar.is-solid::after { opacity: var(--grain-a, .245); }
+  .topbar.is-solid::after { opacity: var(--grain-a, .08); }
   .topbar > * { position: relative; z-index: 1; }
   .topbar a, .topbar button { pointer-events: auto; }
   .topbar a { transition: color .22s ease; }
@@ -344,10 +344,10 @@
   @media (max-width: 767px) { .page-glow { --glow-r: calc(380 * 2.02 / 1440 * 100vw); } }
   .travel { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2;
             pointer-events: none; overflow: visible; }
-  .travel .wire, .xg .wire { fill: none; stroke: var(--black); stroke-width: 1px;
+  .travel .wire, .xg .wire { fill: none; stroke: #000; stroke-width: 1px;
                             vector-effect: non-scaling-stroke; }
   /* the grid line's own alpha, on the group, so overlapping lines do not add up */
-  .travel .ink, .xg .ink { opacity: var(--grid-a, .13); }
+  .travel .ink, .xg .ink { opacity: .13; }   /* the homepage hero graphic's outline: black at 13%, fixed (2026-11-04), not the grid's --grid-a */
 
   .travel .dot, .xg .dot { fill: var(--black); transition: opacity .7s ease; }
   .xg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
@@ -523,7 +523,7 @@
       /* the panel's side rules ARE the page grid's lines 1 and 5 carried down through it, so
          they take the grid line's own colour -- its ink over the page ground, opaque --
          rather than a tint over the picture, which read darker and heavier */
-      border-color: color-mix(in srgb, rgb(var(--black-base)) calc(var(--grid-a, .13) * 100%), var(--color-primary)) !important; }
+      border-color: color-mix(in srgb, rgb(var(--black-base)) calc(var(--grid-a, .08) * 100%), var(--color-primary)) !important; }
     /* the copy and the case sit 32 in from the panel's edge (--spacer-32), not the inset's 8,
        and keep their full measure: the box reaches 32 past its columns, so the text itself is
        still two columns wide (line 1 to line 3's distance), just shifted in */
@@ -624,7 +624,7 @@
   .slide--white .slide__media--placeholder { background: none; }
   .slide--light, .slide--ink { color: var(--black); }
   .slide--light::after, .slide--ink::after { background: none; }
-  .slide--light::before, .slide--ink::before { border-color: rgb(var(--black-base) / .13); }
+  .slide--light::before, .slide--ink::before { border-color: rgb(var(--black-base) / .08); }
   .slide--light .project, .slide--ink .project { color: var(--black); }
   .slide--light .pill, .slide--ink .pill { background: rgb(var(--black-base) / .06); }
   .slide__inner { position: relative; z-index: 1; height: 100%; margin: 0 var(--m);
@@ -702,7 +702,7 @@
      where the grid drops to 2 columns) */
   .faq::before { content: ""; position: absolute; top: 0; bottom: 0; z-index: 2; pointer-events: none;
                 left: var(--m); right: calc(var(--m) - 1px); mix-blend-mode: multiply;
-                background: repeating-linear-gradient(to right, rgb(var(--black-base) / .13) 0 1px, transparent 1px var(--col)); }
+                background: repeating-linear-gradient(to right, rgb(var(--black-base) / .08) 0 1px, transparent 1px var(--col)); }
   .faq__inner { position: relative; z-index: 3; margin: 0 var(--m);
                display: grid; grid-template-columns: repeat(4, 1fr); align-items: start; }
   .faq .sec-head { grid-column: 1 / 3; }
@@ -771,7 +771,7 @@
         color: var(--pf-ink); }
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .10); }
+                background: rgba(244, 244, 244, .04); }
   .pf__glow {
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
@@ -797,7 +797,7 @@
     background-image: url(assets/grain.png);
     background-repeat: repeat;
     background-size: calc(446 * var(--u)) calc(446 * var(--u));
-    mix-blend-mode: hard-light; opacity: var(--grain-a, .245);
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08);
   }
   .pf__band { position: relative; z-index: 1; height: auto;
               margin: 0 calc(var(--m) + var(--inset));
@@ -834,6 +834,16 @@
              font: var(--font-button-1); text-transform: uppercase;
              padding: var(--spacer-8) var(--spacer-56);
              cursor: pointer; white-space: nowrap; }
+  /* THE FOOTER CTA ON THE FOOTER'S OWN GROUND (2026-11-04): #222 and the same grain,
+     rather than see-through, so where it sits across a grid line (phone and tablet,
+     where it centres on the middle line) the line stops at its edge instead of running
+     through the label. The grain is the footer's: the same tile, size, blend and
+     strength, on a layer under the label. */
+  .pf .pf__cta { position: relative; isolation: isolate; overflow: hidden; background-color: var(--black); }
+  .pf .pf__cta::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url(assets/grain.png); background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
   .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
                    display: grid; grid-template-columns: repeat(4, 1fr);
                    grid-auto-flow: row; column-gap: 0; row-gap: 0; }
@@ -1483,7 +1493,7 @@
 
   <div class="grain" aria-hidden="true"></div>
 
-  <script src="config.js?v=20261027b"></script>
+  <script src="config.js?v=20261104e"></script>
   <script src="shaders.js?v=20261027b"></script>
   <script src="app.js?v=20261027b"></script>
   <script src="footer.js?v=20261027b"></script>

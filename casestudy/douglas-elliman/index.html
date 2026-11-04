@@ -24,12 +24,12 @@
     --col: 340px;
     --u: 1px;
     --inset: var(--spacer-8);
-    --grain-a: .245;
+    --grain-a: .08;       /* grain layer opacity, everywhere (light and dark): 8% (2026-11-04); was .124, .131, .138, which was 20% under .172, 30% under .245 (2026-11-04) */
     --pad-top: 32px;
     --pad-bottom: 66px;
     --font: Beausite, -apple-system, "Segoe UI", Arial, sans-serif;
     /* the page's one horizontal rule: the grid line's own weight, as the topbar uses it */
-    --rule: rgb(var(--black-base) / var(--grid-a, .13));
+    --rule: rgb(var(--black-base) / var(--grid-a, .08));
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: auto; background: var(--color-primary); overflow: visible; }
@@ -47,19 +47,19 @@
   .page-grid { position: fixed; inset: 0; z-index: 2; pointer-events: none;
                mix-blend-mode: multiply; }
   .page-grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                 background: rgb(var(--black-base) / var(--grid-a, .13));
+                 background: rgb(var(--black-base) / var(--grid-a, .08));
                  transform-origin: top center; transform: scaleY(0);
                  transition: transform .70s cubic-bezier(.62,.02,.34,1); }
   .page-grid.drawn i  { transform: scaleY(1); }
-  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .13)); }
+  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .08)); }
   .page-grid.settled i { transition: none; transform: none;
-                         background: rgb(var(--black-base) / var(--grid-a, .13)); }
+                         background: rgb(var(--black-base) / var(--grid-a, .08)); }
 
   .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none;
            background-image: url(assets/grain.png);
            background-repeat: repeat;
            background-size: calc(446 * var(--u)) calc(446 * var(--u));
-           mix-blend-mode: hard-light; opacity: var(--grain-a, .245); }
+           mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
 
   main { position: relative; }
 
@@ -145,9 +145,9 @@
                                 background-color .25s ease, border-color .25s ease; }
   .topbar.is-preload { transform: translateY(calc(-100% - 10px)); transition: none; }
   .topbar.is-solid { background: var(--color-primary);
-                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .13)); }
+                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .10); }
+                             border-bottom-color: rgba(244, 244, 244, .04); }
   .topbar::after {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background-image: url(assets/grain.png);
@@ -156,7 +156,7 @@
     mix-blend-mode: hard-light; opacity: 0;
     transition: opacity .25s ease;
   }
-  .topbar.is-solid::after { opacity: var(--grain-a, .245); }
+  .topbar.is-solid::after { opacity: var(--grain-a, .08); }
   .topbar > * { position: relative; z-index: 1; }
   .topbar a, .topbar button { pointer-events: auto; }
   .topbar a { transition: color .22s ease; }
@@ -231,8 +231,8 @@
   /* WHERE IT SITS (expertise-page.js writes --xsub-b, the gap under it): ANCHORED TO THE
      SCREEN'S FOOT, so a change of its own height (opening, closing down) grows or shrinks
      it upward from a bottom edge that does not move, and a phone's browser bar coming and
-     going cannot shift it. Over the resting hero 40 above the foot (32 on a phone); once
-     the page moves 32; below the screen as Reasons arrives. Only those moves glide. */
+     going cannot shift it. 32 above the foot from the first screen on (it was 40 over the
+     resting hero); below the screen as Reasons arrives. Only that move glides. */
   .xsub { position: fixed; left: 50%; top: auto; bottom: var(--xsub-b, -200px); z-index: 5; pointer-events: auto;
           transform: translateX(-50%); max-width: calc(100vw - 2 * var(--m));
           opacity: 0; transition: opacity .6s ease; }
@@ -393,7 +393,7 @@
         color: var(--pf-ink); }
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .10); }
+                background: rgba(244, 244, 244, .04); }
   .pf__glow {
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
@@ -419,7 +419,7 @@
     background-image: url(assets/grain.png);
     background-repeat: repeat;
     background-size: calc(446 * var(--u)) calc(446 * var(--u));
-    mix-blend-mode: hard-light; opacity: var(--grain-a, .245);
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08);
   }
   .pf__band { position: relative; z-index: 1; height: auto;
               margin: 0 calc(var(--m) + var(--inset));
@@ -456,6 +456,16 @@
              font: var(--font-button-1); text-transform: uppercase;
              padding: var(--spacer-8) var(--spacer-56);
              cursor: pointer; white-space: nowrap; }
+  /* THE FOOTER CTA ON THE FOOTER'S OWN GROUND (2026-11-04): #222 and the same grain,
+     rather than see-through, so where it sits across a grid line (phone and tablet,
+     where it centres on the middle line) the line stops at its edge instead of running
+     through the label. The grain is the footer's: the same tile, size, blend and
+     strength, on a layer under the label. */
+  .pf .pf__cta { position: relative; isolation: isolate; overflow: hidden; background-color: var(--black); }
+  .pf .pf__cta::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url(assets/grain.png); background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
   .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
                    display: grid; grid-template-columns: repeat(4, 1fr);
                    grid-auto-flow: row; column-gap: 0; row-gap: 0; }
@@ -575,8 +585,9 @@
      -- the inner three are INVISIBLE, not removed: footer.js places the footer's lines by
      reading these. Drawn plain (no multiply, which would vanish on #222). */
   .page-grid { mix-blend-mode: normal; }
-  .page-grid i, .page-grid.toned i, .page-grid.settled i { background: rgb(var(--light-gray-base) / .12); }
+  .page-grid i, .page-grid.toned i, .page-grid.settled i { background: rgb(var(--light-gray-base) / .04); }
   .page-grid i:not(:first-child):not(:last-child) { visibility: hidden; }
+
 
 
   /* ===================================================== A RESKIN OF THE LIVE MARKUP
@@ -797,8 +808,8 @@
      (the section covers .page-grid) */
   .cs-related { padding-top: var(--spacer-104) !important; background: var(--light-gray); color: var(--black); }
   .cs-related::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: calc(var(--m) - 1px); z-index: 0;   /* the right rule ON vline 5, not 1px inside it */ pointer-events: none;
-                        border-left: 1px solid rgb(var(--black-base) / .13); border-right: 1px solid rgb(var(--black-base) / .13);
-                        border-top: 1px solid rgb(var(--black-base) / .13); }   /* a rule across its top, v1 to v5 */
+                        border-left: 1px solid rgb(var(--black-base) / .08); border-right: 1px solid rgb(var(--black-base) / .08);
+                        border-top: 1px solid rgb(var(--black-base) / .08); }   /* a rule across its top, v1 to v5 */
   .cs-related::before { z-index: 1; }   /* the lines over the field, under the cards */
   .cs-related > * { position: relative; z-index: 2; }
   /* THE HOMEPAGE'S PROOF FIELD behind it (halo.js, HALO in config.js): green on Douglas
@@ -1037,7 +1048,7 @@
 
   <div class="grain" aria-hidden="true"></div>
 
-  <script src="config.js?v=20261104b"></script>
+  <script src="config.js?v=20261104e"></script>
   <script src="shaders.js?v=20261103"></script>
   <script src="app.js?v=20261103b"></script>
   <script src="footer.js?v=20261103"></script>

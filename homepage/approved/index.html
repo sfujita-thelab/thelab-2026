@@ -48,8 +48,7 @@
        mobile override had to put it back. The token is the same number written once,
        and it needs no override. */
     --inset: var(--spacer-8);
-    --grain-a: .245;      /* grain layer opacity. Figma's value was .35; this is 30%
-                             less, per request. Feeds .grain and .pf::after alike. */
+    --grain-a: .08;       /* grain layer opacity, everywhere (light and dark): 8% (2026-11-04); was .124, .131, .138, which was 20% under .172, 30% under .245 (2026-11-04) */
     --pad-top: 32px;
     --pad-bottom: 66px;   /* app.js overwrites this in px from the real viewport */
     /* swap this one line for the real brand face */
@@ -462,7 +461,7 @@
     vector-effect: non-scaling-stroke;
     stroke-width: 1px;
     fill: rgba(244, 244, 244, 1);
-    stroke: rgba(0, 0, 0, var(--grid-a, .130));
+    stroke: rgba(0, 0, 0, .130);   /* the original weight, kept (2026-11-04) -- not the grid's --grid-a any more */
   }
   /* The type sits over the mark. Both are absolute inside .hero, and the mark is
      first in the DOM, but these are explicit so re-ordering the markup cannot
@@ -804,7 +803,7 @@
            background-image: url(assets/grain.png);
            background-repeat: repeat;
            background-size: calc(446 * var(--u)) calc(446 * var(--u));
-           mix-blend-mode: hard-light; opacity: var(--grain-a, .245); }
+           mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
   /* ONE grey, throughout. The lines used to be traced at 26% black and then eased
      back to the resting 9.5% once construction finished, so they arrived heavy and
      retreated. They now draw at their resting weight and simply stay there: the
@@ -815,17 +814,17 @@
      pure black at 13%. --grid-a stays UNITLESS because app.js writes it as a bare
      number from CONFIG.grid.alpha, and the tweak panel drives it live. */
   .page-grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                 background: rgb(var(--black-base) / var(--grid-a, .13));
+                 background: rgb(var(--black-base) / var(--grid-a, .08));
                  transform-origin: top center; transform: scaleY(0);
                  transition: transform .70s cubic-bezier(.62,.02,.34,1); }
   .page-grid.drawn i  { transform: scaleY(1); }
-  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .13)); }
+  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .08)); }
   /* Once drawn and toned they are simply the page grid, for the whole rest of the
      site. The resting colour is restated here rather than left to .toned so that a
      rebuild (layout() re-runs on resize) cannot replay the colour transition, and
      transition:none means it cannot replay the draw either. */
   .page-grid.settled i { transition: none; transform: none;
-                         background: rgb(var(--black-base) / var(--grid-a, .13)); }
+                         background: rgb(var(--black-base) / var(--grid-a, .08)); }
 
   /* EDGE TO EDGE, where this used to be inset to the margins. The bar's own box is now
      the full width of the viewport and the margin has moved inside it as padding, so the
@@ -929,7 +928,7 @@
      The rule is the page's own grid line, --grid-a, so the bar closes against the
      vertical lines in the same weight rather than in a second grey of its own. */
   .topbar.is-solid { background: var(--color-primary);
-                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .13)); }
+                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   /* OVER THE FOOTER IT TAKES THE FOOTER'S OWN GROUND, not the page's.
 
      It used to take none at all: on-dark flips the bar's type to light, a #f4f4f4 ground
@@ -946,7 +945,7 @@
      light bar closes on --grid-a: the bar ends on a line the page already draws, in the
      weight that page draws it. */
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .10); }
+                             border-bottom-color: rgba(244, 244, 244, .04); }
 
   /* AND THE GROUND IS GRAINED, light and dark alike, the same as the page it covers.
 
@@ -977,7 +976,7 @@
     mix-blend-mode: hard-light; opacity: 0;
     transition: opacity .25s ease;
   }
-  .topbar.is-solid::after { opacity: var(--grain-a, .245); }
+  .topbar.is-solid::after { opacity: var(--grain-a, .08); }
   .topbar > * { position: relative; z-index: 1; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2268,7 +2267,7 @@
      which is the arrangement the light sections use anyway. */
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .10); }
+                background: rgba(244, 244, 244, .04); }
 
   /* ---- the atmospheric gradient ------------------------------------------------
      A canvas, drawn small and blown up. footer-glow.js renders at 16% scale, so
@@ -2371,7 +2370,7 @@
     background-image: url(assets/grain.png);
     background-repeat: repeat;
     background-size: calc(446 * var(--u)) calc(446 * var(--u));
-    mix-blend-mode: hard-light; opacity: var(--grain-a, .245);
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08);
   }
 
   /* The footer is THREE sibling bands, not a wrapper around two of them: the headline
@@ -2599,6 +2598,16 @@
              font: var(--font-button-1); text-transform: uppercase;
              padding: var(--spacer-8) var(--spacer-56);
              cursor: pointer; white-space: nowrap; }
+  /* THE FOOTER CTA ON THE FOOTER'S OWN GROUND (2026-11-04): #222 and the same grain,
+     rather than see-through, so where it sits across a grid line (phone and tablet,
+     where it centres on the middle line) the line stops at its edge instead of running
+     through the label. The grain is the footer's: the same tile, size, blend and
+     strength, on a layer under the label. */
+  .pf .pf__cta { position: relative; isolation: isolate; overflow: hidden; background-color: var(--black); }
+  .pf .pf__cta::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url(assets/grain.png); background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
   /* NO HOVER STYLING OF ITS OWN. Three were tried and all three are out: a fill, a
      colour inversion, and a doubled ring. What is left is the label roll every CTA on
      the page shares, and nothing else -- this pill looks the same hovered as at rest.
@@ -3897,7 +3906,7 @@
        cover - and it still falls below the grid at 2 and all content above that. -->
   <div class="grain" aria-hidden="true"></div>
 
-  <script src="config.js"></script>
+  <script src="config.js?v=20261104e"></script>
   <script src="shaders.js"></script>
   <script src="app.js"></script>
   <script src="hero-type.js?v=20261104b"></script>

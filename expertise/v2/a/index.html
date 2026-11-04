@@ -179,10 +179,11 @@
      topbar's height, so it clears the bar on a short screen and the hero grows rather
      than crowding it. It is a screen LESS the bar's height, so the bar sits on the
      first screen's bottom edge. A phone keeps a hero as tall as its copy. */
-  /* the hero HOLDS -- sticky -- until the first area slides up over it */
+  /* the hero SCROLLS with the page (it held -- sticky -- until the first area slid up
+     over it; removed 2026-11-04) */
   /* minmax(0, 1fr): the column is the hero's own width, so the copy's max-width: 100% has
      something to hold to -- an auto column sized itself to the copy, 469 wide on a 375 phone */
-  .page-head { position: sticky; top: 0; z-index: 3; display: grid; place-items: center;
+  .page-head { position: relative; z-index: 3; display: grid; place-items: center;
         grid-template-columns: minmax(0, 1fr);
         --xnav-h: 0px;                               /* v1/b: a floating pill, not a bar -- no room kept */
         min-height: calc(100vh - var(--xnav-h));

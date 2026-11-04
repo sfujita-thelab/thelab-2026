@@ -174,10 +174,11 @@
      topbar's height, so it clears the bar on a short screen and the hero grows rather
      than crowding it. It is a screen LESS the bar's height, so the bar sits on the
      first screen's bottom edge. A phone keeps a hero as tall as its copy. */
-  /* the hero HOLDS -- sticky -- until the first area slides up over it */
+  /* the hero SCROLLS with the page (it held -- sticky -- until the first area slid up
+     over it; removed 2026-11-04) */
   /* minmax(0, 1fr): the column is the hero's own width, so the copy's max-width: 100% has
      something to hold to -- an auto column sized itself to the copy, 469 wide on a 375 phone */
-  .page-head { position: sticky; top: 0; z-index: 3; display: grid; place-items: center;
+  .page-head { position: relative; z-index: 3; display: grid; place-items: center;
         grid-template-columns: minmax(0, 1fr);
         --xnav-h: 0px;                               /* v1/b: a floating pill, not a bar -- no room kept */
         min-height: calc(100vh - var(--xnav-h));
@@ -826,8 +827,8 @@
       <div class="wh__glow" aria-hidden="true"><div class="wh__dome"><span></span><span></span><span></span><span></span></div></div>
       <div class="page-head__content">
         <p class="sec-head__eyebrow"><span class="mask" data-hv="1"><span>Our Work</span></span></p>
-        <h1><span class="mask" data-hv="2"><span>Built on a history of delivering.</span></span></h1>
-        <p class="page-head__body"><span class="mask" data-hv="3"><span>Every project here has a before, an after, and something measurable in between. We build things that perform, and we can show you the numbers.</span></span></p>
+        <h1><span class="mask" data-hv="2"><span>Our work in practice</span></span></h1>
+        <p class="page-head__body"><span class="mask" data-hv="3"><span>These selected case studies span industries, bringing together solutions, lasting partnerships, and decades of experience.</span></span></p>
         <!-- =============================================================== FILTERS
              THE EXPERTISE PAGE'S SUBNAV (.xsub): its white pill and items, under the hero
              copy, where it stays -- not fixed, never closed down by the scroll. On a tablet
@@ -860,13 +861,6 @@
          a phone. The fourteen projects, their thumbnails and films are thelab.co/work's. -->
     <section class="wg" id="work" aria-label="Our work">
       <ul class="wg__list">
-      <li class="wk" data-f="real-estate" data-card>
-        <a class="wk__link" href="../../casestudy/douglas-elliman/">
-          <div class="wk__media"><video src="assets/live/douglas-elliman.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
-          <p class="wk__client"><span class="mask"><span>Douglas Elliman</span></span></p>
-          <h2 class="wk__title"><span class="mask"><span>Launching a new world of luxury real estate</span></span></h2>
-        </a>
-      </li>
       <li class="wk" data-f="home-living" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><img src="assets/live/sks.webp" alt=""></div>
@@ -886,6 +880,13 @@
           <div class="wk__media"><video src="assets/live/tula.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
           <p class="wk__client"><span class="mask"><span>Tula (P&amp;G Specialty Beauty)</span></span></p>
           <h2 class="wk__title"><span class="mask"><span>Bringing prebiotics to a new generation of wellness seekers</span></span></h2>
+        </a>
+      </li>
+      <li class="wk" data-f="real-estate" data-card>
+        <a class="wk__link" href="../../casestudy/douglas-elliman/">
+          <div class="wk__media"><video src="assets/live/douglas-elliman.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
+          <p class="wk__client"><span class="mask"><span>Douglas Elliman</span></span></p>
+          <h2 class="wk__title"><span class="mask"><span>Launching a new world of luxury real estate</span></span></h2>
         </a>
       </li>
       <li class="wk" data-f="home-living" data-card>

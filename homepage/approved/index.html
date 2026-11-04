@@ -1231,6 +1231,8 @@
      The image block is the thing you click, so it is the thing that answers. */
   .card__img:hover img,
   .card__img:hover video { transform: scale(1.035); }
+  /* SKS's picture is wide (2:1) in a square tile: its crop sits 50px left of centre */
+  .card--2 .card__img img { object-position: calc(50% - 50px) 50%; }
 
   /* right:24 rather than a width. The text block is asked to clear the card's right
      edge by 24, and saying that directly is also what fixes the 4 it used to overhang
@@ -3544,7 +3546,7 @@
         </div>
 
         <article class="card card--2" data-card>
-          <div class="card__img"><img src="assets/card-sks.png" alt=""></div>
+          <div class="card__img"><img src="assets/card-sks.webp" alt=""></div>
           <div class="card__meta">
             <p class="card__client"><span class="mask"><span>SKS</span></span></p>
             <h3 class="card__title"><span class="mask"><span>Turning innovation into Technicurean desire</span></span></h3>
@@ -3556,7 +3558,7 @@
         <article class="card card--1" data-card>
           <!-- muted is not decoration: autoplay is only allowed without a user gesture
                while a video is muted. featuredwork.js pauses it when the card is off screen. -->
-          <div class="card__img"><video src="assets/card-tula.mp4"
+          <div class="card__img"><video src="assets/card-tula-2.mp4"
                autoplay muted loop playsinline preload="auto" aria-hidden="true"></video></div>
           <div class="card__meta">
             <p class="card__client"><span class="mask"><span>Tula</span></span></p>
@@ -3565,8 +3567,7 @@
           </div>
         </article>
         <article class="card card--3" data-card>
-          <div class="card__img"><video src="assets/card-elliman.mp4"
-               autoplay muted loop playsinline preload="auto" aria-hidden="true"></video></div>
+          <div class="card__img"><img src="assets/card-elliman.webp" alt=""></div>
           <div class="card__meta">
             <p class="card__client"><span class="mask"><span>Douglas Elliman</span></span></p>
             <h3 class="card__title"><span class="mask"><span>Launching a new world of luxury real estate</span></span></h3>

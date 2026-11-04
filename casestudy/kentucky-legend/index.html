@@ -87,6 +87,8 @@
     transform: scaleX(1); transform-origin: left;
     transition: transform .28s cubic-bezier(.22, .61, .36, 1);
   }
+  /* THE PAGE YOU ARE ON (2026-11-04): its nav link keeps the hover's underline */
+  .nav a[aria-current="page"]::after { transform: scaleX(1); }
   @media (prefers-reduced-motion: reduce) {
     .nav a::after, .nav a:hover::after, .tlink::after, .tlink:hover::after { transition: none; }
   }
@@ -176,10 +178,11 @@
      topbar's height, so it clears the bar on a short screen and the hero grows rather
      than crowding it. It is a screen LESS the bar's height, so the bar sits on the
      first screen's bottom edge. A phone keeps a hero as tall as its copy. */
-  /* the hero HOLDS -- sticky -- until the first area slides up over it */
+  /* the hero SCROLLS with the page (it held -- sticky -- until the first area slid up
+     over it; removed 2026-11-04) */
   /* minmax(0, 1fr): the column is the hero's own width, so the copy's max-width: 100% has
      something to hold to -- an auto column sized itself to the copy, 469 wide on a 375 phone */
-  .page-head { position: sticky; top: 0; z-index: 3; display: grid; place-items: center;
+  .page-head { position: relative; z-index: 3; display: grid; place-items: center;
         grid-template-columns: minmax(0, 1fr);
         --xnav-h: 0px;                               /* v1/b: a floating pill, not a bar -- no room kept */
         min-height: calc(100vh - var(--xnav-h));
@@ -868,7 +871,7 @@
         </svg>
       </a>
       <nav class="nav">
-        <a href="../../work/v1/">Work</a>
+        <a href="../../work/v1/" aria-current="page">Work</a>
         <a href="../../expertise/v2/">Expertise</a>
         <a href="#">Careers</a>
         <a href="#">Get connected</a>
@@ -878,7 +881,7 @@
 
   <div class="menu" id="menu" aria-hidden="true">
     <nav class="menu__nav">
-      <a href="../../work/v1/"><span>Work</span></a>
+      <a href="../../work/v1/" aria-current="page"><span>Work</span></a>
       <a href="../../expertise/v2/"><span>Expertise</span></a>
       <a href="#"><span>Careers</span></a>
       <a href="#"><span>Get connected</span></a>

@@ -90,6 +90,8 @@
     transform: scaleX(1); transform-origin: left;
     transition: transform .28s cubic-bezier(.22, .61, .36, 1);
   }
+  /* THE PAGE YOU ARE ON (2026-11-04): its nav link keeps the hover's underline */
+  .nav a[aria-current="page"]::after { transform: scaleX(1); }
   @media (prefers-reduced-motion: reduce) {
     .nav a::after, .nav a:hover::after, .tlink::after, .tlink:hover::after { transition: none; }
   }

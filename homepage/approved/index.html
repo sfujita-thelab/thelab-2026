@@ -151,6 +151,8 @@
     transform: scaleX(1); transform-origin: left;
     transition: transform .28s cubic-bezier(.22, .61, .36, 1);
   }
+  /* THE PAGE YOU ARE ON (2026-11-04): its nav link keeps the hover's underline */
+  .nav a[aria-current="page"]::after { transform: scaleX(1); }
   /* The type itself does NOT dim. Dropping to .55 opacity was the whole of the old hover
      state; the reference holds the word at full weight and lets the rule do the work, and
      the two together would read as the item being pressed rather than pointed at. */
@@ -3558,7 +3560,7 @@
         <article class="card card--1" data-card>
           <!-- muted is not decoration: autoplay is only allowed without a user gesture
                while a video is muted. featuredwork.js pauses it when the card is off screen. -->
-          <div class="card__img"><video src="assets/card-tula-2.mp4"
+          <div class="card__img"><video src="assets/card-tula-3.mp4"
                autoplay muted loop playsinline preload="auto" aria-hidden="true"></video></div>
           <div class="card__meta">
             <p class="card__client"><span class="mask"><span>Tula</span></span></p>

@@ -85,6 +85,8 @@
     transform: scaleX(1); transform-origin: left;
     transition: transform .28s cubic-bezier(.22, .61, .36, 1);
   }
+  /* THE PAGE YOU ARE ON (2026-11-04): its nav link keeps the hover's underline */
+  .nav a[aria-current="page"]::after { transform: scaleX(1); }
   @media (prefers-reduced-motion: reduce) {
     .nav a::after, .nav a:hover::after, .tlink::after, .tlink:hover::after { transition: none; }
   }
@@ -624,11 +626,14 @@
   .wh__dome { --dw: 150vw; --off: calc((var(--dw) - 100vw) / 2);
               position: absolute; left: 50%; top: -118%; width: var(--dw); height: 190%;
               transform: translateX(-50%); border-radius: 50%;
-              background: rgb(150 222 206 / .6);
+              /* DEEPER AT THE TOP (2026-11-04): the screen's top edge is about 62% down the dome, so
+                 the fill is a deep green to there, easing to the lighter green by 84% */
+              background: linear-gradient(to bottom, rgb(44 148 124 / .8) 0%, rgb(44 148 124 / .8) 60%,
+                                          rgb(72 180 156 / .76) 72%, rgb(92 196 172 / .72) 84%);
               filter: blur(120px);   /* the homepage Work field's softness: the curve felt, never drawn */
               -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%);
                       mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%); }
-  .wh__dome > span { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
+  .wh__dome > span { position: absolute; border-radius: 50%; filter: blur(70px); will-change: transform; }
   /* LARGE MASSES, not small circles: each is a broad band of the dome (the core and the
      light over a screen wide, half the dome deep), so what moves is the field itself. The
      tones DEEPER, saturated not greyed: the core #289581 full, a deep emerald (#0e8a6e)
@@ -642,12 +647,12 @@
     animation: wh-b 10s ease-in-out infinite alternate; }
   /* the far edge: a pale mint wash across the whole top, so the field has no hard rim */
   .wh__dome > span:nth-child(3) { left: calc(var(--off) - 20vw); top: 50%; width: 140vw; height: 56%;
-    background: radial-gradient(closest-side, rgb(176 232 220 / .7), rgb(176 232 220 / 0));
+    background: radial-gradient(closest-side, rgb(104 206 182 / .78), rgb(104 206 182 / 0));
     animation: wh-c 9s ease-in-out infinite alternate; }
   /* a deep EMERALD pocket, right -- saturated (#16a487), so the right side has depth and
      still answers the left's brightness (a dark, greyed #127060 here went to mud) */
   .wh__dome > span:nth-child(4) { right: calc(var(--off) - 10vw); top: 38%; width: 90vw; height: 66%;
-    background: radial-gradient(closest-side, rgb(14 138 110 / .65), rgb(14 138 110 / .3) 45%, rgb(14 138 110 / .08) 80%, rgb(14 138 110 / 0));
+    background: radial-gradient(closest-side, rgb(20 140 114 / .6), rgb(20 140 114 / .3) 45%, rgb(20 140 114 / .08) 80%, rgb(14 138 110 / 0));
     animation: wh-d 7s ease-in-out infinite alternate; }
   /* each loop: five stops, travelling, turning and swelling -- the core along the diagonal,
      the light across under it, the wash side to side, the pocket round the right */
@@ -674,7 +679,27 @@
     50%  { transform: translate(-36vw, 4vh) scale(.82); }
     75%  { transform: translate(-14vw, 20vh) scale(1.18); }
     100% { transform: translate(8vw, 8vh) scale(.92); } }
-  @keyframes wh-breathe { from { opacity: .74; } to { opacity: 1; } }
+  @keyframes wh-breathe { from { opacity: .88; } to { opacity: 1; } }
+  /* DEPTH (2026-11-04): two more masses so the field reads as a volume, not a wash --
+     a DEEP pine shadow low in the middle, where the dome is thickest, and a near-white
+     mint HIGHLIGHT up in its crown, as if lit from above. Each on its own slow loop. */
+  .wh__dome > span:nth-child(5) { left: calc(var(--off) + 30vw); top: 60%; width: 66vw; height: 34%;
+    background: radial-gradient(closest-side, rgb(22 122 100 / .5), rgb(24 128 104 / .28) 45%, rgb(24 128 104 / 0));
+    animation: wh-e 11s ease-in-out infinite alternate; }
+  .wh__dome > span:nth-child(6) { left: calc(var(--off) + 4vw); top: 56%; width: 50vw; height: 26%;
+    background: radial-gradient(closest-side, rgb(240 255 251 / .8), rgb(210 252 242 / .35) 50%, rgb(200 252 240 / 0));
+    mix-blend-mode: screen;
+    animation: wh-f 13s ease-in-out infinite alternate; }
+  @keyframes wh-e {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-12vw, 4vh) scale(1.15); }
+    66%  { transform: translate(10vw, 8vh) scale(.9); }
+    100% { transform: translate(-4vw, 2vh) scale(1.05); } }
+  @keyframes wh-f {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(18vw, 3vh) scale(1.1); }
+    66%  { transform: translate(-6vw, -2vh) scale(.92); }
+    100% { transform: translate(10vw, 5vh) scale(1.06); } }
   @media (max-width: 767px) {
     /* a PHONE's dome narrower (1.7x), so its curve shows across the short hero -- it read
        flat at 5.6x -- and the field's fade starts lower, so the curve is not faded out */
@@ -767,6 +792,11 @@
     .wk__media > *, .wk__link:hover .wk__media > * { transition: none; transform: none; }
   }
 
+  /* THE VERTICAL LINES OVER THE GRADIENT (2026-11-04): drawn plain (normal blend) rather
+     than multiplied, so where they cross the green they still read as grey lines ON it,
+     not as a faint darkening of it. On the bare #f4f4f4 page the two look the same. */
+  .page-grid { mix-blend-mode: normal; }
+
 </style>
 </head>
 <body class="theme-light theme-lightGray">
@@ -824,7 +854,7 @@
          Centred copy, held to the middle of the screen, under THE CANOPY (.wh__glow). app.js reveals the three [data-hv]
          masks on its intro clock, as on the homepage and Expertise. -->
     <header class="page-head wh">
-      <div class="wh__glow" aria-hidden="true"><div class="wh__dome"><span></span><span></span><span></span><span></span></div></div>
+      <div class="wh__glow" aria-hidden="true"><div class="wh__dome"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
       <div class="page-head__content">
         <p class="sec-head__eyebrow"><span class="mask" data-hv="1"><span>Our Work</span></span></p>
         <h1><span class="mask" data-hv="2"><span>Our work in practice</span></span></h1>
@@ -877,14 +907,14 @@
       </li>
       <li class="wk" data-f="beauty-wellness" data-card>
         <a class="wk__link" href="#">
-          <div class="wk__media"><video src="assets/live/tula.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
+          <div class="wk__media"><video src="assets/live/tula-2.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
           <p class="wk__client"><span class="mask"><span>Tula (P&amp;G Specialty Beauty)</span></span></p>
           <h2 class="wk__title"><span class="mask"><span>Bringing prebiotics to a new generation of wellness seekers</span></span></h2>
         </a>
       </li>
       <li class="wk" data-f="real-estate" data-card>
         <a class="wk__link" href="../../casestudy/douglas-elliman/">
-          <div class="wk__media"><video src="assets/live/douglas-elliman.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
+          <div class="wk__media"><img src="assets/live/douglas-elliman.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>Douglas Elliman</span></span></p>
           <h2 class="wk__title"><span class="mask"><span>Launching a new world of luxury real estate</span></span></h2>
         </a>

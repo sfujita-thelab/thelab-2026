@@ -1,9 +1,9 @@
 # Publishes the site to GitHub Pages on every push to main.
 #
-# It publishes the repo as it is, with two changes: expertise/v1/b is ALSO copied up into
-# expertise/v1, so the page lives at /expertise/v1/ online while the working copy keeps
-# it in b (beside a). /expertise/v1/b/ keeps working too. And expertise/v2/a goes up into
-# expertise/v2 the same way (/expertise/v2/a/ keeps working).
+# It publishes the repo as it is, with one change: expertise/v2/a is ALSO copied up into
+# expertise/v2, so the page lives at /expertise/v2/ online while the working copy keeps
+# it in a (/expertise/v2/a/ keeps working too). expertise/v1 needs no copy any more: its
+# page sits in expertise/v1 itself (a moved up, b removed, 2026-11-04).
 #
 # Folders starting with _ (_archive, _review) and dotfiles stay unpublished, as they
 # were under the old branch build.
@@ -35,9 +35,6 @@ jobs:
       - name: Build the site folder
         run: |
           rsync -a --exclude '.*' --exclude '_*' ./ _site/
-          # expertise/v1/b -> expertise/v1, one level up, so its link home loses a ../
-          rsync -a --exclude '.*' expertise/v1/b/ _site/expertise/v1/
-          sed -i 's|href="../../../homepage/approved/"|href="../../homepage/approved/"|' _site/expertise/v1/index.html
           # expertise/v2/a -> expertise/v2, the same way
           rsync -a --exclude '.*' expertise/v2/a/ _site/expertise/v2/
           # ...every link out of it loses a ../ too (the logo, and the nav's Work)

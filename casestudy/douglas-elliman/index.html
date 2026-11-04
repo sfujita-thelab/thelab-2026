@@ -796,7 +796,15 @@
   .cs-related::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: calc(var(--m) - 1px); z-index: 0;   /* the right rule ON vline 5, not 1px inside it */ pointer-events: none;
                         border-left: 1px solid rgb(var(--black-base) / .13); border-right: 1px solid rgb(var(--black-base) / .13);
                         border-top: 1px solid rgb(var(--black-base) / .13); }   /* a rule across its top, v1 to v5 */
-  .cs-related > * { position: relative; z-index: 1; }
+  .cs-related::before { z-index: 1; }   /* the lines over the field, under the cards */
+  .cs-related > * { position: relative; z-index: 2; }
+  /* THE HOMEPAGE'S PROOF FIELD behind it (halo.js, HALO in config.js): green on Douglas
+     Elliman, Expertise's blue on Kentucky Legend -- the homepage's #halogl rules, under
+     the lines and the cards, faded in over its top 200 */
+  .cs-related > #halogl { position: absolute; inset: 0; width: 100%; height: 100%;
+            display: block; z-index: 0; opacity: 0; pointer-events: none;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u)));
+                    mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u))); }
   .cs-related__head { margin: 0 0 var(--spacer-64); padding: 0 var(--inset); font: var(--font-h-56); text-align: center; }
   .wg { position: relative; z-index: 3; padding: 0 var(--m) var(--spacer-152); }
   .wg__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacer-24); row-gap: var(--spacer-80);
@@ -944,6 +952,7 @@
     <!-- ================================================ RELATED WORK (data-add)
          The Work page's two-column cards (work/v1's .wg / .wk). -->
     <section class="cs-related wg" data-add="related work">
+      <canvas id="halogl" aria-hidden="true"></canvas>
       <h2 class="cs-related__head">Related Work</h2>
       <ul class="wg__list">
       <li class="wk">
@@ -1026,11 +1035,13 @@
 
   <div class="grain" aria-hidden="true"></div>
 
-  <script src="config.js?v=20261104"></script>
+  <script src="config.js?v=20261104b"></script>
   <script src="shaders.js?v=20261103"></script>
   <script src="app.js?v=20261103b"></script>
   <script src="footer.js?v=20261103"></script>
   <script src="footer-glow.js?v=20261103"></script>
+  <script src="halo.js?v=20261104"></script>
+  <script src="contact.js?v=20261104"></script>
   <script>
   window.CS_TABS = ["assets/de-5-1.webp", "assets/de-5-2.webp", "assets/de-5-3.webp"];   /* the tab panels' media, in tab order (the live page renders only the chosen one) */
   /* CASE STUDY: the tabs and the films, on the live page's markup.

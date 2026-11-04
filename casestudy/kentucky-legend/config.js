@@ -759,7 +759,7 @@ const HALO = {
   curRadius: 0.70,   // p-space, deliberately wide: no cursor-shaped edge anywhere
   curWarp:   0,      // no bending of the colour regions
   curSat:    0.22,   // a little more richness under the pointer
-  curHue:   -7.0,    // degrees: a slight lean toward green, inside the aqua range
+  curHue:    0,      // no hue lean: the FAQ's field stays blue
   curSpread: 0.10,   // a touch more coverage
   ease:    0.055,    // follow lag
   fade:    0.030,    // reveal / settle speed
@@ -778,12 +778,12 @@ const HALO = {
     /* Weighted the OTHER way from Work's: the reference's teal is strongest right at
        the left edge (sat 0.46 at x=120) and gone by x=760, so the base carries three
        poles here and the tints stop well short of white. */
-    { x:  0.02, y: -0.02, r: 0.30, color: '#b1fbec' },   // from the tweak panel
-    { x: -0.26, y: -0.10, r: 0.31, color: '#289581' },   // THE BASE
-    { x:  0.22, y: -0.14, r: 0.30, color: '#008f77' },   // from the tweak panel
-    { x: -0.08, y:  0.18, r: 0.31, color: '#289581' },   // THE BASE (pole 3, unchanged)
-    { x:  0.28, y:  0.14, r: 0.30, color: '#4ac4b0' },   // from the tweak panel
-    { x: -0.22, y:  0.10, r: 0.29, color: '#197062' }   // from the tweak panel
+    { x:  0.02, y: -0.02, r: 0.30, color: '#a0d1e7' },   // blue: the base 62% toward white
+    { x: -0.26, y: -0.10, r: 0.31, color: '#0587c1' },   // blue: THE BASE
+    { x:  0.22, y: -0.14, r: 0.30, color: '#0470a0' },   // blue: a step deeper
+    { x: -0.08, y:  0.18, r: 0.31, color: '#0587c1' },   // blue: THE BASE
+    { x:  0.28, y:  0.14, r: 0.30, color: '#64b5d9' },   // blue: the base 38% toward white
+    { x: -0.22, y:  0.10, r: 0.29, color: '#03597f' }   // blue: the shade
   ]
 };
 

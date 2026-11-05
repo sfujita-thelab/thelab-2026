@@ -600,9 +600,11 @@
   /* THE INK: the type, rules and lines in the page's ink -- #f4f4f4 on the dark page,
      #222 on the light one -- and the empty media frame a step off the ground */
   body { --cs-ink: var(--black); --cs-ink-base: var(--black-base); --cs-ground: var(--light-gray); --cs-media-bg: #e4e4e4;
-         --cs-pill-bg: #e7e7e7; }   /* Expertise's pill on its light page: solid #e7e7e7 */
+         --cs-pill-bg: #e7e7e7;
+         --cs-rule: rgb(var(--black-base) / .08); }   /* a rule at the grid lines' strength: 8% on light */   /* Expertise's pill on its light page: solid #e7e7e7 */
   body.theme-dark { --cs-ink: var(--light-gray); --cs-ink-base: var(--light-gray-base); --cs-ground: var(--black); --cs-media-bg: #2c2c2c;
-                    --cs-pill-bg: rgb(244 244 244 / .16); }   /* ...and on a dark one */
+                    --cs-pill-bg: rgb(244 244 244 / .16);
+                   --cs-rule: rgb(var(--light-gray-base) / .04); }   /* ...and 4% on dark */   /* ...and on a dark one */
   @media (max-width: 1023px) { main { --lg-gap: 16px; } }
   @media (max-width: 767px)  { main { --lg-cols: 4; } }
   main i { font-style: inherit; }   /* the live headings' italic half: set roman here */
@@ -693,8 +695,12 @@
   .CaseStudies_case-studies_comma { display: none; }
   @media (max-width: 767px) {
     main .CaseStudies_case-studies_projectIntro { display: flex; flex-direction: column; }
-    .CaseStudies_case-studies_roleListWrapper { padding-bottom: var(--spacer-64); margin-bottom: var(--spacer-40);
-                                                border-bottom: 1px solid rgb(var(--cs-ink-base) / .2); }
+    .CaseStudies_case-studies_roleListWrapper { position: relative; padding-bottom: var(--spacer-64); margin-bottom: var(--spacer-40); }
+    /* the rule under it, at the v-lines' own strength, drawn as a layer so it can fade in
+       with the block (cs.js arms the wrapper with the rest of the project intro) */
+    .CaseStudies_case-studies_roleListWrapper::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+      background: var(--cs-rule); transition: opacity .72s cubic-bezier(.22,.61,.36,1); }
+    .CaseStudies_case-studies_roleListWrapper.pre::after { opacity: 0; transition: none; }
     .CaseStudies_case-studies_roleList { width: auto; }
   }
   /* THE BUTTON: this site's outlined CTA pill (.cta--line), on the live button's markup */
@@ -1251,7 +1257,9 @@
       textBlock(pi, [[mask(pi.querySelector('.CaseStudies_case-studies_roleListWrapper h4')), 0],
                      ...[...pi.querySelectorAll(':scope > p')].map((p, j) => [mask(p), 95 + j * 110]),
                      ...pills.map((li, j) => [li, 335 + j * 60]),
-                     [pi.querySelector('.Clickables_primaryButton'), 335 + pills.length * 60]]);
+                     [pi.querySelector('.Clickables_primaryButton'), 335 + pills.length * 60],
+                     // the rule under Our Role (a phone's): with the last pill
+                     [pi.querySelector('.CaseStudies_case-studies_roleListWrapper'), 335 + Math.max(0, pills.length - 1) * 60]]);
     });
     // each caption under a film or picture
     document.querySelectorAll('.ShowcaseBlock_fullCaption > span').forEach(c => textBlock(c, [[mask(c), 0]]));

@@ -15,7 +15,7 @@
 
      Shared parts (top bar, page grid, type tokens, footer) are expertise/v2/a's, which are
      the approved homepage's. The copy, films and pictures are thelab.co's. -->
-<link rel="stylesheet" href="thelab-tokens.css?v=20261026175422">
+<link rel="stylesheet" href="thelab-tokens.css?v=20261104b">
 
 <style>
   /* ============================================================ homepage: base */
@@ -147,7 +147,7 @@
   .topbar.is-solid { background: var(--color-primary);
                      border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .04); }
+                             border-bottom-color: rgb(var(--light-gray-base) / .04); }
   .topbar::after {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background-image: url(assets/grain.png);
@@ -202,8 +202,8 @@
     .page-head > .page-head__fig { grid-area: 1 / 1; }
     .page-head > .page-head__content { grid-area: 2 / 1; }
   }
-  /* the headline 70% of the full measure, lines 1 to 5; the body two columns under it */
-  .page-head__content { width: calc(4 * var(--col) * .7); max-width: 100%; text-align: center; }
+  /* the headline 60% of the full measure, lines 1 to 5 (2026-11-04, was 70%); the body two columns under it */
+  .page-head__content { width: calc(4 * var(--col) * .6); max-width: 100%; text-align: center; }
   /* v1/c: on a tablet the headline takes 80% of the full measure, line 1 to line 5 */
   @media (min-width: 768px) and (max-width: 1023px) {
     .page-head__content { width: calc(4 * var(--col) * .8); }
@@ -387,13 +387,13 @@
   .pf { position: relative; z-index: 3; overflow: hidden;
         display: flex; flex-direction: column;
         --pf-ink:  var(--white);
-        --pf-sub:  rgba(244,244,244,.72);
-        --pf-dim:  rgba(244,244,244,.56);
+        --pf-sub:  rgb(var(--light-gray-base) / .72);
+        --pf-dim:  rgb(var(--light-gray-base) / .56);
         background: var(--black);
         color: var(--pf-ink); }
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .04); }
+                background: rgb(var(--light-gray-base) / .04); }
   .pf__glow {
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
@@ -428,6 +428,8 @@
               align-items: center;
               pointer-events: none; }
   .pf__band > * { pointer-events: auto; }
+  /* a phone: --spacer-80 under the band (40 there), the top unchanged (2026-11-04) */
+  @media (max-width: 767px) { .pf .pf__band { padding-bottom: var(--spacer-80); } }
   .pf { --pf-mark: 240px; }
   .pf__head { position: static; grid-area: 1 / 1; width: var(--col);
               font: var(--font-h-40); margin: 0; }
@@ -603,7 +605,7 @@
          --cs-pill-bg: #e7e7e7;
          --cs-rule: rgb(var(--black-base) / .08); }   /* a rule at the grid lines' strength: 8% on light */   /* Expertise's pill on its light page: solid #e7e7e7 */
   body.theme-dark { --cs-ink: var(--light-gray); --cs-ink-base: var(--light-gray-base); --cs-ground: var(--black); --cs-media-bg: #2c2c2c;
-                    --cs-pill-bg: rgb(244 244 244 / .16);
+                    --cs-pill-bg: rgb(var(--light-gray-base) / .16);
                    --cs-rule: rgb(var(--light-gray-base) / .04); }   /* ...and 4% on dark */   /* ...and on a dark one */
   @media (max-width: 1023px) { main { --lg-gap: 16px; } }
   @media (max-width: 767px)  { main { --lg-cols: 4; } }

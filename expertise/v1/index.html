@@ -19,7 +19,7 @@
 
      Shared parts are the approved homepage's. hero-glow.js and halo.js are in the
      folder from the copy but not loaded. -->
-<link rel="stylesheet" href="thelab-tokens.css?v=20261026175422">
+<link rel="stylesheet" href="thelab-tokens.css?v=20261104b">
 
 <style>
   /* ============================================================ homepage: base */
@@ -43,7 +43,7 @@
 
   #fallback[hidden] { display: none; }
   #fallback { position: fixed; inset: 0; display: grid; place-items: center;
-              text-align: center; padding: 24px; color: var(--color-text-secondary); }
+              text-align: center; padding: var(--spacer-24); color: var(--color-text-secondary); }
 
   .page-bg { position: fixed; inset: 0; background: var(--color-primary); z-index: -1; }
   #stage { display: block; position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; }
@@ -151,7 +151,7 @@
   .topbar.is-solid { background: var(--color-primary);
                      border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .04); }
+                             border-bottom-color: rgb(var(--light-gray-base) / .04); }
   .topbar::after {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background-image: url(assets/grain.png);
@@ -549,7 +549,7 @@
      rule, so the page's frame holds across every panel */
   .slide::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: var(--m);
                 z-index: 2; pointer-events: none;
-                border-left: 1px solid rgba(244, 244, 244, .22); border-right: 1px solid rgba(244, 244, 244, .22); }
+                border-left: 1px solid rgb(var(--light-gray-base) / .22); border-right: 1px solid rgb(var(--light-gray-base) / .22); }
   /* THE SHADING: the left goes well down under the copy (2026-10-24, deeper than the
      comp's), clearing by 60% across; the bottom-right corner a little; the rest of the
      picture is left as it is */
@@ -602,7 +602,7 @@
   /* no outline: a frosted ground -- #f4f4f4 at 16% over an 8px blur of the picture, which
      the copy side's deep shade keeps dark enough for the white label -- 4 by 12 round it */
   .pill { font: var(--font-p-14); padding: var(--spacer-4) var(--spacer-12);
-           border: 0; background: rgb(244 244 244 / .16); border-radius: 999px;
+           border: 0; background: rgb(var(--light-gray-base) / .16); border-radius: 999px;
            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); white-space: nowrap;
            transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
   .pill.pre { opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
@@ -704,13 +704,13 @@
   .pf { position: relative; z-index: 3; overflow: hidden;
         display: flex; flex-direction: column;
         --pf-ink:  var(--white);
-        --pf-sub:  rgba(244,244,244,.72);
-        --pf-dim:  rgba(244,244,244,.56);
+        --pf-sub:  rgb(var(--light-gray-base) / .72);
+        --pf-dim:  rgb(var(--light-gray-base) / .56);
         background: var(--black);
         color: var(--pf-ink); }
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .04); }
+                background: rgb(var(--light-gray-base) / .04); }
   .pf__glow {
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
@@ -745,6 +745,8 @@
               align-items: center;
               pointer-events: none; }
   .pf__band > * { pointer-events: auto; }
+  /* a phone: --spacer-80 under the band (40 there), the top unchanged (2026-11-04) */
+  @media (max-width: 767px) { .pf .pf__band { padding-bottom: var(--spacer-80); } }
   .pf { --pf-mark: 240px; }
   .pf__head { position: static; grid-area: 1 / 1; width: var(--col);
               font: var(--font-h-40); margin: 0; }

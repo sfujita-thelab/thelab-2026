@@ -14,7 +14,7 @@
 
      Shared parts (top bar, page grid, type, footer) are expertise/v2/a's, which are the
      approved homepage's; app.js is loaded for the grid, the top bar and the hero reveal. -->
-<link rel="stylesheet" href="thelab-tokens.css?v=20261026175422">
+<link rel="stylesheet" href="thelab-tokens.css?v=20261104b">
 
 <style>
   /* ============================================================ homepage: base */
@@ -146,7 +146,7 @@
   .topbar.is-solid { background: var(--color-primary);
                      border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .04); }
+                             border-bottom-color: rgb(var(--light-gray-base) / .04); }
   .topbar::after {
     content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
     background-image: url(assets/grain.png);
@@ -386,13 +386,13 @@
   .pf { position: relative; z-index: 3; overflow: hidden;
         display: flex; flex-direction: column;
         --pf-ink:  var(--white);
-        --pf-sub:  rgba(244,244,244,.72);
-        --pf-dim:  rgba(244,244,244,.56);
+        --pf-sub:  rgb(var(--light-gray-base) / .72);
+        --pf-dim:  rgb(var(--light-gray-base) / .56);
         background: var(--black);
         color: var(--pf-ink); }
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .04); }
+                background: rgb(var(--light-gray-base) / .04); }
   .pf__glow {
     position: absolute; left: -80px; top: 0; z-index: 0;
     width: calc(100% + 160px); height: calc(100% + 80px);
@@ -427,6 +427,8 @@
               align-items: center;
               pointer-events: none; }
   .pf__band > * { pointer-events: auto; }
+  /* a phone: --spacer-80 under the band (40 there), the top unchanged (2026-11-04) */
+  @media (max-width: 767px) { .pf .pf__band { padding-bottom: var(--spacer-80); } }
   .pf { --pf-mark: 240px; }
   .pf__head { position: static; grid-area: 1 / 1; width: var(--col);
               font: var(--font-h-40); margin: 0; }

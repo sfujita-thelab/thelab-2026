@@ -1,6 +1,6 @@
 /* ==========================================================================
    thelab design tokens — copied from the live site (www.thelab.co)
-   Pulled 2026-10-15 from /static/cbcaee7b/dist/index.css
+   Pulled 2026-10-15 from /static/99afb794/dist/index.css
    Names are IDENTICAL to production. Do not rename.
    EXCEPT the type changes marked "REDESIGN" below. They are proposed for this
    redesign, are not on the live site yet, and are listed in NEW-TOKENS.md.
@@ -8,11 +8,11 @@
    ========================================================================== */
 
 /* ---------- Fonts (loaded from the live site; the "cbcaee7b" folder changes when the site redeploys) ---------- */
-@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/cbcaee7b/dist/BeausiteClassicWeb-Clear.woff2") format("woff2"); font-style: normal; font-weight: 350; }
-@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/cbcaee7b/dist/BeausiteClassicWeb-ClearItalic.woff2") format("woff2"); font-style: italic; font-weight: 350; }
-@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/cbcaee7b/dist/BeausiteClassicWeb-Semibold.woff2") format("woff2"); font-style: normal; font-weight: 700; }
-@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/cbcaee7b/dist/BeausiteClassicWeb-SemiboldItalic.woff2") format("woff2"); font-style: italic; font-weight: 700; }
-@font-face { font-family: Recife; src: url("https://www.thelab.co/static/cbcaee7b/dist/RecifeDisplayWeb-BookItalic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/99afb794/dist/BeausiteClassicWeb-Clear.woff2") format("woff2"); font-style: normal; font-weight: 350; }
+@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/99afb794/dist/BeausiteClassicWeb-ClearItalic.woff2") format("woff2"); font-style: italic; font-weight: 350; }
+@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/99afb794/dist/BeausiteClassicWeb-Semibold.woff2") format("woff2"); font-style: normal; font-weight: 700; }
+@font-face { font-family: Beausite; src: url("https://www.thelab.co/static/99afb794/dist/BeausiteClassicWeb-SemiboldItalic.woff2") format("woff2"); font-style: italic; font-weight: 700; }
+@font-face { font-family: Recife; src: url("https://www.thelab.co/static/99afb794/dist/RecifeDisplayWeb-BookItalic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
 
 /* ---------- Color palette ---------- */
 :root {
@@ -90,6 +90,7 @@ html {
   --font-h-32-lg: 400 32px / 110% Beausite;  --font-h-32-sm: 400 24px / 110% Beausite;
   --font-h-32-i-lg: italic 400 32px / 110% Recife; --font-h-32-i-sm: italic 400 24px / 110% Recife;
   --font-h-24-lg: 400 24px / 110% Beausite;  --font-h-24-sm: 400 20px / 110% Beausite;
+  --font-h-20-lg: 400 20px / 110% Beausite;  --font-h-20-sm: 400 18px / 110% Beausite;   /* new (Expertise v1/c): 20 / 20 / 18 */
   --font-h-24-i-lg: italic 400 24px / 110% Recife; --font-h-24-i-sm: italic 400 20px / 110% Recife;
   --font-p-24-lg: 400 24px / 170% Beausite;  --font-p-24-sm: 400 20px / 150% Beausite;
   --font-p-20-lg: 400 20px / 150% Beausite;  --font-p-20-sm: 400 18px / 150% Beausite;
@@ -117,6 +118,7 @@ html {
   --font-h-40: var(--font-h-40-lg);    --font-h-40-i: var(--font-h-40-i-lg);
   --font-h-32: var(--font-h-32-lg);    --font-h-32-i: var(--font-h-32-i-lg);
   --font-h-24: var(--font-h-24-lg);    --font-h-24-i: var(--font-h-24-i-lg);
+  --font-h-20: var(--font-h-20-lg);
   --font-p-24: var(--font-p-24-lg);  --font-p-20: var(--font-p-20-lg);
   --font-p-18: var(--font-p-18-lg);  --font-p-16: var(--font-p-16-lg);
   --font-p-14: var(--font-p-14-lg);
@@ -131,6 +133,7 @@ html {
     --font-h-40: var(--font-h-40-xl, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-xl, var(--font-h-40-i-lg));
     --font-h-32: var(--font-h-32-xl, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-xl, var(--font-h-32-i-lg));
     --font-h-24: var(--font-h-24-xl, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-xl, var(--font-h-24-i-lg));
+    --font-h-20: var(--font-h-20-xl, var(--font-h-20-lg));
   }
 }
 @media (max-width: 1023px) {
@@ -143,6 +146,7 @@ html {
     --font-h-40: var(--font-h-40-md, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-md, var(--font-h-40-i-lg));
     --font-h-32: var(--font-h-32-md, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-md, var(--font-h-32-i-lg));
     --font-h-24: var(--font-h-24-md, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-md, var(--font-h-24-i-lg));
+    --font-h-20: var(--font-h-20-md, var(--font-h-20-lg));
     --font-p-24: var(--font-p-24-md, var(--font-p-24-lg));  --font-p-20: var(--font-p-20-md, var(--font-p-20-lg));
     --font-p-18: var(--font-p-18-md, var(--font-p-18-lg));  --font-p-16: var(--font-p-16-md, var(--font-p-16-lg));
     --font-p-14: var(--font-p-14-md, var(--font-p-14-lg));
@@ -161,6 +165,7 @@ html {
     --font-h-40: var(--font-h-40-sm, var(--font-h-40-lg));    --font-h-40-i: var(--font-h-40-i-sm, var(--font-h-40-i-md));
     --font-h-32: var(--font-h-32-sm, var(--font-h-32-lg));    --font-h-32-i: var(--font-h-32-i-sm, var(--font-h-32-i-md));
     --font-h-24: var(--font-h-24-sm, var(--font-h-24-lg));    --font-h-24-i: var(--font-h-24-i-sm, var(--font-h-24-i-md));
+    --font-h-20: var(--font-h-20-sm, var(--font-h-20-lg));
     --font-p-24: var(--font-p-24-sm, var(--font-p-24-lg));  --font-p-20: var(--font-p-20-sm, var(--font-p-20-lg));
     --font-p-18: var(--font-p-18-sm, var(--font-p-18-lg));  --font-p-16: var(--font-p-16-sm, var(--font-p-16-lg));
     --font-p-14: var(--font-p-14-sm, var(--font-p-14-lg));
@@ -185,7 +190,7 @@ html {
 }
 @media (max-width: 767px) {
   :root {
-    --spacer-12: 8px; --spacer-16: 12px; --spacer-24: 16px; --spacer-32: 24px; --spacer-40: 24px;
+    --spacer-12: 8px; --spacer-16: 8px; /* the live value (was 12 here, 2026-11-04) */ --spacer-24: 16px; --spacer-32: 24px; --spacer-40: 24px;
     --spacer-56: 32px; --spacer-64: 32px; --spacer-80: 40px; --spacer-104: 48px; --spacer-120: 56px;
     --spacer-152: 64px; --spacer-200: 104px; /* 2026-11-02: was 80 (see HANDOFF.md) */ --spacer-248: 104px; --spacer-320: 152px; --spacer-400: 200px;
   }

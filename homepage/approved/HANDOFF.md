@@ -32,7 +32,7 @@ typography, and the rest) stay the same; the type tokens that do move are listed
 |---|---|
 | **Live prototype** | https://sfujita-thelab.github.io/thelab-2026/homepage/approved/ |
 | **Repo** | https://github.com/sfujita-thelab/thelab-2026 |
-| **Token source** | `www.thelab.co` → `/static/cbcaee7b/dist/index.css`, pulled 2026-10-15 and copied verbatim into `thelab-tokens.css` |
+| **Token source** | `www.thelab.co` → `/static/99afb794/dist/index.css`. Pulled 2026-10-15 (then build `cbcaee7b`) and copied verbatim into `thelab-tokens.css`; re-checked against the live build `99afb794` on 2026-11-04 (see *Tokens across all pages*) |
 | **Webfonts** | Beausite (4 faces) + Recife italic, loaded at runtime from the same CDN path |
 
 | File | What it holds |
@@ -49,14 +49,19 @@ typography, and the rest) stay the same; the type tokens that do move are listed
 The remaining `*.js` files are one per section — `hero-type`, `featuredwork`,
 `expertise`, `proof`, `footer` and the glow/halo painters. `README.md` covers them.
 
-The webfont path contains a build hash (`cbcaee7b`) that changes when thelab.co
-redeploys. When it does, the faces 404 and the page falls back to `--font`.
+The webfont path contains a build hash (now `99afb794`) that changes when thelab.co
+redeploys. When it does, the faces 404 and the page falls back to `--font`. This
+happened once: the homepage was still on `cbcaee7b` after the live site moved to
+`99afb794`, and was corrected on 2026-11-04. If the type ever renders in a default
+serif, check this hash first.
 
 ---
 
 ## Summary
 
 - Built on thelab.co's token names. Nothing is renamed.
+- **Every page uses the same token file** — homepage, Work, Expertise, the case studies
+  and Careers (2026-11-04). See *Tokens across all pages*.
 - Among the tokens, type changes, plus one spacing value (`--spacer-200` on mobile, 2026-11-02).
   Colour is production's.
 - Animation is of two kinds: the intro animation on load, and scroll animations per
@@ -95,6 +100,57 @@ tokens and all colour tokens.
 | `--font-tag` | flat 12 | `.pill`, the card tags. The flat 12 `--font-eyebrow` used to be. |
 
 Values read from `thelab-tokens.css` and confirmed against computed style in the browser.
+
+---
+
+## Tokens across all pages
+
+**One token file, everywhere (2026-11-04).** Every page in the prototype loads an
+identical `thelab-tokens.css` — this folder's file, copied into each page's folder:
+
+| Page | Folder |
+|---|---|
+| Homepage | `homepage/approved/` |
+| Work | `work/v1/` |
+| Expertise | `expertise/v2/a/` (published as `/expertise/v2/`), `expertise/v1/` |
+| Case studies | `casestudy/douglas-elliman/`, `casestudy/kentucky-legend/` |
+| Careers | `careers/v1/` (not yet published) |
+
+Edit the token file here and copy it to the other folders; never edit one copy alone.
+Before this the copies had drifted: different webfont hashes, and Expertise v1 still on
+the old `--font-h-56` and `--spacer-200` mobile values. All of them now match this file.
+
+**Checked against the live site (build `99afb794`, 2026-11-04).** Colour, spacing and
+type tokens match production exactly, except the redesign changes listed under *Token
+changes* and the additions under *New tokens*. One mismatch was found and fixed:
+
+| Token | Was here | Live (now here) | Note |
+|---|---|---|---|
+| `--spacer-16`, mobile | 12 | **8** | Undocumented drift. TOKENS-REFERENCE already said 8. Every `--spacer-16` gap is 4px tighter on a phone. |
+
+`--font-h-20` (20 · 20 · 18) was added to the shared file, because Expertise v1 uses it
+(once). Everything else in the file is unchanged.
+
+**Values in the page styles are tokens.** Colour, type and spacing reference the token
+file — `var(--black)`, `var(--light-gray)`, `rgb(var(--light-gray-base) / .04)`,
+`var(--font-*)`, `var(--spacer-*)` — rather than raw numbers. The light grey had been
+written out as `rgba(244, 244, 244, …)` in the footer and dark grid lines; it now uses
+its token. A few raw values remain on purpose, because the live palette has no
+equivalent:
+
+| Raw value | Where | Why it stays |
+|---|---|---|
+| Black at an alpha, e.g. `rgba(0,0,0,.22)` | Drop shadows; the hero graphics' outline (black at 13%) | Shadows and that outline are true black by design, not `--black` (#222). |
+| `#000` | Inside `mask-image` gradients | A mask's colour is only its opacity; it never shows. |
+| `#e4e4e4`, `#e7e7e7`, `#e8e8e8` | Picture placeholders while media loads; the Expertise and case-study pills | Light neutrals between `--light-gray` and `--silver`; not in the palette. |
+| `#3d3f42`, `#0b0b0b` | Expertise: placeholder and film-reel grounds | As above, on dark. |
+| Green ramp, e.g. `rgb(44 148 124 / .8)` | Work hero gradient | A painted gradient built around `--teal`; its steps are not tokens. |
+| `font-size: 10–12px`, greys | `#tweak` panel (homepage) | The hidden design-tuning panel; not part of the site. |
+
+**Grid line and grain strength** are this prototype's own settings, not production
+tokens: the line strength is `grid.alpha` in each page's `config.js` (8% on light; the
+footer and the dark case study draw theirs at 4%), and the grain is `--grain-a` at the
+top of each page's stylesheet (8% everywhere).
 
 ---
 

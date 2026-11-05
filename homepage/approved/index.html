@@ -21,7 +21,7 @@
      in _archive/2026-10-16/v3-c, and linking them here turns this into it.
      Beausite and Recife load from thelab.co's CDN, so the real faces need a
      connection; without one the page falls back to the stack in --font. -->
-<link rel="stylesheet" href="thelab-tokens.css">
+<link rel="stylesheet" href="thelab-tokens.css?v=20261104b">
 
 <style>
   /* NO COLOUR ALIASES. --bg, --ink and --dark are gone; every use now names a live
@@ -64,7 +64,7 @@
 
   #fallback[hidden] { display: none; }
   #fallback { position: fixed; inset: 0; display: grid; place-items: center;
-              text-align: center; padding: 24px; color: var(--color-text-secondary); }
+              text-align: center; padding: var(--spacer-24); color: var(--color-text-secondary); }
 
   /* ------------------------------------------------------------ hero type */
   /* The overlay ignores the pointer so the canvas still receives every move;
@@ -460,7 +460,7 @@
   .hero__dot {
     vector-effect: non-scaling-stroke;
     stroke-width: 1px;
-    fill: rgba(244, 244, 244, 1);
+    fill: var(--light-gray);
     stroke: rgba(0, 0, 0, .130);   /* the original weight, kept (2026-11-04) -- not the grid's --grid-a any more */
   }
   /* The type sits over the mark. Both are absolute inside .hero, and the mark is
@@ -941,11 +941,11 @@
 
      --black is the field .pf itself is painted in, so the bar closes against the footer
      seamlessly rather than introducing a second dark. The rule is the footer's OWN line
-     -- rgba(244,244,244,.10), the value .pf__grid i carries -- for the same reason the
+     -- rgb(var(--light-gray-base) / .10), the value .pf__grid i carries -- for the same reason the
      light bar closes on --grid-a: the bar ends on a line the page already draws, in the
      weight that page draws it. */
   .topbar.is-solid.on-dark { background: var(--black);
-                             border-bottom-color: rgba(244, 244, 244, .04); }
+                             border-bottom-color: rgb(var(--light-gray-base) / .04); }
 
   /* AND THE GROUND IS GRAINED, light and dark alike, the same as the page it covers.
 
@@ -2233,14 +2233,14 @@
      the footer is back to the 786 new-footer.png draws.
 
      The four ink tokens are fixed values, not a flip: the footer is dark from the
-     moment it exists. Naming them once still beats repeating rgba(244,244,244,.72)
+     moment it exists. Naming them once still beats repeating rgb(var(--light-gray-base) / .72)
      in four rules. */
   .pf { position: relative; z-index: 3; overflow: hidden;
         display: flex; flex-direction: column;
         --pf-ink:  var(--white);
-        --pf-sub:  rgba(244,244,244,.72);
-        --pf-dim:  rgba(244,244,244,.56);
-        --pf-rule: rgba(244,244,244,.55);
+        --pf-sub:  rgb(var(--light-gray-base) / .72);
+        --pf-dim:  rgb(var(--light-gray-base) / .56);
+        --pf-rule: rgb(var(--light-gray-base) / .55);
         background: var(--black);
         color: var(--pf-ink); }
 
@@ -2252,7 +2252,7 @@
      lines across the edge; what was missing was any rule to paint them, so they were
      built and invisible.
 
-     LIGHT, where the page's are dark: rgba(244,244,244,.10), measured off the reference
+     LIGHT, where the page's are dark: rgb(var(--light-gray-base) / .10), measured off the reference
      as a white at implied alpha .099 over the #222 field. No mix-blend-mode -- the light
      section's lines multiply, which on a dark field would do nothing at all.
 
@@ -2267,7 +2267,7 @@
      which is the arrangement the light sections use anyway. */
   .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
-                background: rgba(244, 244, 244, .04); }
+                background: rgb(var(--light-gray-base) / .04); }
 
   /* ---- the atmospheric gradient ------------------------------------------------
      A canvas, drawn small and blown up. footer-glow.js renders at 16% scale, so
@@ -2425,6 +2425,8 @@
                  centred 164 above the other two. */
               pointer-events: none; }
   .pf__band > * { pointer-events: auto; }
+  /* a phone: --spacer-80 under the band (40 there), the top unchanged (2026-11-04) */
+  @media (max-width: 767px) { .pf .pf__band { padding-bottom: var(--spacer-80); } }
 
   /* footer.png, measured: a 532u field.
 

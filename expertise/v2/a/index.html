@@ -1040,7 +1040,7 @@
       .slides__viewport > .slide > .slide__inner ~ .project {
         position: absolute; left: auto; right: var(--m); top: auto; bottom: 0; z-index: 2;
         width: var(--col);   /* ends AT vline 5, not over it: the line stays drawn beside the card */ max-width: none; margin: 0;
-        padding: var(--spacer-24); background: #f4f4f4; }
+        padding: var(--spacer-24) var(--spacer-24) var(--spacer-8); background: #f4f4f4; }   /* bottom --spacer-8 (2026-11-05) */
       /* the button keeps its own width and its 56 each side wherever the card has room; on a
          narrower desktop the sides give way (a % of padding is of the card's inner width; 144
          is the label) so it never runs out of the card */

@@ -201,8 +201,8 @@
     .page-head > .page-head__fig { grid-area: 1 / 1; }
     .page-head > .page-head__content { grid-area: 2 / 1; }
   }
-  /* the headline 70% of the full measure, lines 1 to 5; the body two columns under it */
-  .page-head__content { width: calc(4 * var(--col) * .7); max-width: 100%; text-align: center; }
+  /* the headline 60% of the full measure, lines 1 to 5 (2026-11-04, was 70%); the body two columns under it */
+  .page-head__content { width: calc(4 * var(--col) * .6); max-width: 100%; text-align: center; }
   /* v1/c: on a tablet the headline takes 80% of the full measure, line 1 to line 5 */
   @media (min-width: 768px) and (max-width: 1023px) {
     .page-head__content { width: calc(4 * var(--col) * .8); }
@@ -806,6 +806,14 @@
      than multiplied, so where they cross the green they still read as grey lines ON it,
      not as a faint darkening of it. On the bare #f4f4f4 page the two look the same. */
   .page-grid { mix-blend-mode: normal; }
+
+  /* THE GRADIENT ARRIVES FROM ABOVE (2026-11-04): on load the dome fades in as it settles
+     90 units down onto its place, over 1.4s, easing out -- a small move inside the frame,
+     not a slide in from outside it. `translate`, so the dome's own centring transform and
+     the masses' loops are left alone. */
+  .wh__dome { animation: wh-in 1.4s cubic-bezier(.22, .61, .36, 1) .2s both; }
+  @keyframes wh-in { from { opacity: 0; translate: 0 calc(-90 * var(--u)); } to { opacity: 1; translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .wh__dome { animation: none; } }
 
 </style>
 </head>

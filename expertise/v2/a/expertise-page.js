@@ -51,9 +51,9 @@
      its loop -- they merge into one line instead of darkening, and no line on the page
      reads heavier than the vertical grid. The dots sit outside the group, solid. */
 
-  // the homepage figure's entrance: 140ms hold, 175ms apart, 560ms each
-  const HOLD = 140, DUR = 560, STAGGER = 175, OPENED = HOLD + STAGGER * 3 + DUR;
-  const LAP_MIN = 11538, LAP_MAX = 20000;          // expertise.js's lap lengths
+  // the homepage figure's entrance at 2x (2026-11-04): 70ms hold, 88ms apart, 280ms each (was 140 / 175 / 560)
+  const HOLD = 70, DUR = 280, STAGGER = 88, OPENED = HOLD + STAGGER * 3 + DUR;
+  const LAP_MIN = 5769, LAP_MAX = 10000;           // the dots' laps at 2x (expertise.js's were 11538 / 20000)
   const T0 = performance.now() + (instant ? -1e5 : 380);   // opens with the grid, at 380
 
   function el(svg, tag, cls) {

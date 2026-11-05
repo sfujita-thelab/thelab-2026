@@ -1039,7 +1039,7 @@
        hero reads as a single block arriving rather than a list being filled in. 1610 is
        where the first line always started, so the intro as a whole is no shorter -- it
        just stops trailing 350ms behind itself. */
-    text:      [1610, 1610, 1610, 1610],       // 2 headline lines, body, CTA -- together
+    text:      [1000, 1000, 1000, 1000],       // together; at 1000 (2026-11-04, was 1610) -- as the figure, opening at 2x, lands
     /* THE TOPBAR, with the first grid line rather than with the type. The bar is chrome,
        not artwork -- the same reason its padding is flat px -- so it belongs to the frame
        the page assembles before it speaks: lines wipe down, bar slides down, and both are

@@ -57,7 +57,7 @@
   setTimeout(() => {
     glow.classList.add('is-on'); lit = true;
     setTimeout(() => glow.classList.add('is-set'), 950);
-  }, instant ? 0 : 1605);
+  }, instant ? 0 : 1000);   // with the figure, opening at 2x (was 1605: 380 + 1225)
   const heroFade = () => {
     const hk = Math.min(1, Math.min(1, scrollY / (innerHeight * 0.8)) * 1.05);
     return 1 - hk * hk * (3 - 2 * hk);

@@ -778,16 +778,12 @@
   .wg__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacer-24); row-gap: var(--spacer-80);
               margin: 0; padding: 0; list-style: none; }
   .wk[hidden] { display: none; }
-  /* THE ENTRANCE, the homepage's card (featuredwork.js, per card_animation.mov): the card
-     rises 26 and fades in; 60ms on, its picture's FRAME opens outward from its own centre
-     (a clip from 16% / 13% in, so the picture is never scaled); 420ms on, the client and
-     the headline slide up out of their masks, 110 apart. The armed state lands instantly
-     (transition: none), so only the reveal ever animates. The clip's start is written
-     inline by the script, as on the homepage. */
-  .wk { transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
-  .wk.pre { opacity: 0; transform: translateY(calc(26 * var(--u))); transition: none; }
-  .wk__media { transition: clip-path .95s cubic-bezier(.62,.02,.28,1); }
-  .wk.pre .wk__media { transition: none; }
+  /* THE ENTRANCE: the whole card grid fades in, once, on load, just after the hero copy
+     (was the homepage's card entrance on the first row, 2026-11-05). The list, not the
+     section: the section's ground covers the inner grid lines and must stay put. The armed
+     state lands instantly (transition: none), so only the reveal animates. */
+  .wg__list { transition: opacity .9s cubic-bezier(.22,.61,.36,1); }
+  .wg__list.pre { opacity: 0; transition: none; }
   .wk__link { display: block; color: inherit; text-decoration: none; }
   .wk__media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #e4e4e4; }
   .wk__media > video, .wk__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
@@ -890,9 +886,9 @@
           <li><button type="button" data-f="beauty-wellness" aria-pressed="false"><span class="xsub__long">Beauty &amp; Wellness</span></button></li>
           <li><button type="button" data-f="food-beverage" aria-pressed="false"><span class="xsub__long">Food &amp; Beverage</span></button></li>
           <li><button type="button" data-f="home-living" aria-pressed="false"><span class="xsub__long">Home &amp; Living</span></button></li>
-          <li><button type="button" data-f="real-estate" aria-pressed="false"><span class="xsub__long">Real Estate</span></button></li>
-          <li><button type="button" data-f="mobility" aria-pressed="false"><span class="xsub__long">Mobility</span></button></li>
-          <li><button type="button" data-f="social-impact" aria-pressed="false"><span class="xsub__long">Social Impact</span></button></li>
+          <li><button type="button" data-f="luxury" aria-pressed="false"><span class="xsub__long">Luxury</span></button></li>
+          <li><button type="button" data-f="innovation" aria-pressed="false"><span class="xsub__long">Innovation</span></button></li>
+          <li><button type="button" data-f="community" aria-pressed="false"><span class="xsub__long">Community</span></button></li>
             </ul>
             <span class="xsub__current" aria-hidden="true"></span>
             <button class="xsub__more" type="button" aria-label="Show all the industries" aria-expanded="false" aria-controls="xsub-list">
@@ -910,7 +906,7 @@
          a phone. The fourteen projects, their thumbnails and films are thelab.co/work's. -->
     <section class="wg" id="work" aria-label="Our work">
       <ul class="wg__list">
-      <li class="wk" data-f="home-living" data-card>
+      <li class="wk" data-f="home-living luxury" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><img src="assets/live/sks.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>SKS</span></span></p>
@@ -924,14 +920,14 @@
           <h2 class="wk__title"><span class="mask"><span>Bringing prebiotics to a new generation of wellness seekers</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="social-impact" data-card>
+      <li class="wk" data-f="community" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><img src="assets/live/lean-in.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>Lean In</span></span></p>
           <h2 class="wk__title"><span class="mask"><span>Expanding the reach of a global movement for women</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="real-estate" data-card>
+      <li class="wk" data-f="luxury" data-card>
         <a class="wk__link" href="../../casestudy/douglas-elliman/">
           <div class="wk__media"><img src="assets/live/douglas-elliman.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>Douglas Elliman</span></span></p>
@@ -952,14 +948,14 @@
           <h2 class="wk__title"><span class="mask"><span>Building a DTC future where snackers come first</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="home-living" data-card>
+      <li class="wk" data-f="home-living luxury" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><img src="assets/live/emtek.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>Emtek</span></span></p>
           <h2 class="wk__title"><span class="mask"><span>Making high-end hardware make sense</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="home-living" data-card>
+      <li class="wk" data-f="home-living innovation" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><video src="assets/live/tsi-dev.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
           <p class="wk__client"><span class="mask"><span>Tempur-Sealy International</span></span></p>
@@ -973,7 +969,7 @@
           <h2 class="wk__title"><span class="mask"><span>Boosting subscription with high-quality performance creative</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="mobility" data-card>
+      <li class="wk" data-f="innovation" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><video src="assets/live/supernal.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video></div>
           <p class="wk__client"><span class="mask"><span>Supernal</span></span></p>
@@ -1001,7 +997,7 @@
           <h2 class="wk__title"><span class="mask"><span>Introducing happy homemaking to the US market</span></span></h2>
         </a>
       </li>
-      <li class="wk" data-f="beauty-wellness" data-card>
+      <li class="wk" data-f="beauty-wellness community" data-card>
         <a class="wk__link" href="#">
           <div class="wk__media"><img src="assets/live/devacurl.webp" alt=""></div>
           <p class="wk__client"><span class="mask"><span>DevaCurl</span></span></p>
@@ -1094,9 +1090,8 @@
 
      THE FILTERS: All Work shows everything; an industry only its work.
 
-     THE CARDS' ENTRANCE is the homepage's (featuredwork.js), for the FIRST ROW only -- two
-     cards side by side, one on a phone -- played once on load, just after the hero copy,
-     the second 110ms after the first. Every other card is simply there. The filter only
+     THE GRID'S ENTRANCE: the whole card grid fades in, once, on load, just after the hero
+     copy (2026-11-05; was the homepage's card entrance on the first row). The filter only
      shows and hides: nothing ever animates again until the page is reloaded.
 
      THE FILMS play only while their card is on screen. */
@@ -1207,31 +1202,15 @@
       markBar();
     }
 
-    /* ============================================== the cards' entrance */
-    const CLIP = 'inset(16% 13% 16% 13%)', OPEN = 'inset(0% 0% 0% 0%)';
-    const play = !reduced;
-    // the first row: two side by side, one where the grid is a single column (a phone)
-    const perRow = getComputedStyle(document.querySelector('.wg__list')).gridTemplateColumns.split(' ').length;
-    const ws = cards.slice(0, perRow).map(card => ({ card, im: card.querySelector('.wk__media'),
-                                                     txt: [...card.querySelectorAll('.mask')] }));
-    function arm(w) {
-      w.card.classList.add('pre');
-      w.txt.forEach(m => m.classList.add('pre'));
-      if (w.im) w.im.style.clipPath = CLIP;
-    }
-    function reveal(w, i) {
-      const d = i * 110;
-      setTimeout(() => w.card.classList.remove('pre'), d);
-      setTimeout(() => { if (w.im) w.im.style.clipPath = OPEN; }, d + 60);
-      w.txt.forEach((m, j) => setTimeout(() => m.classList.remove('pre'), d + 420 + j * 110));
-    }
-    /* THE HERO FIRST: the first row waits for the hero copy to rise (app.js lifts .hpre
-       off its masks), then CARD_AFTER more */
-    const CARD_AFTER = 300;
+    /* ============================================== the grid's entrance */
+    const list = document.querySelector('.wg__list');
+    /* THE HERO FIRST: the grid waits for the hero copy to rise (app.js lifts .hpre off its
+       masks), then GRID_AFTER more */
+    const GRID_AFTER = 300;
     let started = false;
-    const go = () => { if (started) return; started = true; setTimeout(() => ws.forEach(reveal), CARD_AFTER); };
-    if (play) {
-      ws.forEach(arm);
+    const go = () => { if (started) return; started = true; setTimeout(() => list.classList.remove('pre'), GRID_AFTER); };
+    if (!reduced && list) {
+      list.classList.add('pre');
       void document.body.offsetHeight;   // paint the armed state first
       const heroCopy = document.querySelector('.page-head [data-hv]');
       if (!heroCopy || !heroCopy.classList.contains('hpre')) requestAnimationFrame(() => requestAnimationFrame(go));
@@ -1247,7 +1226,7 @@
 
     function show(f) {
       // only shown or hidden: a card that has played stays played
-      cards.forEach(c => { c.hidden = !(!f || c.dataset.f === f); });
+      cards.forEach(c => { c.hidden = !(!f || c.dataset.f.split(' ').includes(f)); });   // a card can sit in several
     }
     // PICKING ONE: it is marked on, the grid filters, and the bar closes
     links.forEach((a, j) => a.addEventListener('click', e => {

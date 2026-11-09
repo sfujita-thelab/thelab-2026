@@ -642,6 +642,10 @@
   .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture.pre,
   .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root.pre,
   .SplitBlock_mediaWrapper > picture.pre { clip-path: inset(10%); }
+  /* the hero film waits for the hero's type: hidden until it has risen in (app.js's
+     intro, 480 + .82s), then it fades up as it opens */
+  .FullWidthMedia_root > .VideoWithPlayPauseButton_root { transition: clip-path 1s cubic-bezier(.22,.61,.36,1), opacity .8s cubic-bezier(.22,.61,.36,1); }
+  .FullWidthMedia_root > .VideoWithPlayPauseButton_root.pre { opacity: 0; }
   .VideoWithPlayPauseButton_root { position: relative; overflow: hidden; background: var(--cs-media-bg); aspect-ratio: 16 / 9; }
   .VideoWithPlayPauseButton_root video,
   .ShowcaseBlock_picture img, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel img {
@@ -795,57 +799,32 @@
     .StatsBlock_StatsBlock_rtf, .StatsBlock_StatsBlock_statList { width: 100%; }
   }
 
-  /* ================================================== RELATED CASE STUDIES
-     An addition, after the stats: the heading (--font-h-56, the 8 inset), --spacer-64,
-     then two cards in the Work page's two-column card layout (work/v1's .wg / .wk,
-     as they are there, on the dark page's grey); --spacer-152 to the footer. Each card
-     plays the Work page's entrance as it comes on screen, once. */
-  /* ON THE LIGHT PAGE (#f4f4f4), full bleed, the type in #222: where the dark page ends
-     is its top edge; the outer two grid lines redrawn over it in the light page's ink
-     (the section covers .page-grid) */
-  .cs-related { padding-top: var(--spacer-104) !important; background: var(--light-gray); color: var(--black); }
-  .cs-related::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: calc(var(--m) - 1px); z-index: 0;   /* the right rule ON vline 5, not 1px inside it */ pointer-events: none;
-                        border-left: 1px solid rgb(var(--black-base) / .08); border-right: 1px solid rgb(var(--black-base) / .08);
-                        border-top: 1px solid rgb(var(--black-base) / .08); }   /* a rule across its top, v1 to v5 */
-  .cs-related::before { z-index: 1; }   /* the lines over the field, under the cards */
-  .cs-related > * { position: relative; z-index: 2; }
-  /* THE HOMEPAGE'S PROOF FIELD behind it (halo.js, HALO in config.js): green on Douglas
-     Elliman, Expertise's blue on Kentucky Legend -- the homepage's #halogl rules, under
-     the lines and the cards, faded in over its top 200 */
-  .cs-related > #halogl { position: absolute; inset: 0; width: 100%; height: 100%;
-            display: block; z-index: 0; opacity: 0; pointer-events: none;
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u)));
-                    mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u))); }
-  .cs-related__head { margin: 0 0 var(--spacer-64); padding: 0 var(--inset); font: var(--font-h-56); text-align: center; }
-  .wg { position: relative; z-index: 3; padding: 0 var(--m) var(--spacer-152); }
-  .wg__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--spacer-24); row-gap: var(--spacer-80);
-              margin: 0; padding: 0; list-style: none; }
-  .wk[hidden] { display: none; }
-  /* THE ENTRANCE, the homepage's card (featuredwork.js, per card_animation.mov): the card
-     rises 26 and fades in; 60ms on, its picture's FRAME opens outward from its own centre
-     (a clip from 16% / 13% in, so the picture is never scaled); 420ms on, the client and
-     the headline slide up out of their masks, 110 apart. The armed state lands instantly
-     (transition: none), so only the reveal ever animates. The clip's start is written
-     inline by the script, as on the homepage. */
-  .wk { transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
-  .wk.pre { opacity: 0; transform: translateY(calc(26 * var(--u))); transition: none; }
-  .wk__media { transition: clip-path .95s cubic-bezier(.62,.02,.28,1); }
-  .wk.pre .wk__media { transition: none; }
-  .wk__link { display: block; color: inherit; text-decoration: none; }
-  .wk__media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #e4e4e4; }
-  .wk__media > video, .wk__media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
-                       transition: transform .8s cubic-bezier(.22,.61,.36,1); }
-  .wk__link:hover .wk__media > video, .wk__link:hover .wk__media > img { transform: scale(1.03); }
-  .wk__client, .wk__title { padding-left: var(--inset); padding-right: var(--inset); }
-  .wk__client { margin-top: var(--spacer-16); font: var(--font-eyebrow); text-transform: uppercase; }
-  .wk__client .mask, .wk__title .mask { padding: .12em 0 .14em; margin: -.12em 0 -.14em; }   /* room for descenders in the clip */
-  .wk__title { margin-top: var(--spacer-8); font: var(--font-h-24); }
-  @media (max-width: 767px) {
-    .wg__list { grid-template-columns: minmax(0, 1fr); row-gap: var(--spacer-56); }
+  /* ================================================== UP NEXT
+     The live page's next-case-study block, as it is there: a rule above and below in
+     the v-lines' ink; "Up Next" (the section eyebrow), the client (--font-h-56) and
+     its line (body 22) across 9 columns, the button right in the last 3. On hover the
+     next study's still fills it under 40% black, the type turns white and the button
+     goes solid white. Stacked under 1024. */
+  .CaseStudies_case-studies_nextStudyBlockContainer { position: relative; z-index: 3;
+    border-top: 1px solid var(--cs-rule); border-bottom: 1px solid var(--cs-rule);   /* the v-lines' own ink */
+    background-position: 50%; background-size: cover; }
+  .CaseStudies_case-studies_nextStudyBlockContainer:hover { color: var(--white);
+    background-image: linear-gradient(rgb(var(--black-base) / .4), rgb(var(--black-base) / .4)), var(--next-study-hover-bg); }
+  .CaseStudies_case-studies_nextStudyBlockContainer:hover .Clickables_primaryButton { background: var(--white); color: var(--black); box-shadow: none; }
+  .CaseStudies_case-studies_nextStudyBlock { padding: var(--spacer-104) var(--inset); align-items: center; }   /* the 8 inset off the lines */
+  .CaseStudies_case-studies_nextStudyBlock > div { grid-column: 1 / span 9; }
+  .CaseStudies_case-studies_nextStudyBlock > div > p { margin: 0; }
+  .CaseStudies_case-studies_nextStudyBlock > div > p:first-child { font: var(--font-eyebrow); text-transform: uppercase; }   /* the section eyebrow */
+  .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(2) { margin: var(--spacer-16) 0; font: var(--font-h-56); }
+  .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(3) { font: 400 22px / 150% Beausite; }   /* body 22 (no token yet); 20 on a phone */
+  .CaseStudies_case-studies_nextStudyBlock > span { grid-column: 10 / -1; text-align: right; }
+  @media (max-width: 1023px) {
+    .CaseStudies_case-studies_nextStudyBlock { row-gap: 0; }
+    .CaseStudies_case-studies_nextStudyBlock > div, .CaseStudies_case-studies_nextStudyBlock > span { grid-column: 1 / -1; text-align: left; }
+    .CaseStudies_case-studies_nextStudyBlock > span { margin-top: 24px; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .wk__media > *, .wk__link:hover .wk__media > * { transition: none; transform: none; }
-  }
+  @media (max-width: 767px) { .CaseStudies_case-studies_nextStudyBlock > span { margin-top: 8px; }
+                              .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(3) { font-size: 20px; } }
 
   /* ======================================================== THE TEXT REVEALS
      Every block of copy comes in as Expertise's and the homepage's headers do (cs.js):
@@ -854,11 +833,13 @@
      every 60ms. Heading 95, copy 235 (110 between paragraphs), pills from 335. The masks
      are added by the script, so the markup stays the live page's. Room is kept round the
      big type's masks for its descenders. */
-  main :is(h1, h2, h3, h4) > .mask, .cs-related__head > .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
+  main :is(h1, h2, h3, h4) > .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
   main p > .mask, .ShowcaseBlock_fullCaption > span > .mask { padding: .12em 0 .14em; margin: -.12em 0 -.14em; }
-  .CaseStudies_case-studies_roleList li, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton {
+  .CaseStudies_case-studies_roleList li, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton,
+  .CaseStudies_case-studies_nextStudyBlock .Clickables_primaryButton {
     transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1), background .25s ease, color .25s ease; }
-  .CaseStudies_case-studies_roleList li.pre, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton.pre {
+  .CaseStudies_case-studies_roleList li.pre, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton.pre,
+  .CaseStudies_case-studies_nextStudyBlock .Clickables_primaryButton.pre {
     opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
 
   /* ======================================================== SMALLER SCREENS */
@@ -891,7 +872,7 @@
       <nav class="nav">
         <a href="../../work/v1/" aria-current="page">Work</a>
         <a href="../../expertise/v2/">Expertise</a>
-        <a href="#">Careers</a>
+        <a href="../../careers/v1/">Careers</a>
         <a href="#">Get connected</a>
       </nav>
       <button class="navtoggle" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
@@ -901,7 +882,7 @@
     <nav class="menu__nav">
       <a href="../../work/v1/" aria-current="page"><span>Work</span></a>
       <a href="../../expertise/v2/"><span>Expertise</span></a>
-      <a href="#"><span>Careers</span></a>
+      <a href="../../careers/v1/"><span>Careers</span></a>
       <a href="#"><span>Get connected</span></a>
     </nav>
     <div class="menu__foot">
@@ -955,27 +936,10 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
     <div><span class="stat-num" data-to="9900" data-add="count">9900</span><span>%</span></div><p><span class="mask" data-add="reveal"><span>lift in reach on Instagram</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-2.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-1"/></picture></div></li><li class="StatsBlock_StatsBlock_statContainer"><div class="StatsBlock_StatsBlock_stat">
     <div><span class="stat-num" data-to="11.7" data-add="count">11.7</span>M<span>+</span></div><p><span class="mask" data-add="reveal"><span>happy Meta ham enthusiasts in 2024</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-3.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-4"/></picture></div></li></ul></section></div>
 
-    <!-- ================================================ RELATED WORK (data-add)
-         The Work page's two-column cards (work/v1's .wg / .wk). -->
-    <section class="cs-related wg" data-add="related work">
-      <h2 class="cs-related__head">Related Work</h2>
-      <ul class="wg__list">
-      <li class="wk">
-        <a class="wk__link" href="https://www.thelab.co/case-studies/qdoba/">
-          <div class="wk__media"><img src="assets/related-qdoba.webp" alt=""></div>
-          <p class="wk__client"><span class="mask"><span>Qdoba Mexican Eats</span></span></p>
-          <h3 class="wk__title"><span class="mask"><span>Bringing more flavor to the marketplace</span></span></h3>
-        </a>
-      </li>
-      <li class="wk">
-        <a class="wk__link" href="https://www.thelab.co/case-studies/fritolay/">
-          <div class="wk__media"><img src="assets/related-fritolay.webp" alt=""></div>
-          <p class="wk__client"><span class="mask"><span>Frito-Lay</span></span></p>
-          <h3 class="wk__title"><span class="mask"><span>Building a DTC future where snackers come first</span></span></h3>
-        </a>
-      </li>
-      </ul>
-    </section>
+    <div aria-hidden="true" class="SpacerBlock_large SpacerBlock_transparent" data-spacer-block="true"></div>
+    <!-- ================================================ UP NEXT
+         The live page's next-case-study block. -->
+    <section class="CaseStudies_case-studies_nextStudyBlockContainer" style="--next-study-hover-bg:url('assets/upnext-supernal.jpg')"><div class="CaseStudies_case-studies_nextStudyBlock layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div><p>Up Next</p><p>Supernal</p><p>Opening the world to greater possibilities</p></div><span><a type="button" tabindex="0" href="https://www.thelab.co/case-studies/supernal/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent">View Case Study<div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></span></div></section>
   </main>
 
 
@@ -1103,25 +1067,7 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
     });
 
-    /* THE RELATED CARDS: the Work page's entrance, as each comes on screen, once -- the
-       card rises and fades in, its picture's frame opens from its centre, then the client
-       and the headline slide up out of their masks */
     const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cards = [...document.querySelectorAll('.cs-related .wk')];
-    if (!REDUCED && 'IntersectionObserver' in window && cards.length) {
-      const CLIP = 'inset(16% 13% 16% 13%)', OPEN = 'inset(0% 0% 0% 0%)';
-      cards.forEach(c => { c.classList.add('pre'); c.querySelectorAll('.mask').forEach(m => m.classList.add('pre'));
-                           const im = c.querySelector('.wk__media'); if (im) im.style.clipPath = CLIP; });
-      const seen = new IntersectionObserver(es => es.forEach(e => {
-        if (!e.isIntersecting) return;
-        seen.unobserve(e.target);
-        const c = e.target, d = cards.indexOf(c) * 110, im = c.querySelector('.wk__media');
-        setTimeout(() => c.classList.remove('pre'), d);
-        setTimeout(() => { if (im) im.style.clipPath = OPEN; }, d + 60);
-        c.querySelectorAll('.mask').forEach((m, j) => setTimeout(() => m.classList.remove('pre'), d + 420 + j * 110));
-      }), { threshold: 0.2 });
-      cards.forEach(c => seen.observe(c));
-    }
 
     /* ====== THE SCROLL WATCHER, Expertise v2's (expertise-sections.js): entering the band
        plays, only a BOTTOM exit re-arms, 0.12 of hysteresis between; the first pass
@@ -1148,12 +1094,15 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
     /* THE PICTURES OPEN OUT, as Expertise's: armed at once (not animated there), opened
        as each scrolls into view at 0.9 of the screen -- ONCE: they stay open when you
        scroll back up, until the page is reloaded */
+    const HERO_FILM_AT = /[?&]intro=0/.test(location.search) ? 0 : 1100;   // the hero's type lands ~1300 (480 + .82s)
     if (!REDUCED) document.querySelectorAll('.FullWidthMedia_root > .VideoWithPlayPauseButton_root, .ShowcaseBlock_showcaseImage, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root, .SplitBlock_mediaWrapper > picture').forEach(m => {
       m.style.transition = 'none';
       m.classList.add('pre');
       void m.offsetWidth;
       m.style.transition = '';
-      watch(m, 0.9, () => m.classList.remove('pre'), () => {});   // once: no re-arm, until reload
+      // the hero film opens only once the hero's type is in: at HERO_FILM_AT from load
+      const wait = m.closest('.FullWidthMedia_root') ? () => Math.max(0, HERO_FILM_AT - performance.now()) : () => 0;
+      watch(m, 0.9, () => setTimeout(() => m.classList.remove('pre'), wait()), () => {});   // once: no re-arm, until reload
     });
 
     /* THE STATS COUNT UP, the homepage proof's (proof.js): the header at 0.80 of the
@@ -1249,8 +1198,11 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
     });
     // each caption under a film or picture
     document.querySelectorAll('.ShowcaseBlock_fullCaption > span').forEach(c => textBlock(c, [[mask(c), 0]]));
-    // the Related Work heading (its cards have the Work page's own entrance)
-    document.querySelectorAll('.cs-related__head').forEach(h => textBlock(h, [[mask(h), 0]]));
+    // Up Next: its three lines (0, 95, 235), the button after them
+    document.querySelectorAll('.CaseStudies_case-studies_nextStudyBlock').forEach(b => {
+      const ps = [...b.querySelectorAll(':scope > div > p')];
+      textBlock(b, [...ps.map((p, j) => [mask(p), [0, 95, 235][j]]), [b.querySelector('.Clickables_primaryButton'), 335]]);
+    });
 
     addEventListener('scroll', gates, { passive: true });
     (function pump() { gates(); if (pumped < 3) requestAnimationFrame(pump); })();
@@ -1258,7 +1210,6 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
     // the live page's two icons: two bars while it plays, a filled triangle while paused
     const PATH = { pause: 'M6 2H4v12h2V2Zm6 0h-2v12h2V2Z', play: 'M14.67 8 3.33 15.33V.67L14.66 8Z' };
     const films = [...document.querySelectorAll('.VideoWithPlayPauseButton_root video')];
-    const cardFilms = [...document.querySelectorAll('.wk__media > video')];
     films.forEach(v => {
       v.removeAttribute('autoplay');
       const btn = v.parentNode.querySelector('.VideoWithPlayPauseButton_button');
@@ -1274,11 +1225,11 @@ Kentucky Legend came to us to level up their look, feel and marketing to ensure 
         if (v.paused) { v.dataset.held = ''; v.play().catch(() => {}); } else { v.dataset.held = '1'; v.pause(); }
       });
     });
-    if (!('IntersectionObserver' in window)) { films.concat(cardFilms).forEach(v => v.play().catch(() => {})); return; }
+    if (!('IntersectionObserver' in window)) { films.forEach(v => v.play().catch(() => {})); return; }
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (e.isIntersecting) { if (!e.target.dataset.held) e.target.play().catch(() => {}); } else e.target.pause();
     }), { rootMargin: '200px 0px' });
-    films.concat(cardFilms).forEach(v => io.observe(v));
+    films.forEach(v => io.observe(v));
   })();
 
   </script>

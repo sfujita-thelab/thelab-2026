@@ -10,6 +10,8 @@ v2/
 !expertise/v2/
 # ...and the Work page's v1 (2026-11-03)
 !work/v1/
+# ...and the Careers page's v1 (2026-11-09)
+!careers/v1/
 _archive/
 
 # Measurement screenshots from the build sessions. 54MB of PNGs, none of it source.

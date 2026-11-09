@@ -1333,6 +1333,9 @@
   /* the clipped start state is set inline by featuredwork.js so the transition is
      unambiguous; this rule only supplies the timing */
   .card__img { transition: clip-path .95s cubic-bezier(.62,.02,.28,1); }
+  /* THE WHOLE CARD IS THE LINK: an empty anchor stretched over it (the card's markup and
+     layout untouched) -- Douglas Elliman to its case study here, the others to thelab.co */
+  .card__link { position: absolute; inset: 0; z-index: 5; }
   .card__meta { transition: opacity .6s ease .12s, transform .6s cubic-bezier(.22,.61,.36,1) .12s; }
 
   /* ---- ARMING IS INSTANT; ONLY THE REVEAL ANIMATES ---------------------------
@@ -2147,6 +2150,8 @@
     .featuredwork .sec-head__body { margin-bottom: var(--spacer-24); }
     /* 44 -> --spacer-80, which is 40 on mobile. Picked by the mobile column. */
     .card { position: static; width: auto; height: auto; margin: var(--spacer-80) var(--m) 0; }
+    /* in the flow here, but still the box the card's link stretches over */
+    .featuredwork .card, .featuredwork__col > .card--2 { position: relative; }
     .card__img { position: static; width: 100%; height: auto; aspect-ratio: 1; }
     /* Everything the card used to re-declare here now comes from its tokens: p-16 is
        14, h-24 is 20, eyebrow is a flat 12, and the two margins are --spacer-16 (8)
@@ -3455,7 +3460,7 @@
       <nav class="nav">
         <a href="../../work/v1/">Work</a>
         <a href="../../expertise/v2/">Expertise</a>
-        <a href="#">Careers</a>
+        <a href="../../careers/v1/">Careers</a>
         <a href="#">Get connected</a>
       </nav>
       <!-- THE PHONE'S TRIGGER. Lives in the bar beside the logo, which is where
@@ -3478,7 +3483,7 @@
     <nav class="menu__nav">
       <a href="../../work/v1/"><span>Work</span></a>
       <a href="../../expertise/v2/"><span>Expertise</span></a>
-      <a href="#"><span>Careers</span></a>
+      <a href="../../careers/v1/"><span>Careers</span></a>
       <a href="#"><span>Get connected</span></a>
     </nav>
     <div class="menu__foot">
@@ -3569,6 +3574,7 @@
             <h3 class="card__title"><span class="mask"><span>Turning innovation into Technicurean desire</span></span></h3>
             <span class="mask mask--pill"><span><span class="pill">Experience Design</span><span class="pill">Platform</span></span></span>
           </div>
+                  <a class="card__link" href="https://www.thelab.co/case-studies/sks/" target="_blank" rel="noopener" aria-label="SKS case study"></a>
         </article>
         </div>
 
@@ -3582,6 +3588,7 @@
             <h3 class="card__title"><span class="mask"><span>Bringing prebiotics to a new generation of wellness seekers</span></span></h3>
             <span class="mask mask--pill"><span><span class="pill">Performance Marketing</span><span class="pill">E-commerce</span></span></span>
           </div>
+                  <a class="card__link" href="https://www.thelab.co/case-studies/tula/" target="_blank" rel="noopener" aria-label="Tula case study"></a>
         </article>
         <article class="card card--3" data-card>
           <div class="card__img"><img src="assets/card-elliman.webp" alt=""></div>
@@ -3590,6 +3597,7 @@
             <h3 class="card__title"><span class="mask"><span>Launching a new world of luxury real estate</span></span></h3>
             <span class="mask mask--pill"><span><span class="pill">Platform</span><span class="pill">Brand Design</span></span></span>
           </div>
+                  <a class="card__link" href="../../casestudy/douglas-elliman/" aria-label="Douglas Elliman case study"></a>
         </article>
 
         <div class="ticker" data-rv="7" aria-hidden="true">

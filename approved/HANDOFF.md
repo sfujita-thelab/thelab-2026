@@ -49,7 +49,7 @@ Working prototype, for alignment and dev scoping. Not production code.
 | [`shared/`](https://github.com/sfujita-thelab/thelab-2026/tree/main/approved/shared) | **One copy for every page:** `thelab-tokens.css`, `shaders.js`, `footer.js`, `footer-glow.js`, `contact.js`, `halo.js`, `hero-glow.js`. |
 | [`NEW-TOKENS.md`](https://github.com/sfujita-thelab/thelab-2026/blob/main/approved/NEW-TOKENS.md) | Token changes against the live site, with impact. Adds `--placeholder-gray` (2026-11-11). |
 | [`TOKENS-REFERENCE.md`](https://github.com/sfujita-thelab/thelab-2026/blob/main/approved/TOKENS-REFERENCE.md) | What each token resolves to per breakpoint. |
-| [`README.md`](https://github.com/sfujita-thelab/thelab-2026/blob/main/approved/README.md) | The WebGL work, `config.js`, URL flags. Its file list predates `shared/`. |
+| [`README.md`](https://github.com/sfujita-thelab/thelab-2026/blob/main/approved/README.md) | Project overview, scope and sitemap. The detailed build notes stay in v1's [`homepage/approved/README.md`](https://github.com/sfujita-thelab/thelab-2026/blob/main/homepage/approved/README.md). |
 | `config.js` · `app.js` | One per page: `approved/`, `approved/expertise/`, `approved/work/`. See *Per-page files*. |
 | `expertise/expertise-page.js` | The travelling figure, the subnav. |
 | `expertise/expertise-sections.js` | Scroll reveals, case-study frames, the accordion, the cursor. |

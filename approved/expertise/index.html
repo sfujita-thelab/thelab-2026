@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no,address=no,email=no,date=no">
+<title>Expertise — thelab</title>
+
+<!-- EXPERTISE PAGE, v1/a.
+
+     The page: a short hero, the four areas as a sticky bar of anchor links, and the
+     four areas -- each a centred header with what's included as pills, then its
+     featured work full width at 16:9 with the copy on the picture.
+
+     THE GRAPHIC is the homepage's Expertise figure. The hero has it whole; each area
+     takes its own loop from it and splits that one circle into a shape of its own as
+     it scrolls in (expertise-page.js says which and why). The colour is one tone at a
+     time, multiplied onto the page as the homepage hero's gradient is.
+
+     Shared parts are the approved homepage's. hero-glow.js and halo.js are in the
+     folder from the copy but not loaded. -->
+<link rel="stylesheet" href="../shared/thelab-tokens.css?v=20261111">
+
+<style>
+  /* ============================================================ homepage: base */
+  :root {
+    --m: 40px;
+    --col: 340px;
+    --u: 1px;
+    --inset: var(--spacer-8);
+    --grain-a: .08;       /* grain layer opacity, everywhere (light and dark): 8% (2026-11-04); was .124, .131, .138, which was 20% under .172, 30% under .245 (2026-11-04) */
+    --pad-top: 32px;
+    --pad-bottom: 66px;
+    --font: Beausite, -apple-system, "Segoe UI", Arial, sans-serif;
+    /* the page's one horizontal rule: the grid line's own weight, as the topbar uses it */
+    --rule: rgb(var(--black-base) / var(--grid-a, .08));
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: auto; background: var(--color-primary); overflow: visible; }
+  html, body { overflow-x: clip; }
+  body { font-family: var(--font); color: var(--color-text-primary); -webkit-font-smoothing: antialiased; }
+  ul { list-style: none; }
+
+  #fallback[hidden] { display: none; }
+  #fallback { position: fixed; inset: 0; display: grid; place-items: center;
+              text-align: center; padding: var(--spacer-24); color: var(--color-text-secondary); }
+
+  .page-bg { position: fixed; inset: 0; background: var(--color-primary); z-index: -1; }
+  #stage { display: block; position: fixed; inset: 0; z-index: 0; width: 100vw; height: 100vh; }
+
+  .page-grid { position: fixed; inset: 0; z-index: 2; pointer-events: none;
+               mix-blend-mode: multiply; }
+  .page-grid i { position: absolute; top: 0; bottom: 0; width: 1px;
+                 background: rgb(var(--black-base) / var(--grid-a, .08));
+                 transform-origin: top center; transform: scaleY(0);
+                 transition: transform .70s cubic-bezier(.62,.02,.34,1); }
+  .page-grid.drawn i  { transform: scaleY(1); }
+  .page-grid.toned i  { background: rgb(var(--black-base) / var(--grid-a, .08)); }
+  .page-grid.settled i { transition: none; transform: none;
+                         background: rgb(var(--black-base) / var(--grid-a, .08)); }
+
+  .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+           background-image: url(assets/grain.png);
+           background-repeat: repeat;
+           background-size: calc(446 * var(--u)) calc(446 * var(--u));
+           mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
+
+  main { position: relative; }
+
+  /* ==================================================== homepage: topbar + nav */
+  .logo { display: flex; align-items: center; text-decoration: none; color: inherit; }
+  .logo svg { display: block; height: 30px; width: auto; flex: none; }
+
+  .nav { display: flex; gap: var(--spacer-32); }
+  .nav a {
+    position: relative;
+    font: var(--font-button-1); text-transform: uppercase;
+    text-decoration: none; color: inherit; white-space: nowrap;
+    opacity: .92;
+  }
+  /* the underline wipe -- the homepage's one link hover, reused below for every text link */
+  .nav a::after, .tlink::after {
+    content: ""; position: absolute;
+    left: 0; right: 0; bottom: calc(-7 * var(--u)); height: 1px;
+    background: currentColor;
+    transform: scaleX(0); transform-origin: right;
+    transition: transform .18s cubic-bezier(.5, 0, .78, .25);
+  }
+  .nav a:hover::after, .tlink:hover::after, a:hover > .tlink::after {
+    transform: scaleX(1); transform-origin: left;
+    transition: transform .28s cubic-bezier(.22, .61, .36, 1);
+  }
+  /* THE PAGE YOU ARE ON (2026-11-04): its nav link keeps the hover's underline */
+  .nav a[aria-current="page"]::after { transform: scaleX(1); }
+  @media (prefers-reduced-motion: reduce) {
+    .nav a::after, .nav a:hover::after, .tlink::after, .tlink:hover::after { transition: none; }
+  }
+
+  .navtoggle { display: none; background: none; border: 0; padding: 0; cursor: pointer;
+               font: var(--font-button-1); text-transform: uppercase; color: inherit;
+               letter-spacing: inherit; }
+
+  .menu { position: fixed; inset: 0; z-index: 5; display: none;
+          background: var(--color-primary); color: var(--color-text-primary);
+          flex-direction: column; overflow-y: auto;
+          padding: calc(2 * var(--spacer-24) + 24px + var(--spacer-24))
+                   calc(var(--m) + var(--inset))
+                   var(--spacer-40);
+          opacity: 0; pointer-events: none;
+          transition: opacity .32s cubic-bezier(.22,.61,.36,1); }
+  .menu.is-open { opacity: 1; pointer-events: auto; }
+  .menu::before { content: ""; position: absolute; left: 0; right: 0;
+                  top: calc(2 * var(--spacer-24) + 24px);
+                  height: 1px; background: var(--color-nav-border); }
+  .menu__nav { display: flex; flex-direction: column; }
+  .menu__nav a { display: flex; align-items: center;
+                 padding: var(--spacer-32) 0;
+                 margin-left:  calc(-1 * (var(--m) + var(--inset)));
+                 margin-right: calc(-1 * (var(--m) + var(--inset)));
+                 padding-left:  calc(var(--m) + var(--inset));
+                 padding-right: calc(var(--m) + var(--inset));
+                 color: var(--color-text-primary); text-decoration: none;
+                 font: var(--font-h-32); text-transform: uppercase; }
+  .menu__nav a + a { border-top: 1px solid var(--color-nav-border); }
+  .menu__foot { margin-top: auto; padding-top: var(--spacer-56);
+                display: flex; align-items: center; justify-content: space-between;
+                gap: var(--spacer-16); }
+  .menu__social { display: flex; align-items: center; gap: var(--spacer-12); }
+  .menu__icon { display: grid; place-items: center; flex: none; color: var(--color-text-primary); }
+  .menu__icon svg { width: 24px; height: 24px; display: block; }
+  .menu__foot p { color: var(--color-text-primary); font: var(--font-p-14); margin: 0; }
+  .menu__foot p a { color: inherit; text-decoration: none; }
+  .menu__foot p a:hover { text-decoration: underline; }
+  @media (prefers-reduced-motion: reduce) { .menu { transition: none; } }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 6; pointer-events: none;
+    padding: var(--spacer-24) calc(var(--m) + var(--inset));
+    transition: transform .4s cubic-bezier(.5, 0, .78, .25), color .22s ease,
+                background-color .25s ease, border-color .25s ease;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+  .topbar.is-away { transform: translateY(calc(-100% - 10px)); }
+  .topbar.is-back { transition: transform .55s cubic-bezier(.22, .61, .36, 1),
+                                color .22s ease,
+                                background-color .25s ease, border-color .25s ease; }
+  .topbar.is-preload { transform: translateY(calc(-100% - 10px)); transition: none; }
+  .topbar.is-solid { background: var(--color-primary);
+                     border-bottom-color: rgb(var(--black-base) / var(--grid-a, .08)); }
+  .topbar.is-solid.on-dark { background: var(--black);
+                             border-bottom-color: rgb(var(--light-gray-base) / .04); }
+  .topbar::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url(assets/grain.png);
+    background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .topbar.is-solid::after { opacity: var(--grain-a, .08); }
+  .topbar > * { position: relative; z-index: 1; }
+  .topbar a, .topbar button { pointer-events: auto; }
+  .topbar a { transition: color .22s ease; }
+  .topbar.on-dark, .topbar.on-dark a { color: var(--color-text-contrast); }
+  .topbar.is-menu, .topbar.is-menu a, .topbar.is-menu .navtoggle { color: var(--color-text-primary); }
+  @media (prefers-reduced-motion: reduce) { .topbar { transition: none; } }
+
+  /* ================================================================== HERO */
+  /* After expertise.png. The homepage's Expertise figure at its own size -- four grid
+     columns by two, the loops tangent to the centre line -- with the copy centred on
+     it: eyebrow, headline at --font-h-64, body, the block two columns wide. The figure
+     and the copy share one grid cell, so the hero is the figure's height (or the copy's,
+     where that is taller) and the bar follows straight under it.
+
+     .page-head__fig is an EMPTY BOX: the figure itself is drawn on .travel, the fixed layer it
+     leaves the hero on, and this box is where expertise-page.js reads its place. */
+  /* ONE SCREEN, the figure centred in it -- the same room above and below, the
+     topbar's height, so it clears the bar on a short screen and the hero grows rather
+     than crowding it. It is a screen LESS the bar's height, so the bar sits on the
+     first screen's bottom edge. A phone keeps a hero as tall as its copy. */
+  /* the hero SCROLLS with the page (it held -- sticky -- until the first area slid up
+     over it; removed 2026-11-04) */
+  /* minmax(0, 1fr): the column is the hero's own width, so the copy's max-width: 100% has
+     something to hold to -- an auto column sized itself to the copy, 469 wide on a 375 phone */
+  .page-head { position: relative; z-index: 3; display: grid; place-items: center;
+        grid-template-columns: minmax(0, 1fr);
+        --xnav-h: 0px;                               /* v1/b: a floating pill, not a bar -- no room kept */
+        min-height: calc(100vh - var(--xnav-h));
+        /* the room UNDER the figure is the bar's height less than the room over it, so the
+           figure's centre is the middle of the SCREEN, not of the screen less the bar */
+        padding: calc(2 * var(--spacer-24) + 24px) var(--m) calc(2 * var(--spacer-24) + 24px - var(--xnav-h)); }
+  @media (max-width: 767px) {
+    .page-head { min-height: 0; padding-bottom: var(--spacer-24); }
+  }
+  .page-head > .page-head__fig, .page-head > .page-head__content { grid-area: 1 / 1; }
+  .page-head__fig { width: calc(4 * var(--col)); aspect-ratio: 2 / 1; }
+  /* v1/c, PHONE: the hero fills the screen (100svh, the height left by the browser's bars)
+     and the figure sits ABOVE the copy rather than behind it, 40 between them, the pair
+     centred in the screen. A tablet keeps the full-measure figure with the copy over it. */
+  @media (max-width: 767px) {
+    .page-head { min-height: 100svh; grid-template-rows: auto auto; align-content: center;
+                 row-gap: var(--spacer-40); padding-bottom: var(--spacer-40); }
+    .page-head > .page-head__fig { grid-area: 1 / 1; }
+    .page-head > .page-head__content { grid-area: 2 / 1; }
+  }
+  /* the headline 60% of the full measure, lines 1 to 5 (2026-11-04, was 70%); the body two columns under it */
+  .page-head__content { width: calc(4 * var(--col) * .6); max-width: 100%; text-align: center; }
+  /* v1/c: on a tablet the headline takes 80% of the full measure, line 1 to line 5 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .page-head__content { width: calc(4 * var(--col) * .8); }
+  }
+  .page-head .sec-head__eyebrow { margin-bottom: var(--spacer-16); }
+  h1 { display: flex; flex-direction: column; padding: 0 var(--inset); font: var(--font-h-64); }
+  h1 .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
+  h1 .mask.hpre > span { transform: translateY(118%); }
+  /* the slides block is pulled up over the hero: its empty viewport lets clicks through
+     to the hero below, its panels still take them */
+  .slides, .slides__viewport { pointer-events: none; }
+  .slides__viewport > .slide { pointer-events: auto; }
+  .page-head__body { width: calc(2 * var(--col)); max-width: 100%; margin: var(--spacer-24) auto 0;
+              padding: 0 var(--inset); font: var(--font-p-18); }
+  @media (max-width: 767px) { .page-head__fig { width: calc(2 * var(--col)); } }
+  /* v1/c: on a tablet the body is 70% of the full measure, line 1 to line 5 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .page-head__body { width: calc(4 * var(--col) * .7); }
+  }
+
+  /* THE SUBNAV (v1/b, in place of the bar): one dark pill, FIXED at the foot of the
+     screen, centred. Over the hero it holds all four areas as links; once the page is in
+     the areas it closes down to the area you are in and a +, which opens the four again
+     (the + turning to a x). expertise-page.js runs it. */
+  /* WHERE IT SITS (expertise-page.js writes --xsub-b, the gap under it): ANCHORED TO THE
+     SCREEN'S FOOT, so a change of its own height (opening, closing down) grows or shrinks
+     it upward from a bottom edge that does not move, and a phone's browser bar coming and
+     going cannot shift it. 32 above the foot from the first screen on (it was 40 over the
+     resting hero); below the screen as Reasons arrives. Only that move glides. */
+  .xsub { position: fixed; left: 50%; top: auto; bottom: var(--xsub-b, -200px); z-index: 5; pointer-events: auto;
+          transform: translateX(-50%); max-width: calc(100vw - 2 * var(--m));
+          opacity: 0; transition: opacity .6s ease; }
+  .xsub.is-ready { transition: bottom .7s cubic-bezier(.22,.61,.36,1), opacity .6s ease; }
+  .xsub.is-in { opacity: 1; }
+  .xsub.is-off { opacity: 0; pointer-events: none; }
+  /* WHITE, with the area you are in in #222; when it closes down or opens up its width
+     glides between the two (expertise-page.js) */
+  .xsub__pill { display: flex; align-items: center; justify-content: center; gap: var(--spacer-4);
+                padding: var(--spacer-4); border-radius: 999px; overflow: hidden; white-space: nowrap;
+                background: var(--white); color: var(--black);
+                transition: width .7s cubic-bezier(.22,.61,.36,1), height .7s cubic-bezier(.22,.61,.36,1); }
+  /* the four (over the hero, or opened from the +): the pill's 4 all round, so a highlight
+     sits 4 inside it on every side -- 20 from the pill's edge to the first and last label
+     (4 + the label's own 16; 12 on a phone) */
+  .xsub:not(.is-compact) .xsub__pill, .xsub.is-open .xsub__pill { padding-left: var(--spacer-4); padding-right: var(--spacer-4); }
+  /* ...and it may run to 8 from the screen's edges rather than the 20 margin: the four are
+     346 wide, which a 375 screen's margins (335) would clip */
+  @media (max-width: 767px) { .xsub { max-width: calc(100vw - 16px); } }
+  /* what it shows fades in behind the glide: a beat late, and slower */
+  .xsub__pill > * { animation: xsub-in .6s ease .1s both; }
+  @keyframes xsub-in { from { opacity: 0; } }
+  /* the four, each a pill inside the pill; the area you are in inverted */
+  /* the active and hover pills: 16 each side of the label, and a 4 GAP between items so
+     they never touch (36 label to label). A phone keeps 8 each side -- the four only just
+     fit its width as it is. */
+  .xsub__list { display: flex; gap: var(--spacer-4); margin: 0; padding: 0; list-style: none; }
+  .xsub__list a { display: block; padding: var(--spacer-8) var(--spacer-16); border-radius: 999px;
+                  color: inherit; text-decoration: none; white-space: nowrap; font: var(--font-p-16);
+                  transition: background-color .2s ease, color .2s ease; }
+  .xsub__list a:hover { background: rgb(var(--black-base) / .06); }
+  .xsub__list a.is-on { background: var(--black); color: var(--white); }
+  .xsub__short { display: none; }
+  /* A PHONE keeps the FULL names -- never trimmed -- so the four go in a VERTICAL LIST, one
+     to a row, each row the list's full width; the pill rounds its corners (20) rather than
+     capping its ends */
+  /* ...and a TABLET takes the phone's subnav too (closed, a vertical list when open), at
+     its own type size: --font-p-16 is 16 on a tablet, the phone's 14 below 768 */
+  @media (max-width: 1023px) {
+    .xsub__list { flex-direction: column; align-items: stretch; gap: var(--spacer-4); }
+    .xsub__list a { padding-left: var(--spacer-12); padding-right: var(--spacer-12); font: var(--font-p-16); text-align: left; }
+    .xsub__pill { border-radius: 20px; }
+    /* CLOSED, it is always a full pill (9999), as the Work page's filter; only the open
+       list takes the 20 */
+    .xsub.is-compact:not(.is-open) .xsub__pill { border-radius: 9999px; }
+  }
+  /* PHONE, CLOSED: 16 from the pill's edge to the label on the left (the pill's 4 plus the
+     label's --spacer-16, 12 on a phone) and to the + on the right (--spacer-24, 16 on a
+     phone) -- as the Work page's filter */
+  @media (max-width: 767px) {
+    .xsub.is-compact:not(.is-open) .xsub__pill { padding-right: var(--spacer-24); }
+    .xsub.is-compact:not(.is-open) .xsub__current { padding-left: var(--spacer-16); }
+    /* ...and OPEN, the same 16 each side: the pill's 4 plus each item's --spacer-16 (12) */
+    .xsub__list a { padding-left: var(--spacer-16); padding-right: var(--spacer-16); }
+  }
+  @media (max-width: 767px) {
+    .xsub__list a { font: var(--font-p-14); }
+  }
+  /* CLOSED DOWN (in the areas): the current area's name and the + */
+  /* --spacer-16 from the pill's edge to the name (the pill's 4 + 12 here), matching the
+     --spacer-16 either side of the + on the right */
+  .xsub__current { display: none; padding: var(--spacer-8) var(--spacer-4) var(--spacer-8) calc(var(--spacer-16) - var(--spacer-4));
+                   white-space: nowrap; font: var(--font-p-16); }
+  /* EQUAL SPACE EACH SIDE OF THE + / x: --spacer-16 from the text to the icon and from the
+     icon to the pill's edge. The button is the icon's own width; the margins make up the
+     16 against what is already there (closed: the name's 4 + the 4 gap; open: the last
+     label's 12 + the gap), and the pill's right padding is the 16. A wider hit area
+     sits around it (::after) without moving anything. */
+  .xsub__more { display: none; flex: none; position: relative; width: 14px; height: 36px;
+                margin-left: calc(var(--spacer-16) - 2 * var(--spacer-4));
+                padding: 0; border: 0;
+                align-items: center; justify-content: center; cursor: pointer;
+                background: none; color: var(--black);   /* v1/b: the bare + and x, no circle */
+                transition: opacity .2s ease; }
+  .xsub__more:hover { opacity: .6; }
+  .xsub__more svg { width: 14px; height: 14px; transition: transform .25s ease; }
+  .xsub.is-compact .xsub__more { display: flex; }
+  .xsub.is-compact:not(.is-open) .xsub__list { display: none; }
+  .xsub.is-compact:not(.is-open) .xsub__current { display: block; }
+  /* OPEN, there is no x: the + goes and the four stand alone. It closes as the pointer
+     leaves, on a pick, on a tap elsewhere, or on Escape (expertise-page.js). */
+  .xsub.is-compact.is-open .xsub__more { display: none; }
+  /* ...and the closed pill's 16 on the right goes with it: open, the pill is 4 all round */
+  .xsub.is-compact.is-open .xsub__pill { padding-right: var(--spacer-4); }
+  .xsub.is-compact .xsub__pill { padding-right: var(--spacer-16); }
+  .xsub__more::after { content: ""; position: absolute; inset: 0 -10px; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  /* =========================================================== THE GRAPHIC */
+  /* .travel: the one fixed, full-screen layer the hero figure is drawn on, in screen
+     pixels, so it can hold its place while the hero leaves and land in Digital
+     Experiences. Under the content (z 3) and the bar, over the colour. */
+  /* THE HOMEPAGE'S EXPERTISE GLOW behind the hero figure (page-glow.js): one round fixed
+     element, 380 units in radius (2.02x on a phone), under .travel so the wires draw over
+     it; the opaque slides cover it as they come up */
+  .page-glow { --glow-r: calc(380 / 1440 * 100vw);
+               position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;
+               width: calc(2 * var(--glow-r)); height: calc(2 * var(--glow-r));
+               margin: calc(-1 * var(--glow-r)) 0 0 calc(-1 * var(--glow-r));
+               opacity: 0; transition: opacity .9s ease; will-change: transform; }
+  .page-glow.is-on { opacity: 1; }
+  .page-glow.is-set { transition: none; }   /* lit: page-glow.js fades it with the hero */
+  @media (max-width: 767px) { .page-glow { --glow-r: calc(380 * 2.02 / 1440 * 100vw); } }
+  .travel { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2;
+            pointer-events: none; overflow: visible; }
+  .travel .wire, .xg .wire { fill: none; stroke: var(--black); stroke-width: 1px;
+                            vector-effect: non-scaling-stroke; }
+  /* the grid line's own alpha, on the group, so overlapping lines do not add up */
+  .travel .ink, .xg .ink { opacity: .13; }   /* the homepage hero graphic's outline: black at 13%, fixed (2026-11-04), not the grid's --grid-a */
+
+  .travel .dot, .xg .dot { fill: var(--black); transition: opacity .7s ease; }
+  .xg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  /* side by side, 02-04's circle is the held figure on .travel; their own drawing is
+     for the stacked layout only */
+  @media (min-width: 1024px) { .xa__fig .xg { display: none; } }
+
+  /* THE COLOUR. A full-screen canvas MULTIPLIED onto the page, as the homepage hero's
+     gradient is, one tone at a time, gathered on the middle of the screen. */
+  /* HIDDEN FOR NOW: delete this rule to bring the colour back */
+  .field { display: none !important; }
+  .field { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1;
+           pointer-events: none; mix-blend-mode: multiply; opacity: 0; }
+
+  /* ========================================================== homepage: CTA pill */
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--black); color: var(--color-text-contrast); border: 0; cursor: pointer;
+    font: var(--font-button-1); text-transform: uppercase;
+    padding: var(--spacer-8) var(--spacer-56);
+    border-radius: 999px; white-space: nowrap; text-decoration: none;
+    transition: background .25s ease, transform .25s ease;
+  }
+  /* THE OUTLINED PILL, on light. The homepage has it on dark only (.pf__cta, a 1px
+     ring in the ink colour); this is that pill in #222 ink. The ring is an inset
+     shadow rather than a border so the outlined pill is exactly as tall as the filled
+     one beside it -- a border would add 2px. */
+
+  .cta__clip {
+    display: block; overflow: hidden;
+    height: var(--cta-line, 1.2em); line-height: var(--cta-line, 1.2em);
+  }
+  .cta__roll { display: block; will-change: transform;
+               transition: transform .30s cubic-bezier(.22,.61,.36,1); }
+  .cta__roll > span { display: block; height: var(--cta-line, 1.2em); }
+  .cta:hover .cta__roll,
+  .pf__cta:hover .cta__roll { transform: translateY(calc(-1 * var(--cta-line, 1.16em))); }
+  .cta:active { transform: scale(.985); }
+
+  /* ================================================ homepage: masks + reveals */
+  .mask { display: block; overflow: hidden; }
+  .mask > span {
+    display: block;
+    transition: transform .82s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+  }
+  .mask.pre > span, .mask.hpre > span { opacity: 0; }
+  .mask.pre > span, .mask.hpre > span { transform: translateY(104%); transition: none; }
+  .mask--cta { padding: 2px 2px 3px; margin: -2px -2px -3px; }
+
+  [data-rv], .card {
+    transition: opacity .72s cubic-bezier(.22,.61,.36,1),
+                transform .72s cubic-bezier(.22,.61,.36,1);
+  }
+  [data-rv].pre, .card.pre { opacity: 0; transform: translateY(calc(26 * var(--u)));
+                             transition: none; }
+
+  /* ===================================================== homepage: section header */
+  .sec-head { padding: 0 var(--inset); }
+  .sec-head--left   { text-align: left; }
+
+  .sec-head__eyebrow { margin: 0 0 var(--spacer-16);
+                       font: var(--font-eyebrow); text-transform: uppercase; }
+  .sec-head__title { display: flex; flex-direction: column;
+                     margin: 0 0 var(--spacer-24); font: var(--font-h-56); }
+  .sec-head__title .mask { overflow: hidden; padding: .16em 0 .12em; margin: -.16em 0 -.12em; }
+  .sec-head__body { width: 80%; }
+  /* as the homepage: the shared rule holds only the measure; each section that uses a
+     header sets its body's type and the gap under it (2026-11-11) */
+  .slide__copy .sec-head__body, .faq .sec-head__body { margin: 0 0 var(--spacer-24); font: var(--font-p-18); }
+
+  /* GLOBAL: a header body with nothing after it (no CTA, no pills) ends the header, so it
+     carries no margin below -- the space after a header belongs to what follows it */
+  .sec-head .sec-head__body:last-child { margin-bottom: 0; }
+  @media (min-width: 1024px) {
+    .sec-head--left .sec-head__title { padding-right: var(--spacer-80); }
+  }
+
+  /* ============================================================ homepage: card */
+  .card { position: relative; width: calc(2 * var(--col)); height: calc(340 * var(--u)); }
+
+  .pill {
+    display: inline-block; border: 1px solid rgb(var(--black-base) / .42); border-radius: 999px;
+    white-space: nowrap;
+    font: var(--font-tag);
+    padding: var(--spacer-4) var(--spacer-8);
+  }
+  /* A card with no picture yet. The frame keeps the homepage's own empty-card grey and
+     carries the nine-dot mark drawn the way the homepage hero draws it -- a hairline in
+     the grid's weight -- so a missing image reads as a held place, not a broken one.
+     It takes the same hover scale a picture does. */
+  .card__ph { width: 100%; height: 100%; display: grid; place-items: center;
+              transition: transform .9s cubic-bezier(.22,.61,.36,1); }
+  .card__ph svg { width: 36%; height: auto; overflow: visible; }
+  .card__ph circle { fill: none; stroke: rgb(var(--black-base) / .2);
+                     stroke-width: 1px; vector-effect: non-scaling-stroke; }
+
+  .cs-cursor {
+    position: fixed; left: 0; top: 0; z-index: 8; pointer-events: none;
+    width: 116px; height: 116px;
+    margin-left: -58px; margin-top: -58px;
+    border-radius: 50%;
+    display: grid; place-items: center; text-align: center;
+    background: var(--black);
+    box-shadow: 0 2px 28px rgb(var(--black-base) / .22);
+    opacity: 0;
+    transition: opacity .42s cubic-bezier(.22,.61,.36,1);
+  }
+  .cs-cursor.on { opacity: 1; }
+  .cs-cursor span { font: var(--font-button-2); text-transform: uppercase; color: var(--color-text-contrast); }
+  @media (hover: none) { .cs-cursor { display: none; } }
+  .cs-cursor { display: none; }   /* v1/c: hidden -- the panel's own View Case Study button stays */
+  /* over a slide's right half the disc is up and a click opens the case (expertise-sections.js) */
+  html.cs-over, html.cs-over * { cursor: pointer; }
+
+  /* ============================================================ AREA SECTIONS */
+  /* 2026-10-23, AFTER expertise/old (its services block, measured in the browser): one
+     viewport PINNED for the length of the four areas, each panel a full screen, stacked
+     inside it. expertise-page.js runs the sequence on one number -- how many panels have
+     come up -- eased toward the scroll the way the old page's scrub was:
+       incoming  rises from below at the full rate, one screen per 1.2 screens of scroll
+       covered   drifts up 22% of a screen per panel as the next one comes over it
+     That difference in speed is the parallax. The picture does not move inside its panel.
+     The copy and the case are in the panel and move with it: the copy 14% of a screen
+     from the top (at least 80px, at most 160), the case's foot 8% of a screen (48 to 96)
+     plus 100px from the bottom -- the old page's places. */
+  .slides { position: relative; z-index: 3; --slide-h: 100vh; height: var(--slides-h, 400vh); }
+  .slides__viewport { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  /* pulled up a screen, over the hero, so the pin starts at the top of the page and the
+     first panel's rise is the sequence's first step (expertise-page.js) */
+  /* v1/b: no pin, so no pull up over the hero -- the slides follow it in flow */
+  .slides__viewport > .slide { position: absolute; inset: 0; will-change: transform;
+                      transform: translate3d(0, var(--ty, 0%), 0); }
+  /* v1/c: THE PANELS ARE THE GRID'S WIDTH, line 1 to line 5, inside the page margins --
+     not full bleed. Their copy loses its own margin (the panel already sits on it) and the
+     outer lines move onto the panel's edges. Pinned layouts only (desktop, v1/c); a tablet
+     and a phone stack full width. */
+  @media not all {   /* v1/b: OFF -- the pinned desktop panels; every width stacks now */
+    /* right: 1px short of the margin, so the panel's right rule lands ON the page grid's line 5
+       (as its left rule does on line 1) instead of beside it, which read as one thick line */
+    .slides__viewport > .slide { left: var(--m); right: calc(var(--m) - 1px); }
+    /* ...and 90% of the screen tall, centred in the pinned screen (5% above and below);
+       expertise-page.js rises each one from the screen's foot to that place */
+    .slides { --slide-h: 90vh; }
+    .slides__viewport > .slide { top: calc((100vh - var(--slide-h)) / 2); bottom: auto; }
+    /* only the picture drifts as its panel is covered; the copy holds still (no parallax) */
+    .slides__viewport > .slide > .slide__media { transform: translate3d(0, var(--py, 0%), 0); }
+    /* v1/c: no offsets on the copy or the project info -- --slide-edge alone sets their distance
+       from the panel's top and foot */
+    /* v1/c, desktop: the project info 24 lower (--spacer-24) than the --slide-edge */
+    @media (min-width: 1024px) {
+      .slides__viewport > .slide .project { margin-bottom: calc(-1 * var(--spacer-24)); }
+    }
+    .slides__viewport > .slide > .slide__inner { margin: 0; }
+    .slides__viewport > .slide::before { left: 0; right: 0;
+      /* the panel's side rules ARE the page grid's lines 1 and 5 carried down through it, so
+         they take the grid line's own colour -- its ink over the page ground, opaque --
+         rather than a tint over the picture, which read darker and heavier */
+      border-color: color-mix(in srgb, rgb(var(--black-base)) calc(var(--grid-a, .08) * 100%), var(--color-primary)) !important; }
+    /* the copy and the case sit 32 in from the panel's edge (--spacer-32), not the inset's 8,
+       and keep their full measure: the box reaches 32 past its columns, so the text itself is
+       still two columns wide (line 1 to line 3's distance), just shifted in */
+    .slides__viewport > .slide .slide__copy, .slides__viewport > .slide .project {
+      padding-left: var(--spacer-32); padding-right: 0; margin-right: calc(-1 * var(--spacer-32)); }
+  }
+  /* v1/c: on a tablet and a phone the section header follows homepage/approved exactly: the
+     shared 8px inset each side, no reach past the right, three columns wide on a tablet
+     and the full width on a phone. The project info keeps the header's left edge. */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    .slides__viewport > .slide .slide__copy, .slides__viewport > .slide .project {
+      padding-left: var(--inset); padding-right: var(--inset); margin-right: 0; }
+  }
+  /* ...and on a tablet the header is three columns wide, as the homepage's tablet headers are */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .slides__viewport > .slide .slide__copy { width: calc(3 * var(--col)); }
+  }
+  /* the first panel's EXPAND (expertise-page.js writes --xk, 1 = inset, 0 = open): it
+     starts at 80% of the grid's width, centred -- 10% of the grid in from each side of the
+     panel -- and opens out to the grid's width as it rises over the hero */
+  .slides__viewport > .slide:first-child {
+    --x0: calc(0.4 * var(--col));
+    clip-path: inset(0 calc(var(--x0) * var(--xk, 0)) 0 calc(var(--x0) * var(--xk, 0))); }
+  /* its copy stays where it is and plays its reveal only once the panel is nearly open
+     (expertise-page.js, OPEN_AT) */
+  .slide { position: relative; z-index: 3; height: var(--slide-h); overflow: hidden;
+        background: rgb(var(--ground, 42 44 47)); color: var(--white); }
+  /* v1/c: EACH SLIDE'S BACKGROUND, one setting per slide (an rgb triplet, so the washes
+     over its picture can take it at any strength). It shows wherever the picture does
+     not: the tablet's top half, the phone, and while a picture loads. */
+  #digital-experiences  { --ground: 209 212 215; }   /* #D1D4D7 */
+  #performance-creative { --ground: 228 223 217; }   /* #E4DFD9 */
+  #ai-workflows         { --ground: 255 255 255; }   /* #FFFFFF */
+  #content-that-scales  { --ground:  34  34  34; }   /* #222222 */
+  /* ...and on a tablet or phone, Digital Experiences and Performance Creative go white */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    #digital-experiences, #performance-creative { --ground: 255 255 255; }
+  }
+  /* the case card fades up after its slide's copy has played in (expertise-page.js) */
+  .slides .project { transition: opacity .3s ease;
+                      /* and rises faster than its panel as the panel is covered (--cy) */
+                      transform: translate3d(0, var(--cy, 0px), 0); }
+  .slides .project.is-wait { opacity: 0; }
+  .slide__media { position: absolute; inset: 0; }
+  .slide__media > img, .slide__media > video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
+
+  /* media composed for the copy on the left: cropped from the left only, so whatever sits
+     on its right is never cut */
+
+  /* v1/c, desktop: every slide picture is centred, the right-held one too */
+  @media (min-width: 1024px) {
+    .slide__media > img, .slide__media > video { object-position: 50% 50%; }
+  }
+  /* A PORTRAIT REEL (Tula, 2026-10-24, a look test): the clip is 720x900, so on desktop
+     it fills the panel's RIGHT HALF -- exactly its own size on a 1440x900 screen, so it
+     is never blown up -- on a near-black ground that matches its edges, and the copy
+     keeps the left half. Below 1024 it covers the panel like a picture. */
+
+  /* FULL SCREEN WITHOUT BLOWING IT UP: a second copy of the clip covers the whole panel
+     behind it, blurred deep and darkened -- held 20% oversize so the blur's soft edge
+     stays off screen -- and the sharp clip plays on the right half over it. The two are
+     kept in step (expertise-sections.js). Below 1024 only the sharp one, covering. */
+
+  /* THE GRID'S OUTER LINES carry on over the picture: lines 1 and 5 only, as a light
+     rule, so the page's frame holds across every panel */
+  .slide::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--m); right: var(--m);
+                z-index: 2; pointer-events: none;
+                border-left: 1px solid rgb(var(--light-gray-base) / .22); border-right: 1px solid rgb(var(--light-gray-base) / .22); }
+  /* THE SHADING: the left goes well down under the copy (2026-10-24, deeper than the
+     comp's), clearing by 60% across; the bottom-right corner a little; the rest of the
+     picture is left as it is */
+  .slide::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+               background: linear-gradient(to right, rgb(var(--black-base) / .55), rgb(var(--black-base) / .35) 35%, transparent 60%),
+                           radial-gradient(ellipse 45% 45% at 100% 100%, rgb(var(--black-base) / .32), transparent 100%); }
+  /* A BUSY PICTURE (a wall of bright posts) needs a deeper shade on the copy's side: the
+     left half goes well down, then clears by the middle so the right stays bright */
+
+  /* A LIGHT PANEL (2026-10-26, Performance Creative): the post wall on --cream, #F0ECE7
+     (the video's own ground, "Comp 1_1 - F0ECE7 - No Outlines"), so the copy goes dark, the shade goes, the
+     outer grid lines take the page grid's ink and the pills a light-on-dark tint */
+  /* DARK TYPE ONLY (.slide--ink, Digital Experiences 2026-10-26): the light panel's #222
+     copy, lines and pills over a picture that is light on its own, with no ground of its own */
+  .slide--light { --slide-ground: var(--ground, 228 223 217); background: rgb(var(--slide-ground)); }
+  .slide--light, .slide--ink { color: var(--black); }
+  .slide--light::after, .slide--ink::after { background: none; }
+  .slide--light::before, .slide--ink::before { border-color: rgb(var(--black-base) / .08); }
+  .slide--light .project, .slide--ink .project { color: var(--black); }
+  .slide--light .pill--glass, .slide--ink .pill--glass { background: rgb(var(--black-base) / .06); }
+  .slide__inner { position: relative; z-index: 1; height: 100%; margin: 0 var(--m);
+               display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: auto 1fr;
+               /* the copy --slide-edge down and the case's foot the same distance up, on the
+                  spacer scale: 120 (104 on a tablet) */
+               --slide-edge: var(--spacer-64);
+               padding: var(--slide-edge) 0; }
+  /* v1/c: each slide's name is the headline (--font-h-56: 56 / 48 / 40) and its line under it a subhead (--font-h-24) */
+  /* homepage/approved's left header system: --spacer-24 under the headline, --spacer-24 under
+     the body (the body owns the gap to what follows it, not the pills) */
+  .slide__copy .sec-head__title { margin-bottom: var(--spacer-24); }
+
+  /* ...the same width as the headline: it takes the left header title's right padding too */
+
+  .slide__copy { grid-column: 1 / 3; grid-row: 1; padding: 0 var(--inset); }
+  /* THE HEADER, after the comp: the name large (64) and on two lines (held to a column
+     and a half), then 40 to the headline, 16 to the body, 40 to the pills */
+  /* the area name and body ARE the homepage's section title and body (.sec-head__title,
+     .sec-head__body in a .sec-head--left header) and take every rule from them: the
+     shared block above, nothing of their own */
+  /* the pills on the body's measure: 80% of the header box, as .sec-head__body (both go
+     to the full box at 1023 and below) */
+  .pills { display: flex; flex-wrap: wrap; gap: var(--spacer-4); width: 80%;
+               max-width: 100%; margin-top: 0; }
+  /* .pill--glass (renamed 2026-11-11 from .pill, which is the homepage's outline pill):
+     no outline, a frosted ground -- #f4f4f4 at 16% over an 8px blur of the picture, which
+     the copy side's deep shade keeps dark enough for the white label -- 4 by 12 round it */
+  .pill--glass { font: var(--font-p-14); padding: var(--spacer-4) var(--spacer-12);
+           border: 0; background: rgb(var(--light-gray-base) / .16); border-radius: 999px;
+           -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); white-space: nowrap;
+           transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1); }
+  .pill--glass.pre { opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
+  /* THE FEATURED WORK: no ground, white type, across the FIRST TWO columns (vline 1 to
+     vline 3, the header's own box) on the panel's foot, under the header. Client, then
+     the title, then the link, quieter. */
+  .project { grid-column: 1 / 3; grid-row: 2; align-self: end; color: var(--white);
+              /* the header's 8px inset, so its left edge is the heading's */
+              padding: 0 var(--inset); }
+  /* under the header in the same column: on the foot when there is room, and on a short
+     screen pushed down rather than over the pills, never closer to them than 40 */
+  .project { margin-top: var(--spacer-40); }
+
+  .project__title { font: var(--font-h-24); }
+  /* the case's lines on the section body's measure: 80% of the header box */
+  .project__title { width: 80%; }
+  /* THE ACTION: the homepage's filled CTA pill (.cta, #222 with the rolling label), 16
+     under the title. On a dark panel it inverts to --light-gray with #222 type. */
+  .cta.project__link { margin-top: var(--spacer-24); }
+  /* the case link is the FAQ's text link (.acc__link: label + stretching arrow), 16 under the title */
+  .acc__link.project__link { margin-top: var(--spacer-16); }
+  .slide:not(.slide--ink):not(.slide--light) .cta.project__link { background: var(--light-gray); color: var(--black); }
+
+  /* ============================================================ REASONS + ACCORDION */
+  /* Proof's pattern: the header in the left two columns, the questions in the right
+     two. No field behind it in this version -- the circle is the page's gradient. */
+  .faq { position: relative; z-index: 4; background: var(--color-primary);
+        padding: var(--spacer-120) 0 var(--spacer-120); }
+  /* the bottom is the homepage Proof section's: --spacer-152 on desktop, --spacer-120 below
+     it (104 on a tablet, 56 on a phone) */
+  @media (min-width: 1024px) { .faq { padding-bottom: var(--spacer-152); } }
+  /* the top: --spacer-200 from the last expertise area to the FAQ, the same gap as between
+     the areas (200 / 152 / 104) */
+  .faq { padding-top: var(--spacer-200); }
+  /* THE HOMEPAGE'S PROOF FIELD behind the FAQ, in blue (halo.js, HALO in config.js):
+     the homepage's #halogl rules -- under the content, faded in over its top 200 */
+  #halogl { position: absolute; inset: 0; width: 100%; height: 100%;
+            display: block; z-index: 1; opacity: 0; pointer-events: none;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u)));
+                    mask-image: linear-gradient(to bottom, transparent 0, #000 calc(200 * var(--u))); }
+  /* THE GRID'S VERTICAL LINES over the FAQ's ground (and the blue field), under the copy:
+     the section is opaque and covers .page-grid, so it carries its own -- 1px of the
+     grid's line every column from the margin, as app.js lays the grid out (5 lines, 3
+     where the grid drops to 2 columns) */
+  .faq::before { content: ""; position: absolute; top: 0; bottom: 0; z-index: 2; pointer-events: none;
+                left: var(--m); right: calc(var(--m) - 1px); mix-blend-mode: multiply;
+                background: repeating-linear-gradient(to right, rgb(var(--black-base) / .08) 0 1px, transparent 1px var(--col)); }
+  .faq__inner { position: relative; z-index: 3; margin: 0 var(--m);
+               display: grid; grid-template-columns: repeat(4, 1fr); align-items: start; }
+  .faq .sec-head { grid-column: 1 / 3; }
+  /* THE HEADER'S CTA, as homepage/approved's Featured Work: the filled pill under the body,
+     the body's 24 above it, revealed last (data-rv 3) */
+  .faq .sec-head__cta { width: fit-content; }
+  /* --spacer-8 down, the homepage .proof__stats' own margin beside its header */
+  .acc { grid-column: 3 / 5; border-bottom: 1px solid var(--color-nav-border); margin-top: var(--spacer-8); }
+
+  /* A question is one row: the hairline over it, the line at --font-h-24, a plus at
+     the right edge. Opening it runs the panel's height on the homepage's ease-out
+     (.55s, the curve the topbar arrives on) and brings the answer up the way a mask
+     reveal does. The plus loses its upright to become a minus. */
+  .acc__item { border-top: 1px solid var(--color-nav-border); }
+  .acc__q { display: flex; align-items: flex-start; justify-content: space-between;
+            gap: var(--spacer-24); width: 100%;
+            padding: var(--spacer-24) var(--spacer-24) var(--spacer-24) var(--inset);
+            background: none; border: 0; cursor: pointer; text-align: left;
+            font: var(--font-h-24); color: inherit; }
+  .acc__q .mask { flex: 1; }
+  .acc__icon { position: relative; flex: none; width: 16px; height: 16px; margin-top: .1em; }
+  .acc__icon::before, .acc__icon::after { content: ""; position: absolute; background: currentColor; }
+  .acc__icon::before { left: 0; right: 0; top: 50%; height: 1px; margin-top: -.5px; }
+  .acc__icon::after  { top: 0; bottom: 0; left: 50%; width: 1px; margin-left: -.5px;
+                       transition: transform .28s cubic-bezier(.22,.61,.36,1); }
+  .acc__item.is-open .acc__icon::after { transform: scaleY(0); }
+
+  .acc__a { display: grid; grid-template-rows: 0fr;
+            transition: grid-template-rows .55s cubic-bezier(.22,.61,.36,1); }
+  .acc__item.is-open .acc__a { grid-template-rows: 1fr; }
+  .acc__a > div { overflow: hidden; min-height: 0; }
+  .acc__body { padding: 0 var(--spacer-80) var(--spacer-32) var(--inset);
+               opacity: 0; transform: translateY(calc(16 * var(--u)));
+               transition: opacity .3s ease, transform .3s ease; }
+  .acc__item.is-open .acc__body { opacity: 1; transform: none;
+               transition: opacity .5s ease .12s, transform .82s cubic-bezier(.16,1,.3,1) .12s; }
+  .acc__body p { font: var(--font-p-18); }
+  .acc__link { display: inline-block; margin-top: var(--spacer-16);
+               color: inherit; text-decoration: none;
+               font: var(--font-button-1); text-transform: uppercase; }
+  .tlink { position: relative; }
+  .acc__link .tlink { display: inline-block; }
+  /* THE ARROW, after the 2026-10-22 recording: no underline on these links -- on hover
+     the arrow's SHAFT STRETCHES to the right and its head rides out on the tip, then it
+     draws back. The shaft is a 1px rule in the label's ink, the head a chevron. Arriving
+     eases out, leaving eases in: the nav underline's own pair of curves. */
+  .acc__link { display: inline-flex; align-items: center; gap: var(--spacer-8); }
+  .acc__link .tlink::after { display: none; }
+  .acc__arrow { display: inline-flex; align-items: center; flex: none; height: 10px; }
+  .acc__shaft { display: block; width: 12px; height: 1.2px; margin-right: -5px; background: currentColor;
+                transition: width .18s cubic-bezier(.5, 0, .78, .25); }
+  .acc__arrow svg { display: block; width: 6px; height: 10px; overflow: visible; }
+  .acc__link:hover .acc__shaft { width: 32px; transition: width .28s cubic-bezier(.22, .61, .36, 1); }
+  @media (prefers-reduced-motion: reduce) { .acc__shaft, .acc__link:hover .acc__shaft { transition: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .acc__a, .acc__body, .acc__item.is-open .acc__body, .acc__icon::after { transition: none; }
+  }
+
+  /* ========================================================== homepage: footer */
+  .pf { position: relative; z-index: 3; overflow: hidden;
+        display: flex; flex-direction: column;
+        --pf-ink:  var(--white);
+        --pf-sub:  rgb(var(--light-gray-base) / .72);
+        --pf-dim:  rgb(var(--light-gray-base) / .56);
+        background: var(--black);
+        color: var(--pf-ink); }
+  .pf__grid { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .pf__grid i { position: absolute; top: 0; bottom: 0; width: 1px;
+                background: rgb(var(--light-gray-base) / .04); }
+  .pf__glow {
+    position: absolute; left: -80px; top: 0; z-index: 0;
+    width: calc(100% + 160px); height: calc(100% + 80px);
+    transform: translateZ(0);
+    filter: blur(44px);
+    opacity: .5;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to top, #000 0,
+        rgba(0,0,0,.92) calc(80px +  60 * var(--u)),
+        rgba(0,0,0,.62) calc(80px + 140 * var(--u)),
+        rgba(0,0,0,.30) calc(80px + 220 * var(--u)),
+        rgba(0,0,0,.12) calc(80px + 280 * var(--u)),
+        transparent     calc(80px + 330 * var(--u)));
+            mask-image: linear-gradient(to top, #000 0,
+        rgba(0,0,0,.92) calc(80px +  60 * var(--u)),
+        rgba(0,0,0,.62) calc(80px + 140 * var(--u)),
+        rgba(0,0,0,.30) calc(80px + 220 * var(--u)),
+        rgba(0,0,0,.12) calc(80px + 280 * var(--u)),
+        transparent     calc(80px + 330 * var(--u)));
+  }
+  .pf::after {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url(assets/grain.png);
+    background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08);
+  }
+  .pf__band { position: relative; z-index: 1; height: auto;
+              margin: 0 calc(var(--m) + var(--inset));
+              padding: var(--spacer-56) 0;
+              display: grid; grid-template-columns: 1fr auto 1fr;
+              align-items: center;
+              pointer-events: none; }
+  .pf__band > * { pointer-events: auto; }
+  /* a phone: --spacer-80 under the band (40 there), the top unchanged (2026-11-04) */
+  @media (max-width: 767px) { .pf .pf__band { padding-bottom: var(--spacer-80); } }
+  .pf { --pf-mark: 240px; }
+  .pf__head { position: static; grid-area: 1 / 1; width: var(--col);
+              font: var(--font-h-40); margin: 0; }
+  .pf__mark { position: static; grid-area: 1 / 2;
+              width: var(--pf-mark); height: var(--pf-mark); z-index: 1;
+              transform: rotate(var(--spin, 0deg))
+                         rotate(var(--enter-rot, -135deg))
+                         scale(var(--enter-s, .45));
+              transition: transform .9s cubic-bezier(.22, .61, .36, 1);
+              --D: calc(var(--pf-mark) * 0.225);
+              --R: calc((var(--pf-mark) - var(--D)) / 2); }
+  .pf__mark.is-in { --enter-rot: 0deg; --enter-s: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .pf__mark { --enter-rot: 0deg; --enter-s: 1; transition: none; }
+  }
+  .pf__dot {
+    position: absolute; left: calc(50% - var(--D) / 2); top: calc(50% - var(--D) / 2);
+    width: var(--D); height: var(--D);
+    border-radius: 50%; background: var(--pf-ink);
+    transform: translate(calc(var(--dx) * var(--R)), calc(var(--dy) * var(--R)));
+  }
+  .pf__cta { position: static; grid-area: 1 / 3; justify-self: end; z-index: 1;
+             display: inline-flex; align-items: center; justify-content: center;
+             background: none; color: var(--pf-ink);
+             border: 1px solid var(--pf-ink); border-radius: 999px;
+             font: var(--font-button-1); text-transform: uppercase;
+             padding: var(--spacer-8) var(--spacer-56);
+             cursor: pointer; white-space: nowrap; }
+  /* THE FOOTER CTA ON THE FOOTER'S OWN GROUND (2026-11-04): #222 and the same grain,
+     rather than see-through, so where it sits across a grid line (phone and tablet,
+     where it centres on the middle line) the line stops at its edge instead of running
+     through the label. The grain is the footer's: the same tile, size, blend and
+     strength, on a layer under the label. */
+  .pf .pf__cta { position: relative; isolation: isolate; overflow: hidden; background-color: var(--black); }
+  .pf .pf__cta::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url(assets/grain.png); background-repeat: repeat;
+    background-size: calc(446 * var(--u)) calc(446 * var(--u));
+    mix-blend-mode: hard-light; opacity: var(--grain-a, .08); }
+  .pf__locations { position: static; z-index: 1; margin: 0 var(--m); width: auto;
+                   display: grid; grid-template-columns: repeat(4, 1fr);
+                   grid-auto-flow: row; column-gap: 0; row-gap: 0; }
+  .pf__office { padding-left: var(--inset); padding-right: var(--spacer-16); }
+  .pf__legal { position: static; z-index: 1;
+               margin: var(--spacer-56) var(--m) var(--spacer-40);
+               display: flex; justify-content: center; align-items: center;
+               gap: var(--spacer-24);
+               font: var(--font-p-14); color: var(--pf-dim); }
+  .pf__end { display: flex; align-items: center; gap: var(--spacer-16); }
+  .pf__social { display: flex; align-items: center; gap: var(--spacer-12); }
+  .pf__icon { display: grid; place-items: center; flex: none;
+              color: var(--pf-dim); transition: color .25s ease; }
+  .pf__icon:hover { color: var(--pf-ink); }
+  .pf__icon svg { width: calc(21 * var(--u)); height: calc(21 * var(--u)); display: block; }
+  .pf__city { font: var(--font-h-24); color: var(--pf-ink); margin: 0 0 var(--spacer-12); }
+  .pf__addr, .pf__tel { font: var(--font-p-16); color: var(--pf-sub); margin: 0; }
+  .pf__tel { margin-top: var(--spacer-8); }
+  .pf__tel a { color: inherit; text-decoration: none; }
+  .pf__tel a:hover { color: var(--pf-ink); }
+  .pf__addr a, .pf__tel a, a[x-apple-data-detectors] {
+    color: inherit !important;
+    -webkit-text-decoration: none !important;
+            text-decoration: none !important;
+  }
+  .pf__legal nav { display: flex; gap: var(--spacer-16); flex-wrap: wrap; }
+  .pf__legal a { color: inherit; text-decoration: none; }
+  .pf__legal a:hover { color: var(--pf-ink); }
+
+  /* ================================================== STACKED, 1023 and below */
+  @media (max-width: 1023px) {
+    .nav { display: none; }
+    .card { position: static; width: auto; height: auto; }
+
+    .pf__band { grid-template-columns: 1fr; }
+    .pf__band > * { grid-area: auto; justify-self: stretch; }
+    .pf__head { position: static; transform: none; width: auto; padding: 0;
+                text-align: center; margin: 0 auto var(--spacer-24); }
+    .pf__mark { position: static; --pf-mark: 200px;
+                width: var(--pf-mark); height: var(--pf-mark);
+                margin: 0 auto var(--spacer-24); }
+    .pf__cta { position: static; display: flex; transform: none;
+               width: fit-content; margin: 0 auto; }
+    .pf__locations { grid-template-columns: repeat(2, 1fr); gap: var(--spacer-40) 0;
+                     margin-top: var(--spacer-16); }   /* as the homepage (2026-11-11) */
+    .pf__legal { flex-direction: column; align-items: center; }
+    .pf__end   { flex-direction: column; align-items: center; }
+    .pf__legal nav { justify-content: center; }
+    .pf__icon svg { width: 21px; height: 21px; }
+
+    .faq .sec-head { grid-column: 1 / 4; }
+    .acc { grid-column: 1 / -1; margin-top: var(--spacer-56); }
+  }
+  /* v1/c: the homepage Proof section's gap between header and content -- --spacer-56 on a
+     phone (above), --spacer-40 on a tablet */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .acc { margin-top: var(--spacer-40); }
+    .faq { padding: var(--spacer-200) 0 var(--spacer-120); }
+  }
+
+  /* ========================================================== TABLET, 768-1023 */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* the homepage's tablet section header: three columns wide, vline 1 to vline 4 --
+       and the case on the same measure, so its lines match the body's */
+    .slides .slide__copy, .slides .project { width: calc(3 * var(--col)); max-width: none; }
+    .nav { display: flex; }
+    .card { display: flex; align-items: flex-start; }
+
+    .pf__locations { gap: var(--spacer-24) 0; grid-template-columns: repeat(4, 1fr); }
+    .pf__end       { gap: var(--spacer-12); }
+    .pf__legal     { margin-top: var(--spacer-40); }
+  }
+
+  /* ================================================================ PHONE ONLY */
+  @media (max-width: 767px) {
+    .logo svg { height: 24px; }
+    .navtoggle { display: flex; align-items: center; height: 24px; }
+    .menu { display: flex; }
+    .card { display: flex; flex-direction: column; align-items: stretch; }
+
+    .pf__glow {
+      -webkit-mask-image: linear-gradient(to top, #000 0,
+          rgba(0,0,0,.92) calc(75.15px +  6.061%),
+          rgba(0,0,0,.62) calc(68.69px + 14.141%),
+          rgba(0,0,0,.30) calc(62.22px + 22.222%),
+          rgba(0,0,0,.12) calc(57.37px + 28.283%),
+          transparent     calc(53.33px + 33.333%));
+              mask-image: linear-gradient(to top, #000 0,
+          rgba(0,0,0,.92) calc(75.15px +  6.061%),
+          rgba(0,0,0,.62) calc(68.69px + 14.141%),
+          rgba(0,0,0,.30) calc(62.22px + 22.222%),
+          rgba(0,0,0,.12) calc(57.37px + 28.283%),
+          transparent     calc(53.33px + 33.333%));
+    }
+    .pf__mark { --pf-mark: 120px; }
+    .faq__inner { grid-template-columns: 1fr; }
+    .faq .sec-head { grid-column: 1 / -1; }
+    .sec-head__body, .page-head__body { width: 100%; }
+    .acc__body { padding-right: var(--spacer-16); }
+  }
+  /* ============================================= AREA SECTIONS, 1023 and below */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    /* LEGIBILITY (2026-10-24): stacked, the copy runs across the whole picture rather
+       than a clear half, so the shade is much stronger than desktop's -- deepest at the
+       top under the header and at the foot under the case, lighter through the middle
+       so the picture still reads */
+    .slide::after { background: linear-gradient(to bottom,
+                   rgb(var(--black-base) / .82) 0%, rgb(var(--black-base) / .7) 35%,
+                   rgb(var(--black-base) / .45) 58%, rgb(var(--black-base) / .55) 75%,
+                   rgb(var(--black-base) / .85) 100%); }
+    .slide--light::after { background: linear-gradient(to bottom,
+                   rgb(var(--slide-ground) / .9) 0%, rgb(var(--slide-ground) / .78) 35%,
+                   rgb(var(--slide-ground) / .45) 58%, rgb(var(--slide-ground) / .6) 75%,
+                   rgb(var(--slide-ground) / .9) 100%); }
+    /* stacked, dark type needs a light wash over the picture: --light-gray, neutral, for SKS's grey cut */
+    .slide--ink::after { background: linear-gradient(to bottom,
+                   rgb(var(--ground, var(--light-gray-base)) / .85) 0%, rgb(var(--ground, var(--light-gray-base)) / .7) 35%,
+                   rgb(var(--ground, var(--light-gray-base)) / .4) 58%, rgb(var(--ground, var(--light-gray-base)) / .55) 75%,
+                   rgb(var(--ground, var(--light-gray-base)) / .85) 100%); }
+    .slide__inner { grid-template-columns: 1fr; }
+    .slide__copy, .project { grid-column: 1 / -1; }
+    .project { max-width: calc(2 * var(--col)); }
+    .slide__copy .sec-head__body, .pills, .project__title { width: auto; }
+  }
+  /* tablet and phone (v1/c: the tablet too): the slides scroll in flow, each as tall as its
+     content -- no screen-height floor */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    .slide { height: auto; min-height: 0; }
+    .slides { height: auto; }
+    .slides__viewport { position: static; top: auto; height: auto; overflow: visible; }
+    .slides__viewport > .slide { position: relative; inset: auto; transform: none; top: auto; }
+    .slide__inner { padding-top: var(--spacer-120); padding-bottom: var(--spacer-40); row-gap: var(--spacer-56); }
+  }
+  /* the project title is --font-h-24 (24, 20 on a phone) */
+  .slides__viewport > .slide .project__title { font: var(--font-h-24); }
+  /* v1/c: below desktop a LEFT header's body runs the header's full width, as homepage/approved's
+     Featured Work and Proof do; a centred one keeps its 80% */
+  @media (max-width: 1023px) {
+    .sec-head:not(.sec-head--center) .sec-head__body { width: auto; }
+  }
+  /* v1/c, TABLET AND PHONE: one system. The section header at the top, on the page; the
+     picture BELOW it, 4:3, centred (cropped evenly from both sides); the project info
+     at the bottom-left over the picture; the header and the case 8 in (the shared inset,
+     as any section header); no wash. Slides scroll in flow, each as tall as its content. */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    .slides__viewport > .slide { display: flex; flex-direction: column; }
+    /* NO GROUND OF ITS OWN: the header sits on the page, like any section's, in the page's
+       dark type and the light page's pills. The slide takes the PAGE's colour rather than
+       none -- the hero's fixed layers (the WebGL stage, the travelling figure) are behind
+       it and would show through -- and so redraws the page grid's lines over it, one per
+       column (three on a phone, five on a tablet) in the grid's own colour, so the grid
+       runs on unbroken */
+    /* v1/c: NO FILL AT ALL -- the page itself (its colour, grain and grid) shows through */
+    .slides__viewport > .slide { background: none; }
+    .slides__viewport > .slide::before { display: none; }
+    .slides__viewport > .slide .slide__copy { color: var(--black); }
+    /* v1/b: a SOLID colour, not a tint -- #222 at 6% over the page's #F4F4F4, flattened --
+       and no blur behind it */
+    .slides__viewport > .slide .slide__copy .pill--glass { background: #e7e7e7; color: var(--black);
+                                                    -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .slides__viewport > .slide::after { background: none; }
+    .slides__viewport > .slide > .slide__inner { position: static; order: 1; display: block; padding-bottom: var(--spacer-40); }
+    .slides__viewport > .slide > .slide__media { position: relative; inset: auto; order: 2; flex: none; aspect-ratio: 4 / 3; }
+    .slides__viewport > .slide > .slide__media > img,
+    .slides__viewport > .slide > .slide__media > video { position: absolute; inset: 0; object-position: 50% 50%; }   /* centred */
+    .slides__viewport > .slide .slide__copy, .slides__viewport > .slide .project { padding-left: var(--inset); padding-right: var(--inset); }   /* 8 */
+    .slides__viewport > .slide .project { position: absolute; z-index: 2; left: var(--m); right: var(--m);
+                                         bottom: var(--spacer-40); margin: 0; max-width: none; }
+  }
+  /* v1/c, TABLET AND PHONE: the picture spans the grid, v1-v5 on a tablet, v1-v3 on a phone
+     (margin to margin); the project info over it sits 16 in from the picture's edge */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    /* z-index 0 keeps the picture (and its fade) under the header box, which holds the project info */
+    .slides__viewport > .slide > .slide__media { margin-left: var(--m); margin-right: calc(var(--m) - 1px); z-index: 0; }
+    /* v1/b: the project info is its OWN block after the header (markup): on desktop OVER the picture's bottom-right as a #FFF card -- the slide ends
+       at the picture's foot, so the slide's bottom is the picture's; below desktop UNDER
+       the picture (see "under the picture" at the end of the sheet). Dark type, dark button. */
+    .slides__viewport > .slide > .slide__inner ~ .project { color: var(--black); }
+    
+    .slides__viewport > .slide > .slide__inner ~ .project .project__title { width: auto; }
+    .slides__viewport > .slide > .slide__inner ~ .project .cta.project__link { margin-top: var(--spacer-16);
+                                                                 background: var(--black); color: var(--color-text-contrast); }
+    /* DESKTOP: the card is the grid's LAST column, its left edge ON vline 4, up to
+       vline 5 (not over it) and flush to the picture's foot -- the picture's bottom-right */
+    @media (min-width: 1024px) {
+      .slides__viewport > .slide > .slide__inner ~ .project {
+        position: absolute; left: auto; right: var(--m); top: auto; bottom: 0; z-index: 2;
+        width: var(--col);   /* ends AT vline 5, not over it: the line stays drawn beside the card */ max-width: none; margin: 0;
+        padding: var(--spacer-24) var(--spacer-24) var(--spacer-8); background: var(--light-gray); }   /* bottom --spacer-8 (2026-11-05) */
+      /* the button keeps its own width and its 56 each side wherever the card has room; on a
+         narrower desktop the sides give way (a % of padding is of the card's inner width; 144
+         is the label) so it never runs out of the card */
+      .slides__viewport > .slide > .slide__inner ~ .project .cta.project__link {
+        padding-left: min(var(--spacer-56), calc((100% - 144px) / 2));
+        padding-right: min(var(--spacer-56), calc((100% - 144px) / 2)); }
+    }
+  }
+  /* v1/c, TABLET: no ground anywhere (the Performance Creative reel swaps to a page-colour
+     cut, performance-comp1-f4f4f4.mp4); a shorter picture, 16:9; and a dark fade up from the
+     picture's foot so the project info, now white, reads over any picture */
+  @media (min-width: 768px) {   /* v1/b: desktop too */
+    .slides__viewport > .slide > .slide__media { aspect-ratio: 16 / 9; }
+  }
+  /* v1/b, DESKTOP: the picture block a fixed 720 tall, the grid's full width (the picture
+     covers it, cropped to fit) */
+  @media (min-width: 1024px) {
+    .slides__viewport > .slide > .slide__media { aspect-ratio: auto; height: 720px; }
+  }
+  /* ...and the fade and the white project info on a phone too */
+  @media all {   /* v1/b: every width (was 1023 and below) */
+    .slides__viewport > .slide > .slide__media { background: none; }
+    .slides__viewport > .slide > .slide__media::after {
+      content: ""; position: absolute; inset: 25% 0 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(to bottom, rgb(var(--black-base) / 0), rgb(var(--black-base) / .55) 45%, rgb(var(--black-base) / .8)); }
+    .slides__viewport > .slide .project { color: var(--white); }
+    .slides__viewport > .slide .cta.project__link { background: var(--light-gray); color: var(--black); }
+    /* v1/c: a slide with no picture yet (AI Workflows) keeps the picture's space as a
+       LIGHT GREY placeholder block, sized and placed like every other slide's picture --
+       no fade, and its project info stays dark */
+
+    /* v1/b: A LIGHT PICTURE (.slide__media--light, the Rovex film) takes the placeholder's
+       treatment: no fade, the project info in dark type, the dark button */
+    .slides__viewport > .slide > .slide__media--light::after { display: none; }
+    .slides__viewport > .slide:has(> .slide__media--light) .project { color: var(--black); }
+    .slides__viewport > .slide:has(> .slide__media--light) .cta.project__link { background: var(--black); color: var(--color-text-contrast); }
+  }
+  /* v1/b, DESKTOP: the stacked slide, laid out across the grid. The section header on
+     the left (vline 1 to 3), its pills on the right (vline 3 to 5, level with the body;
+     v1/b has no subhead), and the picture below as its own block, the grid's full width at 16:9 with
+     the project info over its foot -- the tablet's system, two columns wide. */
+  @media (min-width: 1024px) {
+    .slides__viewport > .slide .slide__copy { display: grid; grid-template-columns: 1fr 1fr;
+                                              grid-template-rows: auto 1fr;
+                                              column-gap: calc(2 * var(--inset)); align-items: start; }
+    .slides__viewport > .slide .slide__copy > :not(.pills) { grid-column: 1; }
+    /* the headline runs the header's full width (vline 1 to 5) on ONE line; the body below
+       keeps its own column */
+    .slides__viewport > .slide .slide__copy > .sec-head__title { grid-column: 1 / -1; padding-right: 0; white-space: nowrap; }
+    /* the pills start level with the body, on the row under the title */
+    .slides__viewport > .slide .slide__copy > .pills { grid-column: 2; grid-row: 2;
+                                                       width: auto; margin-top: 0; }
+    /* the header follows homepage/approved's left section headers: the box vline 1 to 3
+       with the 8 inset, the title 80 clear of the right (.sec-head--left), the body 80% */
+    /* 40 from the text block to the picture: .slide__inner's padding-bottom alone */
+    .slides__viewport > .slide .slide__copy .sec-head__body { width: 80%; margin-bottom: 0; }
+    /* --spacer-200 between the areas, from one picture's foot to the next area's title: the
+       AREA's own top padding (as on a tablet and a phone), not the header's */
+    .slides__viewport > .slide { padding-top: var(--spacer-200); }
+    .slides__viewport > .slide > .slide__inner { padding-top: 0; padding-bottom: var(--spacer-40); }
+  }
+  /* UNDER THE PICTURE, TABLET AND PHONE: the slide reads the header, the PICTURE, then the
+     project info. The project info is its own block after the header (markup), so the
+     slide's column simply orders the three: header 1, picture 2, project 3. */
+  @media (max-width: 1023px) {
+    /* the header is ONE box, as on desktop: .slide__inner holds it between the margins
+       (--m) and .slide__copy gives it the 8 inset, so its pieces need no margins of their own */
+    .slides__viewport > .slide > .slide__inner { order: 1; padding-top: 0; padding-bottom: var(--spacer-40); }
+    /* the room above each area is the AREA's own (the slide's top padding), not the
+       headline's: --spacer-120 under the hero for the first, then --spacer-200 (152 tablet,
+       104 phone) from the project info under the picture to the next area */
+    .slides__viewport > .slide .slide__copy > .sec-head__title { margin-top: 0; }
+    .slides__viewport > .slide { padding-top: var(--spacer-120); }
+    .slides__viewport > .slide + .slide { padding-top: var(--spacer-200); }
+    /* body to pills: the body's own --spacer-24 (.sec-head__body) */
+    .slides__viewport > .slide > .slide__media { order: 2; }
+    .slides__viewport > .slide > .slide__inner ~ .project { order: 3; align-self: stretch;
+      position: static; width: auto; max-width: none; margin: var(--spacer-24) calc(var(--m) + var(--inset)) 0;   /* 24 under the picture */
+      padding: 0; background: none; color: var(--black); }
+  }
+  /* ...on a phone, 24 under the picture too: --spacer-24 steps down to 16 there, so --spacer-32 (24) */
+  @media (max-width: 767px) {
+    .slides__viewport > .slide > .slide__inner ~ .project { margin-top: var(--spacer-32); }
+  }
+  /* A LIGHT DARK FADE up from every picture's foot -- 16% at the bottom, gone by halfway up
+     (the project card sits outside the picture, so it stays clean #FFF); it replaces the
+     old fade and the light pictures' none */
+  .slides__viewport > .slide > .slide__media::after,
+  .slides__viewport > .slide > .slide__media--light::after {
+    content: ""; display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(to top, rgb(var(--black-base) / .16), rgb(var(--black-base) / 0) 50%); }
+  /* ...desktop only: on a tablet and a phone the project info sits under the picture, so the
+     picture goes without it */
+  @media (max-width: 1023px) {
+    .slides__viewport > .slide > .slide__media::after,
+    .slides__viewport > .slide > .slide__media--light::after { display: none; }
+  }
+  /* THE MARGINS: the AREA (.slide, the parent container) carries the page margin, --m a side
+     -- the header and the project info inside it carry no side margins of their own (the
+     picture sits between vline 1 and vline 5, leaving both lines drawn). The header
+     (.slide__copy, the .sec-head) keeps only the 8 inset inside it, as homepage/approved's
+     left headers do. */
+  .slides__viewport > .slide { padding-left: var(--m); padding-right: var(--m); }
+  .slides__viewport > .slide > .slide__inner,
+  .slides__viewport > .slide > .slide__inner > .slide__copy { margin-left: 0; margin-right: 0; }
+  .slides__viewport > .slide > .slide__media { margin-left: 1px; margin-right: 0; }   /* BETWEEN vline 1 and vline 5, over neither */
+  @media (max-width: 1023px) {
+    .slides__viewport > .slide > .slide__inner ~ .project { margin-left: 0; margin-right: 0;
+      padding-left: var(--inset); padding-right: var(--inset); }
+  }
+  /* THE PICTURE OPENS OUT (expertise-sections.js): held at 80% of its width AND its height, centred -- 10%
+     clipped off every side -- until it scrolls into view, then opened to the full size of
+     the grid over a second. A clip, not a scale, so the picture itself never stretches. */
+  .slides__viewport > .slide > .slide__media { clip-path: inset(0); transition: clip-path 1s cubic-bezier(.22,.61,.36,1); }
+  .slides__viewport > .slide > .slide__media.pre { clip-path: inset(10%); }
+  /* ...and the project card over it comes in as its OWN beat once the picture has opened:
+     the white card wipes up from the picture's foot, then its lines (client, title, link)
+     rise in one after another -- so it reads as a separate block laid on the picture */
+  @media (min-width: 1024px) {
+    .slides__viewport > .slide > .slide__inner ~ .project {
+      clip-path: inset(0); transition: clip-path .7s cubic-bezier(.65,0,.35,1) .75s; }
+    .slides__viewport > .slide > .slide__inner ~ .project > * {
+      transition: opacity .5s ease, transform .7s cubic-bezier(.16,1,.3,1); }
+    .slides__viewport > .slide > .slide__inner ~ .project > :nth-child(1) { transition-delay: 1.15s; }
+    .slides__viewport > .slide > .slide__inner ~ .project > :nth-child(2) { transition-delay: 1.23s; }
+    .slides__viewport > .slide > .slide__inner ~ .project > :nth-child(3) { transition-delay: 1.31s; }
+    /* while the picture is held (.pre): the card wiped down to nothing, its lines low and
+       hidden; going back there is quick and all at once */
+    .slides__viewport > .slide:has(> .slide__media.pre) > .slide__inner ~ .project {
+      clip-path: inset(100% 0 0 0); transition: clip-path .25s ease; }
+    .slides__viewport > .slide:has(> .slide__media.pre) > .slide__inner ~ .project > * {
+      opacity: 0; transform: translateY(calc(16 * var(--u))); transition: opacity .2s ease, transform 0s .25s; }
+  }
+  @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+    .slides__viewport > .slide > .slide__inner ~ .project,
+    .slides__viewport > .slide > .slide__inner ~ .project > * { transition: none; }
+  }
+</style>
+</head>
+<body class="theme-light theme-lightGray">
+  <div class="page-bg" aria-hidden="true"></div>
+  <canvas class="field" aria-hidden="true"></canvas>
+  <div class="page-grid" aria-hidden="true"></div>
+  <div class="page-glow" aria-hidden="true"></div>
+  <svg class="travel" aria-hidden="true"></svg>
+  <canvas id="stage"></canvas>
+
+  <div id="fallback" hidden>
+    <p>This prototype needs WebGL2.<br>Try Chrome, Safari 15+, or Firefox.</p>
+  </div>
+
+  <header class="topbar">
+      <a class="logo" href="../" aria-label="thelab, home">
+        <svg viewBox="0 0 599 120" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M59.2444 26.5463C66.5677 26.5463 72.5044 20.6037 72.5044 13.2732C72.5044 5.9426 66.5677 0 59.2444 0C51.9211 0 45.9844 5.9426 45.9844 13.2732C45.9844 20.6037 51.9211 26.5463 59.2444 26.5463ZM13.26 46.024C20.5815 46.024 26.52 51.9627 26.52 59.2971C26.52 66.6259 20.5815 72.5703 13.26 72.5703C5.93849 72.5703 0 66.6259 0 59.2971C0 51.9684 5.93849 46.024 13.26 46.024ZM118.482 59.2971C118.482 66.6277 112.545 72.5703 105.222 72.5703C97.8988 72.5703 91.9621 66.6277 91.9621 59.2971C91.9621 51.9666 97.8988 46.024 105.222 46.024C112.545 46.024 118.482 51.9666 118.482 59.2971ZM59.2444 72.5703C66.5677 72.5703 72.5044 66.6277 72.5044 59.2971C72.5044 51.9666 66.5677 46.024 59.2444 46.024C51.9211 46.024 45.9844 51.9666 45.9844 59.2971C45.9844 66.6277 51.9211 72.5703 59.2444 72.5703ZM72.5044 105.321C72.5044 112.651 66.5677 118.594 59.2444 118.594C51.9211 118.594 45.9844 112.651 45.9844 105.321C45.9844 97.99 51.9211 92.0474 59.2444 92.0474C66.5677 92.0474 72.5044 97.99 72.5044 105.321ZM104.911 26.8682C104.911 34.197 98.9783 40.1414 91.6511 40.1414C84.3296 40.1414 78.3911 34.197 78.3911 26.8682C78.3911 19.5394 84.3296 13.595 91.6511 13.595C98.9726 13.595 104.911 19.5394 104.911 26.8682ZM26.8752 13.6237C19.548 13.6237 13.6152 19.5681 13.6152 26.8969C13.6152 34.2257 19.5536 40.1701 26.8752 40.1701C34.1967 40.1701 40.1352 34.2257 40.1352 26.8969C40.1352 19.5681 34.1967 13.6237 26.8752 13.6237ZM104.906 91.7139C104.906 99.0445 98.9689 104.987 91.6456 104.987C84.3223 104.987 78.3856 99.0445 78.3856 91.7139C78.3856 84.3834 84.3223 78.4408 91.6456 78.4408C98.9689 78.4408 104.906 84.3834 104.906 91.7139ZM26.8189 104.982C34.1422 104.982 40.079 99.039 40.079 91.7084C40.079 84.3778 34.1422 78.4352 26.8189 78.4352C19.4956 78.4352 13.5589 84.3778 13.5589 91.7084C13.5589 99.039 19.4956 104.982 26.8189 104.982ZM256.248 27.5581C242.886 27.5581 235.3 33.6099 231.043 39.7803V1.76331H214.21V117.046H231.043V68.9711C231.043 52.8953 239.234 42.9051 252.421 42.9051C264.727 42.9051 270.97 49.488 270.97 62.473V117.046H287.803V60.3031C287.803 40.1024 275.712 27.5525 256.254 27.5525L256.248 27.5581ZM176.309 91.6299V42.7073H197.116V27.6033H176.309V1.76896H159.809V27.6033H145.329V42.7073H159.476V92.7996C159.476 109.344 167.068 117.052 183.371 117.052H197.444V101.869H186.029C179.12 101.869 176.303 98.9022 176.303 91.6299H176.309ZM301.825 73.1353C301.825 45.0237 317.106 27.5578 341.701 27.5578C364.913 27.5578 379.912 44.4021 379.912 70.4682V78.7237H319.347C319.827 94.0819 328.17 103.196 341.865 103.196C352.714 103.196 359.849 98.721 361.955 90.6012L362.232 89.5332H378.969L378.726 91.1719C376.327 107.293 361.17 118.549 341.865 118.549C317.54 118.549 301.825 101.247 301.825 73.1353ZM341.701 42.9104C335.441 42.9104 320.995 45.0237 319.573 64.2131H362.553C362.045 50.8438 354.329 42.9104 341.701 42.9104ZM413.386 1.76331H396.553V117.046H413.386V1.76331ZM433.477 56.144C433.477 39.3118 447.339 27.5589 467.191 27.5578C477.87 27.5584 486.794 30.6662 492.991 36.5479C498.738 42.0063 501.905 49.7306 501.905 58.3082V117.051H487.352L486.505 106.914C480.821 114.447 471.659 118.555 460.363 118.555C442.079 118.555 429.311 107.146 429.311 90.8046C429.311 84.216 431.947 62.7213 465.856 62.7213H485.405V58.6472C485.405 48.4819 478.597 42.4132 467.188 42.4132C454.577 42.4132 449.943 49.5216 449.807 56.1779L449.779 57.5736H433.477V56.144ZM462.87 104.033C475.718 104.033 485.41 94.8335 485.41 82.6339H485.416V76.729H465.867C452.895 76.729 446.319 81.4077 446.319 90.6294C446.319 99.1505 452.353 104.033 462.87 104.033ZM560.5 27.558C547.144 27.558 539.597 33.638 535.629 38.7009V1.76882H518.795V117.052H533.591L535.177 106.818C539.01 111.983 546.619 118.549 560.5 118.549C583.487 118.549 597.876 101.089 598.045 72.9603C597.859 44.9561 583.475 27.558 560.5 27.558ZM558.169 103.196C552.801 103.196 535.295 101.015 535.295 72.966C535.295 44.9166 552.806 42.9049 558.169 42.9049C578.818 42.9049 581.048 63.9307 581.048 72.966C581.048 99.2693 566.715 103.196 558.169 103.196Z" fill="currentColor"/>
+        </svg>
+      </a>
+      <nav class="nav">
+        <a href="../work/">Work</a>
+        <a href="./" aria-current="page">Expertise</a>
+        <a href="../../careers/v1/">Careers</a>
+        <a href="#">Get connected</a>
+      </nav>
+      <button class="navtoggle" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <nav class="menu__nav">
+      <a href="../work/"><span>Work</span></a>
+      <a href="./" aria-current="page"><span>Expertise</span></a>
+      <a href="../../careers/v1/"><span>Careers</span></a>
+      <a href="#"><span>Get connected</span></a>
+    </nav>
+    <div class="menu__foot">
+      <p>&copy;2026 thelab. Part of <a href="#">the wellcom group</a></p>
+      <div class="menu__social">
+        <a class="menu__icon" href="#" aria-label="thelab on Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="4" y="4" width="16" height="16" rx="4.6"/>
+            <circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a class="menu__icon" href="#" aria-label="thelab on LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <rect x="5.2" y="9.6" width="2.7" height="9"/><circle cx="6.55" cy="6.4" r="1.6"/>
+            <path d="M10.1 9.6h2.6v1.25a2.9 2.9 0 0 1 2.6-1.4c2 0 3.2 1.25 3.2 3.75v5.4h-2.7v-4.9c0-1.25-.45-2-1.55-2-.95 0-1.45.63-1.45 2v4.9h-2.7z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- ================================================================== HERO
+         app.js reveals the four [data-hv] masks on its intro clock, as it does the
+         homepage hero's; the index row follows (expertise-sections.js). -->
+    <header class="page-head">
+      <div class="page-head__fig" aria-hidden="true"></div>
+      <div class="page-head__content">
+        <h1><span class="mask" data-hv="2"><span>We deliver outcomes that build relationships.</span></span></h1>
+        <p class="page-head__body"><span class="mask" data-hv="3"><span>Our senior-led teams combine creative excellence, data-driven rigor, engineering depth, and production experience, to produce measurable, lasting impact.</span></span></p>
+      </div>
+    </header>
+
+    <!-- The bar and the four areas share one box, so the bar sticks for as long as the
+         areas last and lets go before Reasons (a sticky element is held inside its parent). -->
+    <nav class="xsub" aria-label="Our four areas of expertise">
+      <div class="xsub__pill">
+        <ul class="xsub__list" id="xsub-list">
+          <li><a href="#digital-experiences"><span class="xsub__long">Digital Experiences</span><span class="xsub__short">Digital</span></a></li>
+          <li><a href="#performance-creative"><span class="xsub__long">Performance Creative</span><span class="xsub__short">Performance</span></a></li>
+          <li><a href="#ai-workflows"><span class="xsub__long">AI Workflows &amp; Automation</span><span class="xsub__short">AI Workflows</span></a></li>
+          <li><a href="#content-that-scales"><span class="xsub__long">Content that Scales</span><span class="xsub__short">Content</span></a></li>
+        </ul>
+        <span class="xsub__current" aria-hidden="true"></span>
+        <button class="xsub__more" type="button" aria-label="Show all four areas" aria-expanded="false" aria-controls="xsub-list">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5v11M1.5 7h11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </nav>
+    <div class="slides">
+      <div class="slides__viewport">
+
+    <!-- ========================================================= 01 DIGITAL EXPERIENCES -->
+    <section class="slide slide--ink" id="digital-experiences" data-area="1">
+      <div class="slide__media slide__media--light">   <!-- v1/b: the project info sits in it -->
+        <video src="assets/rovex-red-antler-08.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      </div>
+      <div class="slide__inner">
+        <div class="slide__copy sec-head sec-head--left" data-head>
+          <h2 class="sec-head__title"><span class="mask" data-rv="0"><span>Digital Experiences</span></span></h2>
+          <p class="sec-head__body"><span class="mask" data-rv="2"><span>We design and build websites, e-commerce platforms, and interactive tools that connect and convert, using insights and analytics to guide decisions and develop flexible systems that drive growth.</span></span></p>
+          <ul class="pills" aria-label="What's included">
+            <li class="pill pill--glass">CX &amp; Experience Strategy</li>
+            <li class="pill pill--glass">User Research &amp; Insights</li>
+            <li class="pill pill--glass">UX/UI &amp; Design Systems</li>
+            <li class="pill pill--glass">E-commerce</li>
+            <li class="pill pill--glass">CMS Strategy &amp; Implementation</li>
+            <li class="pill pill--glass">Full-stack Engineering</li>
+            <li class="pill pill--glass">Accessibility</li>
+            <li class="pill pill--glass">Analytics &amp; Optimization</li>
+            <li class="pill pill--glass">SEO &amp; AI Search</li>
+          </ul>
+        </div>
+      </div>
+      <div class="project">
+        <h3 class="project__title">Turning SKS innovation into Technicurean desire</h3>
+        <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
+      </div>
+    </section>
+
+    <!-- ========================================================= 02 PERFORMANCE CREATIVE -->
+    <section class="slide slide--light" id="performance-creative" data-area="2">
+      <div class="slide__media slide__media--light">
+        <video src="assets/reset-kiln.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      </div>
+      <div class="slide__inner">
+        <div class="slide__copy sec-head sec-head--left" data-head>
+          <h2 class="sec-head__title"><span class="mask" data-rv="0"><span>Performance Creative</span></span></h2>
+          <p class="sec-head__body"><span class="mask" data-rv="2"><span>We build full-funnel programs around your KPIs, developing creative for different audiences and platforms, testing what resonates, and using those insights to improve ad performance.</span></span></p>
+          <ul class="pills" aria-label="What's included">
+            <li class="pill pill--glass">Creative Development</li>
+            <li class="pill pill--glass">Audience &amp; Channel Strategy</li>
+            <li class="pill pill--glass">Creative Strategy</li>
+            <li class="pill pill--glass">Paid Social</li>
+            <li class="pill pill--glass">Content Production</li>
+            <li class="pill pill--glass">Measurement &amp; Optimization</li>
+          </ul>
+        </div>
+      </div>
+      <div class="project">
+        <h3 class="project__title">Bringing Tula’s prebiotics to a new generation of wellness seekers</h3>
+        <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
+      </div>
+    </section>
+
+    <!-- ========================================================= 03 AI WORKFLOWS &AMP; AUTOMATION -->
+    <section class="slide slide--light slide--white" id="ai-workflows" data-area="3">
+      <div class="slide__media slide__media--light">
+        <video src="assets/google-vids.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      </div>
+      <div class="slide__inner">
+        <div class="slide__copy sec-head sec-head--left" data-head>
+          <h2 class="sec-head__title"><span class="mask" data-rv="0"><span>AI Workflows &amp; Automation</span></span></h2>
+          <p class="sec-head__body"><span class="mask" data-rv="2"><span>We work with organizations to target where AI can meaningfully improve capacity, speed, and quality across creative and production workflows. Then we design, build, and deploy these systems with the teams who use them.</span></span></p>
+          <ul class="pills" aria-label="What's included">
+            <li class="pill pill--glass">AI Strategy &amp; Opportunity Assessment</li>
+            <li class="pill pill--glass">Workflow Automation Design</li>
+            <li class="pill pill--glass">Prompt Engineering &amp; LLM Integration</li>
+            <li class="pill pill--glass">Agentic System Development</li>
+            <li class="pill pill--glass">AI-assisted Content Production</li>
+            <li class="pill pill--glass">Measurement &amp; Governance</li>
+            <li class="pill pill--glass">Custom AI Tools &amp; Applications</li>
+            <li class="pill pill--glass">Prototyping &amp; Validation</li>
+          </ul>
+        </div>
+      </div>
+      <div class="project">
+        <h3 class="project__title">Bringing a global network’s work into one place with Wellcom HOME</h3>
+        <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
+      </div>
+    </section>
+
+    <!-- ========================================================= 04 CONTENT THAT SCALES -->
+    <section class="slide" id="content-that-scales" data-area="4">
+      <div class="slide__media slide__media--light">   <!-- the Normal Computing film -->
+        <video src="assets/normal-computing.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      </div>
+      <div class="slide__inner">
+        <div class="slide__copy sec-head sec-head--left" data-head>
+          <h2 class="sec-head__title"><span class="mask" data-rv="0"><span>Content that Scales</span></span></h2>
+          <p class="sec-head__body"><span class="mask" data-rv="2"><span>We strategically blend production, CGI, adaptation, and AI to create more from every idea, asset, and shoot, maintaining quality while meeting platform requirements, following best practices, and staying true to the brand.</span></span></p>
+          <ul class="pills" aria-label="What's included">
+            <li class="pill pill--glass">Social Content</li>
+            <li class="pill pill--glass">Photography &amp; Photoshoots</li>
+            <li class="pill pill--glass">Video production</li>
+            <li class="pill pill--glass">CGI &amp; 3D</li>
+            <li class="pill pill--glass">Asset Adaption &amp; Versioning</li>
+            <li class="pill pill--glass">AI-assisted Production</li>
+            <li class="pill pill--glass">Post-production</li>
+          </ul>
+        </div>
+      </div>
+      <div class="project">
+        <h3 class="project__title">Launching Douglas Elliman’s new world of luxury real estate</h3>
+        <a class="acc__link project__link" href="#"><span class="tlink">View Case Study</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a>
+      </div>
+    </section>
+
+      </div>
+    </div>
+
+    <section class="faq" id="faq">
+      <canvas id="halogl" aria-hidden="true"></canvas>
+      <div class="faq__inner">
+        <div class="sec-head sec-head--left" data-head>
+          <p class="sec-head__eyebrow"><span class="mask" data-rv="0"><span>Challenges We Solve</span></span></p>
+          <h2 class="sec-head__title"><span class="mask" data-rv="1"><span>Where our partnerships begin.</span></span></h2>
+          <p class="sec-head__body"><span class="mask" data-rv="2"><span>Our clients come to us with ambitious initiatives, complex requirements, and high expectations for the work.</span></span></p>
+          <span class="mask mask--cta sec-head__cta" data-rv="3"><span>
+            <button class="cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start a Conversation</span><span aria-hidden="true">Start a Conversation</span></span></span></button>
+          </span></span>
+        </div>
+
+        <div class="acc" data-list>
+          <div class="acc__item is-open">
+            <h3><button class="acc__q" type="button" aria-expanded="true" aria-controls="acc-1" id="accq-1">
+              <span class="mask"><span>Reimagining a global digital ecosystem</span></span><span class="acc__icon" aria-hidden="true"></span></button></h3>
+            <div class="acc__a" id="acc-1" role="region" aria-labelledby="accq-1"><div><div class="acc__body">
+              <p>Customer research and journey mapping inform CX strategies that connect experiences across platforms, markets, and touchpoints.</p>
+            </div></div></div>
+          </div>
+          <div class="acc__item">
+            <h3><button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-2" id="accq-2">
+              <span class="mask"><span>Launching or modernizing a digital platform</span></span><span class="acc__icon" aria-hidden="true"></span></button></h3>
+            <div class="acc__a" id="acc-2" role="region" aria-labelledby="accq-2" inert><div><div class="acc__body">
+              <p>From new websites to redesigns and replatforming, we combine design, content, and engineering to create intuitive, flexible digital experiences.</p>
+            </div></div></div>
+          </div>
+          <div class="acc__item">
+            <h3><button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-3" id="accq-3">
+              <span class="mask"><span>Building an effective AI strategy</span></span><span class="acc__icon" aria-hidden="true"></span></button></h3>
+            <div class="acc__a" id="acc-3" role="region" aria-labelledby="accq-3" inert><div><div class="acc__body">
+              <p>We assess workflows, team structures, and production demands to identify where AI and automation can increase capacity, improve efficiency, and maintain quality.</p>
+            </div></div></div>
+          </div>
+          <div class="acc__item">
+            <h3><button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-4" id="accq-4">
+              <span class="mask"><span>Improving performance across the customer journey</span></span><span class="acc__icon" aria-hidden="true"></span></button></h3>
+            <div class="acc__a" id="acc-4" role="region" aria-labelledby="accq-4" inert><div><div class="acc__body">
+              <p>Audience insights and performance data reveal opportunities to improve creative, media, digital experiences, and conversion.</p>
+            </div></div></div>
+          </div>
+          <div class="acc__item">
+            <h3><button class="acc__q" type="button" aria-expanded="false" aria-controls="acc-5" id="accq-5">
+              <span class="mask"><span>Scaling creative across brands and markets</span></span><span class="acc__icon" aria-hidden="true"></span></button></h3>
+            <div class="acc__a" id="acc-5" role="region" aria-labelledby="accq-5" inert><div><div class="acc__body">
+              <p>Modular creative systems, production expertise, and automation help brands increase content output while maintaining quality and consistency across channels and markets.</p>
+            </div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================================================================ FOOTER
+       The homepage footer, verbatim. footer.js builds the mark and the grid lines;
+       footer-glow.js paints the gradient. -->
+  <footer class="pf" id="footer">
+    <canvas class="pf__glow" aria-hidden="true"></canvas>
+    <div class="pf__grid" aria-hidden="true"></div>
+    <div class="pf__band">
+      <div class="pf__mark" aria-hidden="true"></div>
+      <h2 class="pf__head">Tell us what you want to build.</h2>
+      <button class="pf__cta" type="button"><span class="cta__clip"><span class="cta__roll"><span>Start a conversation</span><span aria-hidden="true">Start a conversation</span></span></span></button>
+    </div>
+    <div class="pf__locations">
+      <div class="pf__office">
+        <p class="pf__city">New York</p>
+        <p class="pf__addr">1115 Broadway, 5th fl New York, NY 10010</p>
+        <p class="pf__tel"><a href="tel:+12122091333">+1.212.209.1333</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">London</p>
+        <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">Istanbul</p>
+        <p class="pf__addr">Suadiye, Kadıkoy İstanbul, 34740, Turkiye</p>
+        <p class="pf__tel"><a href="tel:+903103924892">+90.310.392.4892</a></p>
+      </div>
+      <div class="pf__office">
+        <p class="pf__city">Sydney</p>
+        <p class="pf__addr">40-50 Francis St, Darlinghurst, NSW 2010, Australia</p>
+        <p class="pf__tel"><a href="tel:+61293104458">+61.2.9310.4458</a></p>
+      </div>
+    </div>
+    <div class="pf__legal">
+      <div class="pf__end">
+        <span>&copy;2026 thelab. Part of <a href="#">the wellcom group</a></span>
+        <nav>
+          <a href="#">Privacy</a>
+          <a href="#">Modern Slavery Statement</a>
+          <a href="#">Whistleblower Protection</a>
+        </nav>
+        <div class="pf__social">
+          <a class="pf__icon" href="#" aria-label="thelab on Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="4" y="4" width="16" height="16" rx="4.6"/>
+              <circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+          <a class="pf__icon" href="#" aria-label="thelab on LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+              <rect x="5.2" y="9.6" width="2.7" height="9"/><circle cx="6.55" cy="6.4" r="1.6"/>
+              <path d="M10.1 9.6h2.6v1.25a2.9 2.9 0 0 1 2.6-1.4c2 0 3.2 1.25 3.2 3.75v5.4h-2.7v-4.9c0-1.25-.45-2-1.55-2-.95 0-1.45.63-1.45 2v4.9h-2.7z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cs-cursor" aria-hidden="true"><span>View<br>case study</span></div>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <script src="config.js?v=20261111"></script>
+  <script src="../shared/shaders.js?v=20261111"></script>
+  <script src="app.js?v=20261111"></script>
+  <script src="../shared/footer.js?v=20261111"></script>
+  <script src="../shared/footer-glow.js?v=20261111"></script>
+  <script src="../shared/contact.js?v=20261111"></script>
+  <script src="expertise-sections.js?v=20261104"></script>
+  <script src="expertise-page.js?v=20261104c"></script>
+  <script src="page-glow.js?v=20261104c"></script>
+  <script src="../shared/halo.js?v=20261111"></script>
+</body>
+</html>

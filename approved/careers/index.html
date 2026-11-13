@@ -932,6 +932,17 @@
   .ShowcaseBlock_controls { position: absolute; right: 0; bottom: 0; margin: var(--spacer-16); display: flex; gap: var(--spacer-8); pointer-events: auto; }
   .ShowcaseBlock_controls button { padding: 12px; border: 0; border-radius: 50%; background: var(--white); cursor: pointer; line-height: 0; }
   .ShowcaseBlock_controls button svg { width: var(--spacer-16); height: var(--spacer-16); fill: var(--black); display: block; }
+  /* HOVER INVERTS (2026-11-13): white circle, black arrow -> black circle, white arrow,
+     on the same .25s as the page's other colour changes. Hover only where there is a
+     pointer, so a tap on a phone does not leave it stuck black; keyboard focus matches. */
+  .ShowcaseBlock_controls button { transition: background-color .25s ease; }
+  .ShowcaseBlock_controls button svg { transition: fill .25s ease; }
+  @media (hover: hover) {
+    .ShowcaseBlock_controls button:hover { background: var(--black); }
+    .ShowcaseBlock_controls button:hover svg { fill: var(--white); }
+  }
+  .ShowcaseBlock_controls button:focus-visible { background: var(--black); }
+  .ShowcaseBlock_controls button:focus-visible svg { fill: var(--white); }
   .ShowcaseBlock_carousel .react-aria-TabList { display: flex; justify-content: center; gap: var(--spacer-8); margin-top: var(--spacer-16); }
   .ShowcaseBlock_carousel .react-aria-Tab { width: var(--spacer-8); height: var(--spacer-8); border-radius: 50%; background: var(--black); cursor: pointer; }
   .ShowcaseBlock_carousel .react-aria-Tab:not(.is-on) { opacity: .3; }

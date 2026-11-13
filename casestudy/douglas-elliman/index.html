@@ -813,29 +813,25 @@
   /* ================================================== UP NEXT
      The live page's next-case-study block, as it is there: a rule above and below in
      the v-lines' ink; "Up Next" (the section eyebrow), the client (--font-h-56) and
-     its line (body 22) across 9 columns, the button right in the last 3. On hover the
-     next study's still fills it under 40% black, the type turns white and the button
-     goes solid white. Stacked under 1024. */
+     its line (body 22) across 9 columns, the button BELOW the copy, 24 under it, at every
+     width (2026-11-13; it sat right in the last 3). The next study's still fills it under
+     40% black ALL THE TIME (2026-11-13; it was revealed on hover), the type white and
+     the button solid white. */
   .CaseStudies_case-studies_nextStudyBlockContainer { position: relative; z-index: 3;
     border-top: 1px solid var(--cs-rule); border-bottom: 1px solid var(--cs-rule);   /* the v-lines' own ink */
-    background-position: 50%; background-size: cover; }
-  .CaseStudies_case-studies_nextStudyBlockContainer:hover { color: var(--white);
+    background-position: 50%; background-size: cover; color: var(--white);
     background-image: linear-gradient(rgb(var(--black-base) / .4), rgb(var(--black-base) / .4)), var(--next-study-hover-bg); }
-  .CaseStudies_case-studies_nextStudyBlockContainer:hover .Clickables_primaryButton { background: var(--white); color: var(--black); box-shadow: none; }
-  .CaseStudies_case-studies_nextStudyBlock { padding: var(--spacer-104) var(--inset); align-items: center; }   /* the 8 inset off the lines */
+  .CaseStudies_case-studies_nextStudyBlockContainer .Clickables_primaryButton { background: var(--white); color: var(--black); box-shadow: none; }
+  .CaseStudies_case-studies_nextStudyBlock { padding: var(--spacer-104) var(--inset); }   /* the 8 inset off the lines */
+  .CaseStudies_case-studies_nextStudyBlockContainer .CaseStudies_case-studies_nextStudyBlock { row-gap: 24px; }   /* over the grid's own row gap: 24 between the copy and the button, at every width */
   .CaseStudies_case-studies_nextStudyBlock > div { grid-column: 1 / span 9; }
   .CaseStudies_case-studies_nextStudyBlock > div > p { margin: 0; }
   .CaseStudies_case-studies_nextStudyBlock > div > p:first-child { font: var(--font-eyebrow); text-transform: uppercase; }   /* the section eyebrow */
   .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(2) { margin: var(--spacer-16) 0; font: var(--font-h-56); }
   .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(3) { font: 400 22px / 150% Beausite; }   /* body 22 (no token yet); 20 on a phone */
-  .CaseStudies_case-studies_nextStudyBlock > span { grid-column: 10 / -1; text-align: right; }
-  @media (max-width: 1023px) {
-    .CaseStudies_case-studies_nextStudyBlock { row-gap: 0; }
-    .CaseStudies_case-studies_nextStudyBlock > div, .CaseStudies_case-studies_nextStudyBlock > span { grid-column: 1 / -1; text-align: left; }
-    .CaseStudies_case-studies_nextStudyBlock > span { margin-top: 24px; }
-  }
-  @media (max-width: 767px) { .CaseStudies_case-studies_nextStudyBlock > span { margin-top: 8px; }
-                              .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(3) { font-size: 20px; } }
+  .CaseStudies_case-studies_nextStudyBlock > span { grid-column: 1 / -1; display: flex; }   /* flex: no line box round the button */
+  @media (max-width: 1023px) { .CaseStudies_case-studies_nextStudyBlock > div { grid-column: 1 / -1; } }
+  @media (max-width: 767px) { .CaseStudies_case-studies_nextStudyBlock > div > p:nth-child(3) { font-size: 20px; } }
 
   /* ======================================================== THE TEXT REVEALS
      Every block of copy comes in as Expertise's and the homepage's headers do (cs.js):
@@ -952,7 +948,6 @@
     <div><span class="stat-num" data-to="24" data-add="count">24</span><span class="stat-suffix" data-add="suffix">%</span></div><p><span class="mask" data-add="reveal"><span>increase in saved listings per active user</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-saved.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-5"/></picture></div></li><li class="StatsBlock_StatsBlock_statContainer"><div class="StatsBlock_StatsBlock_stat">
     <div><span class="stat-num" data-to="8.5" data-add="count">8.5</span><span class="stat-suffix" data-add="suffix">%</span></div><p><span class="mask" data-add="reveal"><span>Increase in Search to Listing Page click-thru rate</span></span></p></div><div class="StatsBlock_StatsBlock_icon"><picture class="thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/stat-click.png" loading="lazy" class="StatsBlock_StatsBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="icon-4"/></picture></div></li></ul></section></div>
 
-    <div aria-hidden="true" class="SpacerBlock_large SpacerBlock_transparent" data-spacer-block="true"></div>
     <!-- ================================================ UP NEXT
          The live page's next-case-study block. -->
     <section class="CaseStudies_case-studies_nextStudyBlockContainer" style="--next-study-hover-bg:url('assets/upnext-tula.jpg')"><div class="CaseStudies_case-studies_nextStudyBlock layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div><p>Up Next</p><p>Tula (P&amp;G Specialty Beauty)</p><p>Bringing prebiotics to a new generation of wellness seekers</p></div><span><a type="button" tabindex="0" href="https://www.thelab.co/case-studies/tula/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent">View Case Study<div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></span></div></section>

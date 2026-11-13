@@ -111,7 +111,7 @@
     <div class="ContactUsForm_popover">
       <section class="ContactUsForm_dialog theme-light theme-lightGray" role="dialog" aria-modal="true" aria-label="Connect with us." tabindex="-1">
         <button class="ContactUsForm_close" type="button" aria-label="Close">${CLOSE}</button>
-        <div><h2>Connect with us</h2></div>
+        <div><h2>Start a conversation</h2></div>
         <form class="ContactUsForm_ContactUsFormContent_form" novalidate>
           <div class="FormField_inputs_dropdown FormField_inputs_input FormField_inputs_inputVariables is-filled" data-required="true">
             <div class="FormField_inputs_fieldWrapper"><span class="react-aria-Label" id="cf_subject_label">Subject</span>

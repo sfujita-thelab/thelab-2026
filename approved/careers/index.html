@@ -1015,6 +1015,113 @@
   .perks .acc__q { cursor: default; }
   .perks + .jobs { padding-top: 0; }
 
+  /* THE CAREERS FIELD, IN BLUE (2026-11-13): the Work page's canopy -- the same dome hung
+     from the top, the same masses and motion -- in the brand blue (#0587C1, --blue-base)
+     in place of Work's green. Copied from approved/work/index.html; keyframes renamed cb-. */
+  .wh__glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: multiply; overflow: hidden;
+               animation: cb-breathe 6s ease-in-out infinite alternate;
+               /* NO EDGES: the field fades out top to bottom as a whole, so what ends it is
+                  this long fade, not the dome's outline */
+               -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 90%);
+                       mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 90%); }
+  /* THE DOME: one tall ellipse hung from well above the hero, its lower curve the canopy's
+     edge -- its crown about two-thirds of the way down the hero, rising a clear fifth of the hero toward
+     each side, so it reads as a ROUND dome. It is only a little wider than the screen (1.25x, --dw), so
+     its ends stay off it: the curve meets the screen's sides a third of the way down, with
+     no edge showing. The four masses move INSIDE it (clipped to it), placed from the
+     screen (--off is how far the dome reaches past its left side). THE EDGE IS FELT, NOT
+     SEEN: no hard clip -- a deep blur (64px) on the dome, and a mask that fades its lower
+     curve out over its last third, so the blue dissolves into the page rather than stopping on a line.
+     A pale sky fills it evenly, so the shape holds to its ends. */
+  .wh__dome { --dw: 150vw; --off: calc((var(--dw) - 100vw) / 2);
+              position: absolute; left: 50%; top: -118%; width: var(--dw); height: 190%;
+              transform: translateX(-50%); border-radius: 50%;
+              /* DEEPER AT THE TOP (2026-11-04): the screen's top edge is about 62% down the dome, so
+                 the fill is a deep blue to there, easing to the lighter blue by 84% */
+              background: linear-gradient(to bottom, rgb(4 118 178 / .8) 0%, rgb(4 118 178 / .8) 60%,
+                                          rgb(36 150 208 / .76) 72%, rgb(78 176 228 / .72) 84%);
+              filter: blur(120px);   /* the homepage Work field's softness: the curve felt, never drawn */
+              -webkit-mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%);
+                      mask-image: radial-gradient(50% 50% at 50% 50%, #000 30%, transparent 100%); }
+  .wh__dome > span { position: absolute; border-radius: 50%; filter: blur(70px); will-change: transform; }
+  /* LARGE MASSES, not small circles: each is a broad band of the dome (the core and the
+     light over a screen wide, half the dome deep), so what moves is the field itself. The
+     tones DEEPER, saturated not greyed: the core #289581 full, a deep navy (#0e8a6e)
+     under it, the bright sky kept, so the field runs light to deep with no mud. */
+  .wh__dome > span:nth-child(1) { left: calc(var(--off) + 10vw); top: 36%; width: 120vw; height: 72%;
+    background: radial-gradient(closest-side, rgb(var(--blue-base) / 1), rgb(var(--blue-base) / .6) 55%, rgb(var(--blue-base) / 0));
+    transform: rotate(-12deg); animation: cb-a 8s ease-in-out infinite alternate; }
+  /* the light: the family's bright sky, over the core's left shoulder */
+  .wh__dome > span:nth-child(2) { left: calc(var(--off) - 24vw); top: 40%; width: 100vw; height: 66%;
+    background: radial-gradient(closest-side, rgb(110 206 252 / .9), rgb(110 206 252 / .45) 60%, rgb(110 206 252 / 0));
+    animation: cb-b 10s ease-in-out infinite alternate; }
+  /* the far edge: a pale sky wash across the whole top, so the field has no hard rim */
+  .wh__dome > span:nth-child(3) { left: calc(var(--off) - 20vw); top: 50%; width: 140vw; height: 56%;
+    background: radial-gradient(closest-side, rgb(112 182 228 / .78), rgb(112 182 228 / 0));
+    animation: cb-c 9s ease-in-out infinite alternate; }
+  /* a deep NAVY pocket, right -- saturated (#16a487), so the right side has depth and
+     still answers the left's brightness (a dark, greyed #127060 here went to mud) */
+  .wh__dome > span:nth-child(4) { right: calc(var(--off) - 10vw); top: 38%; width: 90vw; height: 66%;
+    background: radial-gradient(closest-side, rgb(4 100 160 / .6), rgb(4 100 160 / .3) 45%, rgb(4 100 160 / .08) 80%, rgb(4 100 160 / 0));
+    animation: cb-d 7s ease-in-out infinite alternate; }
+  /* each loop: five stops, travelling, turning and swelling -- the core along the diagonal,
+     the light across under it, the wash side to side, the pocket round the right */
+  @keyframes cb-a {
+    0%   { transform: rotate(-12deg) translate(0, 0) scale(1); }
+    25%  { transform: rotate(2deg) translate(-20vw, 10vh) scale(1.22); }
+    50%  { transform: rotate(-24deg) translate(-32vw, 0) scale(.86); }
+    75%  { transform: rotate(-4deg) translate(-10vw, 16vh) scale(1.16); }
+    100% { transform: rotate(-18deg) translate(12vw, 6vh) scale(.96); } }
+  @keyframes cb-b {
+    0%   { transform: translate(0, 0) scale(1); }
+    25%  { transform: translate(26vw, 12vh) scale(1.25); }
+    50%  { transform: translate(46vw, 2vh) scale(.84); }
+    75%  { transform: translate(20vw, 18vh) scale(1.18); }
+    100% { transform: translate(-8vw, 8vh) scale(1.04); } }
+  @keyframes cb-c {
+    0%   { transform: translate(0, 0); }
+    33%  { transform: translate(-14vw, 6vh) scale(1.12); }
+    66%  { transform: translate(14vw, 2vh) scale(.92); }
+    100% { transform: translate(-4vw, 10vh) scale(1.08); } }
+  @keyframes cb-d {
+    0%   { transform: translate(0, 0) scale(1); }
+    25%  { transform: translate(-18vw, 14vh) scale(1.3); }
+    50%  { transform: translate(-36vw, 4vh) scale(.82); }
+    75%  { transform: translate(-14vw, 20vh) scale(1.18); }
+    100% { transform: translate(8vw, 8vh) scale(.92); } }
+  @keyframes cb-breathe { from { opacity: .88; } to { opacity: 1; } }
+  /* DEPTH (2026-11-04): two more masses so the field reads as a volume, not a wash --
+     a DEEP navy shadow low in the middle, where the dome is thickest, and a near-white
+     sky HIGHLIGHT up in its crown, as if lit from above. Each on its own slow loop. */
+  .wh__dome > span:nth-child(5) { left: calc(var(--off) + 30vw); top: 60%; width: 66vw; height: 34%;
+    background: radial-gradient(closest-side, rgb(3 84 144 / .5), rgb(3 84 144 / .28) 45%, rgb(3 84 144 / 0));
+    animation: cb-e 11s ease-in-out infinite alternate; }
+  .wh__dome > span:nth-child(6) { left: calc(var(--off) + 4vw); top: 56%; width: 50vw; height: 26%;
+    background: radial-gradient(closest-side, rgb(240 250 255 / .8), rgb(210 236 252 / .35) 50%, rgb(200 230 252 / 0));
+    mix-blend-mode: screen;
+    animation: cb-f 13s ease-in-out infinite alternate; }
+  @keyframes cb-e {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-12vw, 4vh) scale(1.15); }
+    66%  { transform: translate(10vw, 8vh) scale(.9); }
+    100% { transform: translate(-4vw, 2vh) scale(1.05); } }
+  @keyframes cb-f {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(18vw, 3vh) scale(1.1); }
+    66%  { transform: translate(-6vw, -2vh) scale(.92); }
+    100% { transform: translate(10vw, 5vh) scale(1.06); } }
+  @media (max-width: 767px) {
+    /* a PHONE's dome narrower (1.7x), so its curve shows across the short hero -- it read
+       flat at 5.6x -- and the field's fade starts lower, so the curve is not faded out */
+    .wh__dome { --dw: 170vw; }
+    .wh__glow { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent 92%);
+                        mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent 92%); }
+    .wh__dome > span:nth-child(1) { left: calc(var(--off) - 10vw); width: 170vw; }
+    .wh__dome > span:nth-child(2) { left: calc(var(--off) - 50vw); width: 150vw; }
+    .wh__dome > span:nth-child(4) { right: calc(var(--off) - 30vw); width: 140vw; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wh__glow, .wh__dome > span { animation: none; } }
+
 </style>
 </head>
 <body class="theme-light theme-lightGray">
@@ -1071,11 +1178,12 @@
     <!-- thelab.co/careers/'s markup, the CSS-module hashes off its classes; additions
          marked data-add. --><div></div><div></div>
     <!-- ================================================================== HERO (data-add)
-         The Work page's hero (.page-head.wh), without its canopy: the copy centred, the
+         The Work page's hero (.page-head.wh), with the Work canopy in blue (2026-11-13): the copy centred, the
          headline at --font-h-64 on 60% of the four columns, the body two columns under
          it, --spacer-248 above and --spacer-64 below. app.js reveals the [data-hv] masks
          on its intro clock, as on Work. -->
     <header class="page-head wh">
+      <div class="wh__glow" aria-hidden="true"><div class="wh__dome"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
       <div class="page-head__content">
         <h1><span class="mask" data-hv="1"><span>Work with us,</span></span><span class="mask" data-hv="2"><span>win with us</span></span></h1>
         <p class="page-head__body"><span class="mask" data-hv="3"><span>We are a close-knit collective of makers and doers creating digital products, marketing, and content to drive brands forward. We also love to make eachother laugh, share our favorite hole-in-the-wall lunch spots, swap travel stories, and support one another in living our best lives beyond brainstorms, laptops, Figma boards, and campaign decks.</span></span></p>

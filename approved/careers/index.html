@@ -1122,6 +1122,19 @@
   }
   @media (prefers-reduced-motion: reduce) { .wh__glow, .wh__dome > span { animation: none; } }
 
+  /* THE PERKS STACKED (2026-11-13): five pills at --font-h-32 IN A ROW (2026-11-13; they were stacked), wrapping and
+     ranged LEFT under the left-aligned header (B's, the left two columns), 12 apart, 40 under
+     the header. Each SLIDES IN FROM THE RIGHT, one by one (cs.js, 180 apart): 40 to the right and
+     faded, to its place. */
+  .perk-list { grid-column: 1 / -1; list-style: none; padding: 0 var(--inset); margin: var(--spacer-40) 0 0;
+               display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--spacer-12); }
+  /* AS PILLS (2026-11-13): the site's light-page pill (--cs-pill-bg, #e7e7e7, fully
+     round, as the case studies' role pills), scaled to the 32 type: 8 by 32 round it */
+  .perk-item { font: var(--font-h-32); white-space: nowrap; color: var(--color-text-primary);
+               background: var(--cs-pill-bg); border-radius: 999px; padding: var(--spacer-8) var(--spacer-32);
+               transition: opacity .8s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1); }
+  .perk-item.pre { opacity: 0; transform: translateX(calc(40 * var(--u))); transition: none; }
+  @media (max-width: 767px) { .perk-item { font: var(--font-h-24); padding: var(--spacer-8) var(--spacer-24); white-space: nowrap; } }   /* a phone: 24, so the longest stays one pill-shape */
 </style>
 </head>
 <body class="theme-light theme-lightGray">
@@ -1192,22 +1205,23 @@
     </header>
     <div class="ShowcaseBlock_container careers-first pre" style="--aspect-ratio:2"><div class="ShowcaseBlock_layoutFull ShowcaseBlock_showcaseImages layout_container thelabnyc_thelabui_layout_container"><div class="ShowcaseBlock_carousel Carousel_Carousel_root"><div role="group" aria-roledescription="carousel" aria-label="Images from our work"><div class="ShowcaseBlock_controlWrapper"><div class="ShowcaseBlock_controls Carousel_Carousel_controls Carousel_Carousel_filled Carousel_Carousel_large"><button type="button" aria-label="Go to last tab" class="thelabnyc_thelabui_Clickable_Clickable_buttonReset"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="false" viewBox="0 0 16 16"><path d="M9.48 14.01 3.46 8l6.02-6.01.71.71L4.89 8l5.3 5.3-.71.71Z"></path></svg></button><button type="button" aria-label="Next tab" class="thelabnyc_thelabui_Clickable_Clickable_buttonReset"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="false" viewBox="0 0 16 16"><path d="m6.52 14.01-.71-.71 5.3-5.3-5.29-5.3.71-.71L12.54 8l-6.01 6.01Z"></path></svg></button></div></div><div role="tabpanel" class="react-aria-TabPanel"><div class="ShowcaseBlock_showcaseImage"><picture class="ShowcaseBlock_picture thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/carousel-1.webp" class="ShowcaseBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="Careers 1"></picture></div></div><div class="react-aria-TabPanel" inert=""><div class="ShowcaseBlock_showcaseImage"><picture class="ShowcaseBlock_picture thelabnyc_thelabui_ImageChooserBlock_picture thelabnyc_thelabui_ImageRenditionSet_picture"><img src="assets/carousel-2.webp" class="ShowcaseBlock_image thelabnyc_thelabui_ImageChooserBlock_img thelabnyc_thelabui_ImageRenditionSet_img" alt="Careers 2"></picture></div></div><div class="react-aria-TabList" aria-label="Choose slide to display" role="tablist" aria-orientation="horizontal"><div class="react-aria-Tab" role="tab"><div style="border: 0px; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; white-space: nowrap;">Slide 1</div></div><div class="react-aria-Tab" role="tab"><div style="border: 0px; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; white-space: nowrap;">Slide 2</div></div></div></div></div></div></div>
     <div aria-hidden="true" class="SpacerBlock_xlarge SpacerBlock_transparent" data-spacer-block="true"></div>
-    <!-- PERKS & BENEFITS, option B (2026-11-13): the dark icon grid is gone. The Job
-         Openings layout without the links -- the header on the left two columns, the perks
-         one hairline row each on the right two. -->
+    <!-- PERKS & BENEFITS, option A (2026-11-13): B's left-aligned header (the left two
+         columns); under it the five perks as pills in a row, ranged left, sliding in from
+         the right one by one. -->
     <section class="faq perks" id="perks">
       <div class="faq__inner">
         <div class="sec-head sec-head--left">
           <h2 class="sec-head__title"><span class="mask"><span>Perks &amp; benefits</span></span></h2>
           <p class="sec-head__body"><span class="mask"><span>We’ll support you in finding a work-life balance that feeds your soul, if you bring your passion, care, and consideration to the work we produce together on the easy days and the challenging ones.</span></span></p>
         </div>
-        <ul class="acc">
-          <li class="acc__item"><div class="acc__q"><span class="acc__title"><span class="mask"><span>Hybrid Work Model</span></span></span></div></li>
-          <li class="acc__item"><div class="acc__q"><span class="acc__title"><span class="mask"><span>Professional Growth</span></span></span></div></li>
-          <li class="acc__item"><div class="acc__q"><span class="acc__title"><span class="mask"><span>Unlimited PTO</span></span></span></div></li>
-          <li class="acc__item"><div class="acc__q"><span class="acc__title"><span class="mask"><span>Health, Dental &amp; Vision Insurance</span></span></span></div></li>
-          <li class="acc__item"><div class="acc__q"><span class="acc__title"><span class="mask"><span>401K matching</span></span></span></div></li>
+        <ul class="perk-list">
+          <li class="perk-item"><span>Hybrid Work Model</span></li>
+          <li class="perk-item"><span>Unlimited PTO</span></li>
+          <li class="perk-item"><span>Health, Dental &amp; Vision Insurance</span></li>
+          <li class="perk-item"><span>401K matching</span></li>
+          <li class="perk-item"><span>Professional Growth</span></li>
         </ul>
+
       </div>
     </section>
     <!-- ================================================ JOB OPENINGS (data-add)
@@ -1542,6 +1556,9 @@
                        [head.querySelector('.sec-head__cta'), 235]]);
       const rows = [...sec.querySelectorAll('.acc__item')];
       textBlock(sec.querySelector('.acc'), rows.map((r, j) => [r, 335 + j * 40]));
+      // option A's perks: sliding in from the right ONE BY ONE, from 335, 180 apart
+      const perks = [...sec.querySelectorAll('.perk-item')];
+      textBlock(sec.querySelector('.perk-list'), perks.map((p, j) => [p, 335 + j * 180]));
     });
     // each caption under a film or picture
     document.querySelectorAll('.ShowcaseBlock_fullCaption > span').forEach(c => textBlock(c, [[mask(c), 0]]));

@@ -858,6 +858,17 @@
     const vh = viewH();
     scrollT = Math.min(1, Math.max(0, window.scrollY / (vh * 0.80)));
     const ease = scrollT * scrollT * (3 - 2 * scrollT);
+    /* THE HERO SCROLLS UP WITH THE PAGE (2026-11-13). It was held in place while Work
+       slid over it; now the copy and the WebGL canvas travel up at the page's own rate,
+       as if they were in the flow, and still fade on the curves below. Both stay
+       position:fixed and are moved by the scroll distance, so nothing about their sizing
+       or stacking changes. Capped at one viewport: by then both are gone.
+
+       NOT the atmospheric gradient (.hero-glow): it fades out IN PLACE, as before. Moved,
+       its blurred bottom edge rode up over Work as a visible band. Nor .page-grid -- its
+       lines run the whole page. */
+    const lift = 'translate3d(0,' + (-Math.min(window.scrollY, vh)).toFixed(1) + 'px,0)';
+    canvas.style.transform = lift;
     if (heroEl) {
       // text_animation.mov: the copy fades and drifts upward at the same time,
       // finishing well before the section change completes. Restrained on purpose —
@@ -877,7 +888,7 @@
       const k = Math.min(1, scrollT * 1.05);
       const e = k * k * (3 - 2 * k);
       heroEl.style.opacity = String(1 - e);
-      heroEl.style.transform = 'translate3d(0,' + (-e * vh * 0.075).toFixed(1) + 'px,0)';
+      heroEl.style.transform = lift;
       /* And once it is invisible, it stops taking the pointer. Driven off the SAME e as
          the opacity rather than a scroll threshold of its own, so there is no window in
          which the hero looks gone and still answers the mouse. See .hero.is-gone. */

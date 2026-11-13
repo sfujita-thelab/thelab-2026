@@ -1565,6 +1565,20 @@
     // the Related Work heading (its cards have the Work page's own entrance)
     document.querySelectorAll('.cs-related__head').forEach(h => textBlock(h, [[mask(h), 0]]));
 
+    /* THE JOB OPENINGS JUMP (the hero's button) lands as the Expertise sub nav's does
+       (expertise-page.js): the headline --spacer-40 under the topbar's FULL height, shown
+       or not -- it hides scrolling down, so a jump would otherwise land under it */
+    document.querySelectorAll('a[href="#job-openings"]').forEach(a => a.addEventListener('click', e => {
+      const head = document.querySelector('#job-openings .sec-head__title');
+      if (!head) return;
+      e.preventDefault();
+      const bar = document.querySelector('.topbar');
+      const sp40 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--spacer-40')) || 40;
+      const clear = (bar ? bar.offsetTop + bar.offsetHeight : 0) + sp40;
+      scrollTo({ top: Math.max(0, head.getBoundingClientRect().top + scrollY - clear), behavior: REDUCED ? 'auto' : 'smooth' });
+      history.replaceState(null, '', '#job-openings');
+    }));
+
     addEventListener('scroll', gates, { passive: true });
     (function pump() { gates(); if (pumped < 3) requestAnimationFrame(pump); })();
 

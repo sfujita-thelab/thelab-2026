@@ -1043,7 +1043,10 @@
        until the mark has turned in; this page has no figure, so that wait was an empty
        screen. 480 is a beat after the first grid line sets off -- the copy rises as the
        frame assembles. */
-    text:      [480, 480, 480, 480],           // eyebrow, headline, body -- together
+    text:      document.documentElement.classList.contains('cs-arrive') ? [1300, 1300, 1300, 1300] : [480, 480, 480, 480],   // eyebrow, headline, body -- together
+    /* ARRIVING FROM UP NEXT (upnext.js, html.cs-arrive): the hero film is full screen and
+       settles under the title from 300 to 1400; the title waits for it, rising as the
+       film lands (2026-11-13) */
     /* THE TOPBAR, with the first grid line rather than with the type. The bar is chrome,
        not artwork -- the same reason its padding is flat px -- so it belongs to the frame
        the page assembles before it speaks: lines wipe down, bar slides down, and both are

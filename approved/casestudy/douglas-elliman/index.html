@@ -714,8 +714,23 @@
     padding: var(--spacer-8) var(--spacer-56); border-radius: 999px; box-shadow: inset 0 0 0 1px currentColor;
     color: var(--cs-ink); text-decoration: none; white-space: nowrap;
     font: var(--font-button-1); text-transform: uppercase; transition: background .25s ease, color .25s ease; }
-  .Clickables_primaryButton:hover { background: var(--cs-ink); color: var(--cs-ground); }
+  /* ON HOVER, the site's CTA roll (.cta__clip / .cta__roll, the label rolls up to its
+     twin), not a fill -- as every other CTA (2026-11-13) */
+  .Clickables_primaryButton:hover .cta__roll { transform: translateY(calc(-1 * var(--cta-line, 1.16em))); }
+  .Clickables_primaryButton:active { transform: scale(.985); }
   .Clickables_arrowSpecialWrapper { display: none; }
+  /* VISIT LIVE SITE as a TEXT LINK (2026-11-13): Expertise's case link (.acc__link) --
+     the label, and an arrow whose shaft stretches right on hover, its head riding out on
+     the tip; arriving eases out, leaving eases in. No underline. */
+  .cs-tlink { display: inline-flex; align-items: center; gap: var(--spacer-8);
+              color: var(--cs-ink); text-decoration: none; white-space: nowrap;
+              font: var(--font-button-1); text-transform: uppercase; }
+  .acc__arrow { display: inline-flex; align-items: center; flex: none; height: 10px; }
+  .acc__shaft { display: block; width: 12px; height: 1.2px; margin-right: -5px; background: currentColor;
+                transition: width .18s cubic-bezier(.5, 0, .78, .25); }
+  .acc__arrow svg { display: block; width: 6px; height: 10px; overflow: visible; }
+  .cs-tlink:hover .acc__shaft { width: 32px; transition: width .28s cubic-bezier(.22, .61, .36, 1); }
+  @media (prefers-reduced-motion: reduce) { .acc__shaft, .cs-tlink:hover .acc__shaft { transition: none; } }
 
   /* ============================================================ RICH TEXT
      The heading (h3, --font-h-56) over its copy (--font-p-18), as one block placed on
@@ -814,14 +829,13 @@
      The live page's next-case-study block, as it is there: a rule above and below in
      the v-lines' ink; "Up Next" (the section eyebrow), the client (--font-h-56) and
      its line (body 22) across 9 columns, the button BELOW the copy, 24 under it, at every
-     width (2026-11-13; it sat right in the last 3). The next study's still fills it under
-     40% black ALL THE TIME (2026-11-13; it was revealed on hover), the type white and
-     the button solid white. */
+     width (2026-11-13; it sat right in the last 3). The next study's own hero film fills it
+     under 40% black ALL THE TIME (2026-11-13; a still, revealed on hover), the type white
+     and the button solid white. */
   .CaseStudies_case-studies_nextStudyBlockContainer { position: relative; z-index: 3;
-    border-top: 1px solid var(--cs-rule); border-bottom: 1px solid var(--cs-rule);   /* the v-lines' own ink */
-    background-position: 50%; background-size: cover; color: var(--white);
-    background-image: linear-gradient(rgb(var(--black-base) / .4), rgb(var(--black-base) / .4)), var(--next-study-hover-bg); }
-  .CaseStudies_case-studies_nextStudyBlockContainer .Clickables_primaryButton { background: var(--white); color: var(--black); box-shadow: none; }
+    /* no rules above and below (2026-11-13): the film is its edge, and the page showed through them as a light line */
+    overflow: hidden; cursor: pointer; color: var(--white); }   /* the film under it: .nx__media */
+  .CaseStudies_case-studies_nextStudyBlockContainer .Clickables_primaryButton { color: var(--white); }   /* OUTLINED in white on the film (2026-11-13; it was solid white) */
   .CaseStudies_case-studies_nextStudyBlock { padding: var(--spacer-104) var(--inset); }   /* the 8 inset off the lines */
   .CaseStudies_case-studies_nextStudyBlockContainer .CaseStudies_case-studies_nextStudyBlock { row-gap: 24px; }   /* over the grid's own row gap: 24 between the copy and the button, at every width */
   .CaseStudies_case-studies_nextStudyBlock > div { grid-column: 1 / span 9; }
@@ -842,10 +856,10 @@
      big type's masks for its descenders. */
   main :is(h1, h2, h3, h4) > .mask { padding: .16em 0 .10em; margin: -.16em 0 -.10em; }
   main p > .mask, .ShowcaseBlock_fullCaption > span > .mask { padding: .12em 0 .14em; margin: -.12em 0 -.14em; }
-  .CaseStudies_case-studies_roleList li, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton,
+  .CaseStudies_case-studies_roleList li, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton, .CaseStudies_case-studies_projectIntro .cs-tlink,
   .CaseStudies_case-studies_nextStudyBlock .Clickables_primaryButton {
     transition: opacity .72s cubic-bezier(.22,.61,.36,1), transform .72s cubic-bezier(.22,.61,.36,1), background .25s ease, color .25s ease; }
-  .CaseStudies_case-studies_roleList li.pre, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton.pre,
+  .CaseStudies_case-studies_roleList li.pre, .CaseStudies_case-studies_projectIntro .Clickables_primaryButton.pre, .CaseStudies_case-studies_projectIntro .cs-tlink.pre,
   .CaseStudies_case-studies_nextStudyBlock .Clickables_primaryButton.pre {
     opacity: 0; transform: translateY(calc(16 * var(--u))); transition: none; }
 
@@ -859,7 +873,44 @@
     .Tabs_Tabs_underline, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel img { transition: none; }
   }
 
+  /* ======================================================== UP NEXT -> NEXT (upnext.js)
+     The block plays the next case study's own hero film under the 40% black; clicked,
+     the copy fades and the film grows to the whole screen, its darkening lifting.
+     Arriving, the hero film is full screen from the first paint (html.cs-arrive), on the
+     frame the last page left on, then settles under the title. */
+  @view-transition { navigation: auto; }
+  .CaseStudies_case-studies_nextStudyBlock { position: relative; z-index: 1; transition: opacity .35s ease; }
+  .nx-go .CaseStudies_case-studies_nextStudyBlock { opacity: 0; }
+  .nx__media { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--cs-media-bg); }
+  .nx__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* the 40% black, and over it a soft darkening from the left, under the copy, so the
+     type holds on a bright frame (2026-11-13) */
+  .nx__media::after { content: ""; position: absolute; inset: 0; transition: opacity .9s ease;
+    background: linear-gradient(to right, rgb(var(--black-base) / .5) 0%, rgb(var(--black-base) / .3) 35%, rgb(var(--black-base) / 0) 65%),
+                rgb(var(--black-base) / .4); }
+  .nx__media.is-full::after { opacity: 0; }
+  html.cs-arrive { overflow: hidden; }
+  html.cs-arrive .FullWidthMedia_root { aspect-ratio: 16 / 9; }   /* holds the film's place while it is away */
+  html.cs-arrive .FullWidthMedia_root > .VideoWithPlayPauseButton_root {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; aspect-ratio: auto; z-index: 1000;
+    clip-path: none; opacity: 1;
+    background: var(--cs-arrive-frame, none) center / cover, var(--cs-media-bg); }
 </style>
+<!-- UP NEXT HAND-OFF (upnext.js): arriving from the last page's Up Next, the hero film
+     starts full screen on the frame it left on, before anything paints -->
+<script>
+try {
+  var a = JSON.parse(sessionStorage.getItem('cs-arrive'));
+  if (a && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('cs-arrive');
+    if (a.frame) document.documentElement.style.setProperty('--cs-arrive-frame', 'url(' + a.frame + ')');
+  }
+} catch (e) {}
+// only the Up Next move crossfades in
+addEventListener('pagereveal', function (e) {
+  if (e.viewTransition && !document.documentElement.classList.contains('cs-arrive')) e.viewTransition.skipTransition();
+});
+</script>
 </head>
 <body class="theme-dark theme-black">
   <div class="page-bg" aria-hidden="true"></div>
@@ -917,7 +968,7 @@
     <section class="CaseStudyHero_heroText layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid">
     <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_left CaseStudyHero_richTextBlock"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h1><span class="mask" data-hv="1" data-add="reveal"><span>Launching a new world</span></span><span class="mask" data-hv="2" data-add="reveal"><span><i>of luxury real estate</i></span></span></h1></div></div><div class="CaseStudyHero_heroClient typography_fontHeader32 typography_balance"><span class="mask" data-hv="3" data-add="reveal"><span>Douglas Elliman</span></span></div></section>
     <section class="FullWidthMedia_root"><div class="VideoWithPlayPauseButton_root" style="aspect-ratio:1.7777777777777777"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/de-1.mp4" title="Hero showcasing thelab's work on client Douglas Elliman" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></section>
-    <section class="CaseStudies_case-studies_projectIntro layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div class="CaseStudies_case-studies_roleListWrapper"><h4>Our Role</h4><ul class="CaseStudies_case-studies_roleList utility_listReset"><li>Research<span class="CaseStudies_case-studies_comma">, </span></li><li>Content Strategy<span class="CaseStudies_case-studies_comma">, </span></li><li>Art Direction<span class="CaseStudies_case-studies_comma">, </span></li><li>UX/UI Design<span class="CaseStudies_case-studies_comma">, </span></li><li>Design Systems<span class="CaseStudies_case-studies_comma">, </span></li><li>Analytics<span class="CaseStudies_case-studies_comma">, </span></li><li>Full Stack Engineering<span class="CaseStudies_case-studies_comma">, </span></li><li>SEO/AEO</li></ul><a type="button" tabindex="0" target="_blank" href="https://www.elliman.com/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent">Visit live site<div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></div><p>Douglas Elliman is a leader in luxury real estate across the most sought-after U.S. and global markets. We partnered with their leadership team to create an AI-powered customer and client platform that engages and inspires high-net-worth buyers and sellers—while empowering the ambitious agents and experts who define their competitive edge.</p></section>
+    <section class="CaseStudies_case-studies_projectIntro layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div class="CaseStudies_case-studies_roleListWrapper"><h4>Our Role</h4><ul class="CaseStudies_case-studies_roleList utility_listReset"><li>Research<span class="CaseStudies_case-studies_comma">, </span></li><li>Content Strategy<span class="CaseStudies_case-studies_comma">, </span></li><li>Art Direction<span class="CaseStudies_case-studies_comma">, </span></li><li>UX/UI Design<span class="CaseStudies_case-studies_comma">, </span></li><li>Design Systems<span class="CaseStudies_case-studies_comma">, </span></li><li>Analytics<span class="CaseStudies_case-studies_comma">, </span></li><li>Full Stack Engineering<span class="CaseStudies_case-studies_comma">, </span></li><li>SEO/AEO</li></ul><a class="cs-tlink" data-add="tlink" target="_blank" rel="noopener" href="https://www.elliman.com/"><span class="tlink">Visit live site</span><span class="acc__arrow" aria-hidden="true"><span class="acc__shaft"></span><svg viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span></a></div><p>Douglas Elliman is a leader in luxury real estate across the most sought-after U.S. and global markets. We partnered with their leadership team to create an AI-powered customer and client platform that engages and inspires high-net-worth buyers and sellers—while empowering the ambitious agents and experts who define their competitive edge.</p></section>
     <div class="RichText_rich-text_layout layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid RichText_rich-text_right"><div class="RichText_rich-text_richText RichText_rich-text_largeHeadings RichText_rich-text_both RichText_rich-text_firstChild RichText_rich-text_lastChild"><h3><i>Concierge</i> inspired property search</h3><p></p><p>We powered our property search experience with expert guidance, intuitive navigation, intelligent search, and smart save features that work together to learn user preferences, organize favorites, and surface the most relevant listings over time. It allows people to discover at their own pace while building a clear picture of what they want and making it easy to connect with an agent when they’re ready.</p></div></div>
     <div aria-hidden="true" class="SpacerBlock_small SpacerBlock_transparent" data-spacer-block="true"></div>
     <div class="ShowcaseBlock_container" style="--aspect-ratio:1.7777777777777777"><div class="ShowcaseBlock_layoutFull ShowcaseBlock_showcaseImages layout_container thelabnyc_thelabui_layout_container"><div class="ShowcaseBlock_carousel Carousel_Carousel_root"><div class="react-aria-TabPanel"><div class="ShowcaseBlock_showcaseImage ShowcaseBlock_showcaseImageRounded"><div class="VideoWithPlayPauseButton_root ShowcaseBlock_videoWrapper" style="aspect-ratio:var(--aspect-ratio)"><div class="VideoWithPlayPauseButton_loaderOverlay" aria-hidden="true"></div><div class="VideoWithPlayPauseButton_loaderContainer" aria-hidden="true"><div class="VideoWithPlayPauseButton_loader"></div></div><video src="assets/de-2.mp4" title="Website in situ" loop="" autoplay="" playsinline="" muted="" class="thelabnyc_thelabui_VideoChooserBlock_video"></video><div class="VideoWithPlayPauseButton_controls"><button type="button" tabindex="0" class="VideoWithPlayPauseButton_button thelabnyc_thelabui_Clickable_Clickable_buttonReset"><div style="border:0;clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;white-space:nowrap">Pause Video</div><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="VideoWithPlayPauseButton_icon" viewbox="0 0 16 16"><path d="M6 2H4v12h2V2Zm6 0h-2v12h2V2Z" fill="currentColor"></path></svg></button></div></div></div><div class="ShowcaseBlock_fullCaption ShowcaseBlock_caption layout_grid thelabnyc_thelabui_layout_grid"><span>An AI-powered platform, paired with intuitively placed wayfinding copy and immersive assets, guides visitors to explore homes in the cities and neighborhoods they covet.</span></div></div></div></div></div>
@@ -950,7 +1001,7 @@
 
     <!-- ================================================ UP NEXT
          The live page's next-case-study block. -->
-    <section class="CaseStudies_case-studies_nextStudyBlockContainer" style="--next-study-hover-bg:url('assets/upnext-tula.jpg')"><div class="CaseStudies_case-studies_nextStudyBlock layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div><p>Up Next</p><p>Tula (P&amp;G Specialty Beauty)</p><p>Bringing prebiotics to a new generation of wellness seekers</p></div><span><a type="button" tabindex="0" href="https://www.thelab.co/case-studies/tula/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent">View Case Study<div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></span></div></section>
+    <section class="CaseStudies_case-studies_nextStudyBlockContainer"><div class="nx__media" data-add="upnext" aria-hidden="true"><video src="../kentucky-legend/assets/kl-1.mp4" autoplay muted loop playsinline preload="auto"></video></div><div class="CaseStudies_case-studies_nextStudyBlock layout_gridContainer thelabnyc_thelabui_layout_gridContainer thelabnyc_thelabui_layout_container thelabnyc_thelabui_layout_grid"><div><p>Up Next</p><p>Kentucky Legend</p><p>Serving up a new legendary standard</p></div><span><a type="button" tabindex="0" href="../kentucky-legend/" class="thelabnyc_thelabui_Clickable_Clickable_linkReset Clickables_primaryButton"><div class="Clickables_clickableContent"><span class="cta__clip"><span class="cta__roll"><span>View Case Study</span><span aria-hidden="true">View Case Study</span></span></span><div aria-hidden="true" class="Clickables_arrowSpecialWrapper"><div class="Clickables_arrowSpecial"></div></div></div></a></span></div></section>
   </main>
 
 
@@ -1017,10 +1068,11 @@
 
   <script src="config.js?v=20261104e"></script>
   <script src="shaders.js?v=20261103"></script>
-  <script src="app.js?v=20261103b"></script>
+  <script src="app.js?v=20261113"></script>
   <script src="footer.js?v=20261103"></script>
   <script src="footer-glow.js?v=20261103"></script>
   <script src="contact.js?v=20261113"></script>
+  <script src="upnext.js?v=20261113"></script>
   <script>
   window.CS_TABS = ["assets/de-5-1.webp", "assets/de-5-2.webp", "assets/de-5-3.webp"];   /* the tab panels' media, in tab order (the live page renders only the chosen one) */
   /* CASE STUDY: the tabs and the films, on the live page's markup.
@@ -1107,6 +1159,7 @@
        scroll back up, until the page is reloaded */
     const HERO_FILM_AT = /[?&]intro=0/.test(location.search) ? 0 : 1100;   // the hero's type lands ~1300 (480 + .82s)
     if (!REDUCED) document.querySelectorAll('.FullWidthMedia_root > .VideoWithPlayPauseButton_root, .ShowcaseBlock_showcaseImage, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root, .SplitBlock_mediaWrapper > picture').forEach(m => {
+      if (m.closest('.FullWidthMedia_root') && document.documentElement.classList.contains('cs-arrive')) return;   // arriving from Up Next: already on screen
       m.style.transition = 'none';
       m.classList.add('pre');
       void m.offsetWidth;
@@ -1203,7 +1256,7 @@
       textBlock(pi, [[mask(pi.querySelector('.CaseStudies_case-studies_roleListWrapper h4')), 0],
                      ...[...pi.querySelectorAll(':scope > p')].map((p, j) => [mask(p), 95 + j * 110]),
                      ...pills.map((li, j) => [li, 335 + j * 60]),
-                     [pi.querySelector('.Clickables_primaryButton'), 335 + pills.length * 60],
+                     [pi.querySelector('.Clickables_primaryButton, .cs-tlink'), 335 + pills.length * 60],
                      // the rule under Our Role (a phone's): with the last pill
                      [pi.querySelector('.CaseStudies_case-studies_roleListWrapper'), 335 + Math.max(0, pills.length - 1) * 60]]);
     });

@@ -417,22 +417,25 @@
   if (cur && cards.length) {
     /* The IMAGE block is the trigger, not the card. A card is 680x340 -- the 340 image
        plus the text column beside it -- so binding to the card put the cursor up while
-       the pointer was over the copy, a long way from anything clickable. */
-    cards.forEach(card => {
-      const img = card.querySelector('.card__img');
-      if (!img) return;
-      img.addEventListener('pointerenter', () => { cs.want = 1; cur.classList.add('on'); });
-      img.addEventListener('pointerleave', e => {
-        // moving straight from one image block to another keeps it alive; moving onto
-        // this card's own copy does not, because the copy is not a trigger any more
-        const to = e.relatedTarget;
-        if (to && to.closest && to.closest('.card__img')) return;
-        cs.want = 0; cur.classList.remove('on');
+       the pointer was over the copy, a long way from anything clickable.
+       HIT-TESTED BY POSITION (2026-11-13), not pointerenter on the image: the card's link
+       (.card__link) is stretched over the whole card above it, so the image never got the
+       pointer and the cursor never came up. Checked on every move and every scroll. */
+    const imgs = cards.map(card => card.querySelector('.card__img')).filter(Boolean);
+    const hit = () => {
+      if (!cs.seen) return;
+      const over = imgs.some(img => {
+        const r = img.getBoundingClientRect();
+        return cs.tx >= r.left && cs.tx <= r.right && cs.ty >= r.top && cs.ty <= r.bottom;
       });
-    });
+      cs.want = over ? 1 : 0; cur.classList.toggle('on', over);
+    };
+    addEventListener('scroll', hit, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => { cs.want = 0; cur.classList.remove('on'); });
     addEventListener('pointermove', e => {
       cs.tx = e.clientX; cs.ty = e.clientY;
       if (!cs.seen) { cs.x = cs.tx; cs.y = cs.ty; cs.seen = true; }
+      hit();
     }, { passive: true });
   }
 

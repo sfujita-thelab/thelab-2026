@@ -601,9 +601,9 @@
     const dt = Math.min((now - last) / 1000, 0.1);
     last = now;
 
-    // nothing to draw once the hero has faded out — don't burn the GPU on it
+    // nothing to draw once the hero has scrolled off — don't burn the GPU on it
     introStep(now);
-    if (scrollT >= 1) { if (!STILL) requestAnimationFrame(frame); return; }
+    if (heroOff) { if (!STILL) requestAnimationFrame(frame); return; }
     if (FREEZE === null) simTime += dt * CONFIG.render.timeScale;
 
     // ease the pointer — this is what makes the interaction feel physical
@@ -834,6 +834,7 @@
   const heroEl = document.querySelector('.hero');
   const glowEl = document.querySelector('.hero-glow');
   let scrollT = 0;
+  let heroOff = false;         // true once the hero has scrolled fully off the top
 
   /* ---- the gradient's opacity has TWO owners, and one channel -------------------
      The scroll hand-off fades it out with the hero. The intro fades it in after the
@@ -858,44 +859,26 @@
     const vh = viewH();
     scrollT = Math.min(1, Math.max(0, window.scrollY / (vh * 0.80)));
     const ease = scrollT * scrollT * (3 - 2 * scrollT);
-    /* THE HERO SCROLLS UP WITH THE PAGE (2026-11-13). It was held in place while Work
-       slid over it; now the copy and the WebGL canvas travel up at the page's own rate,
-       as if they were in the flow, and still fade on the curves below. Both stay
-       position:fixed and are moved by the scroll distance, so nothing about their sizing
-       or stacking changes. Capped at one viewport: by then both are gone.
+    /* THE HERO SCROLLS UP WITH THE PAGE (2026-11-13). It was held in place and faded
+       while Work slid over it; now the copy and the WebGL canvas travel up at the page's
+       own rate, as if they were in the flow, and do NOT fade -- they simply leave the top
+       of the viewport. Both stay position:fixed and are moved by the scroll distance, so
+       nothing about their sizing or stacking changes. Capped at one viewport: by then
+       both are fully off screen.
 
        NOT the atmospheric gradient (.hero-glow): it fades out IN PLACE, as before. Moved,
        its blurred bottom edge rode up over Work as a visible band. Nor .page-grid -- its
        lines run the whole page. */
     const lift = 'translate3d(0,' + (-Math.min(window.scrollY, vh)).toFixed(1) + 'px,0)';
     canvas.style.transform = lift;
+    heroOff = window.scrollY >= vh;
     if (heroEl) {
-      // text_animation.mov: the copy fades and drifts upward at the same time,
-      // finishing well before the section change completes. Restrained on purpose —
-      // this is the only thing that moves; grid, background and halo do not.
-      /* 1.05, HALF the 2.1 it was, so the copy takes twice as much scroll to go. The
-         multiplier is the whole speed control: scrollT runs 0 -> 1 over 0.8 of a
-         viewport, and this is how much faster than that the copy fades. At 2.1 it was
-         gone by 343px of a 900px viewport -- about a third of the way out of the hero,
-         which is what made it read as snatched away. At 1.05 it is gone by 686, three
-         quarters of the way, and still finished before Work arrives at 900.
-
-         Only the COPY. The WebGL canvas and the atmospheric gradient still hand over on
-         scrollT's own curve, and they have to: #stage is fixed and .featuredwork has no
-         background of its own, so anything left of the hero's orange paints straight
-         through the Work section. They finish at ~620 against a section edge at 900, and
-         doubling that span would put them 338px inside it. */
-      const k = Math.min(1, scrollT * 1.05);
-      const e = k * k * (3 - 2 * k);
-      heroEl.style.opacity = String(1 - e);
       heroEl.style.transform = lift;
-      /* And once it is invisible, it stops taking the pointer. Driven off the SAME e as
-         the opacity rather than a scroll threshold of its own, so there is no window in
-         which the hero looks gone and still answers the mouse. See .hero.is-gone. */
-      heroEl.classList.toggle('is-gone', e > 0.99);
+      /* Once it is off screen it stops taking the pointer. See .hero.is-gone. */
+      heroEl.classList.toggle('is-gone', heroOff);
     }
+    // the gradient alone still fades, on scrollT's curve, finishing at ~620 of a 900 hero
     fadeScroll = Math.max(0, 1 - ease * 1.06);
-    canvas.style.opacity = String(fadeScroll);
     // the atmospheric gradient belongs to the hero, so it leaves with it
     applyGlow();
   }

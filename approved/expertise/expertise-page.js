@@ -272,14 +272,13 @@
   function stepTravel(now) {
     if (!T) return;
     const vh = innerHeight, sy = scrollY;
-    /* THE HOMEPAGE HERO'S FADE: over the first 80% of a screen the hero's copy and figure
-       fade out and lift by 7.5% of the screen, on its smoothstep -- app.js's numbers */
-    const hk = Math.min(1, Math.min(1, sy / (vh * 0.8)) * 1.05);
-    const he = hk * hk * (3 - 2 * hk);
-    const heroFade = 1 - he;
+    /* THE FIGURE NO LONGER FADES (2026-11-14): its lines and dots scroll away at full
+       strength with the copy, as the homepage hero's do -- it was the homepage hero's
+       fade, over the first 80% of a screen. Only the glow still fades (page-glow.js). */
+    const heroFade = 1;
     /* THE COPY NO LONGER FADES OR LIFTS (2026-11-04): it scrolls away as it is, at full
        strength, with the page (the hero is not sticky any more), and the figure's layer
-       keeps to it. heroFade still eases the figure's lines, dots and glow out. */
+       keeps to it. */
     const hr = heroBox.getBoundingClientRect(), dr = dxBox.getBoundingClientRect();
     const w = hr.width, h = hr.height;
     const hx = hr.left + w / 2;

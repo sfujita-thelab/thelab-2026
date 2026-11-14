@@ -2150,8 +2150,10 @@
     .featuredwork .sec-head__body { margin-bottom: var(--spacer-24); }
     /* 44 -> --spacer-80, which is 40 on mobile. Picked by the mobile column. */
     .card { position: static; width: auto; height: auto; margin: var(--spacer-80) var(--m) 0; }
-    /* in the flow here, but still the box the card's link stretches over */
-    .featuredwork .card, .featuredwork__col > .card--2 { position: relative; }
+    /* in the flow here, but still the box the card's link stretches over -- and the
+       desktop's left/top offsets cleared, or relative positioning applies them and cards
+       1 and 3 sat a column off the screen (2026-11-14) */
+    .featuredwork .card, .featuredwork__col > .card--2 { position: relative; left: auto; top: auto; }
     .card__img { position: static; width: 100%; height: auto; aspect-ratio: 1; }
     /* Everything the card used to re-declare here now comes from its tokens: p-16 is
        14, h-24 is 20, eyebrow is a flat 12, and the two margins are --spacer-16 (8)

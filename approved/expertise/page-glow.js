@@ -49,19 +49,13 @@
   }, { passive: true });
 
   const instant = XP && (XP.skipIntro || XP.CAPTURE);
-  /* IT FADES OUT WITH THE HERO (2026-10-26): the hero copy's own fade -- over the first 80%
-     of a screen, on its smoothstep (expertise-page.js) -- written as the glow's opacity once
-     it has lit. The .9s light-up transition is dropped after it has run (.is-set), so from
-     then on the fade follows the scroll exactly. */
-  let lit = false;
+  /* NO FADE ON SCROLL (2026-11-14): it lights up once (.9s, .is-on) and then stays at
+     full strength, riding with the figure as the hero scrolls away -- as the figure's
+     lines and dots do. (It faded with the hero from 2026-10-26.) */
   setTimeout(() => {
-    glow.classList.add('is-on'); lit = true;
+    glow.classList.add('is-on');
     setTimeout(() => glow.classList.add('is-set'), 950);
   }, instant ? 0 : 1000);   // with the figure, opening at 2x (was 1605: 380 + 1225)
-  const heroFade = () => {
-    const hk = Math.min(1, Math.min(1, scrollY / (innerHeight * 0.8)) * 1.05);
-    return 1 - hk * hk * (3 - 2 * hk);
-  };
 
   (function frame() {
     const r = fig.getBoundingClientRect();
@@ -84,7 +78,6 @@
     const x = Math.max(ox - REACH * u, Math.min(ox + REACH * u, cx));
     const y = Math.max(oy - RISE * u, Math.min(oy + RISE * u, cy));
     glow.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
-    if (lit) glow.style.opacity = heroFade().toFixed(3);
     requestAnimationFrame(frame);
   })();
 })();

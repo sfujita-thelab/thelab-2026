@@ -1132,7 +1132,7 @@
      round, as the case studies' role pills), scaled to the 32 type: 8 by 32 round it */
   .perk-item { font: var(--font-h-32); white-space: nowrap; color: var(--color-text-primary);
                background: var(--cs-pill-bg); border-radius: 999px; padding: var(--spacer-8) var(--spacer-32);
-               transition: opacity .8s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1); }
+               transition: opacity .5s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1); }
   .perk-item.pre { opacity: 0; transform: translateX(calc(40 * var(--u))); transition: none; }
   @media (max-width: 767px) { .perk-item { font: var(--font-h-24); padding: var(--spacer-8) var(--spacer-24); white-space: nowrap; } }   /* a phone: 24, so the longest stays one pill-shape */
 </style>
@@ -1558,7 +1558,7 @@
       textBlock(sec.querySelector('.acc'), rows.map((r, j) => [r, 335 + j * 40]));
       // option A's perks: sliding in from the right ONE BY ONE, from 335, 180 apart
       const perks = [...sec.querySelectorAll('.perk-item')];
-      textBlock(sec.querySelector('.perk-list'), perks.map((p, j) => [p, 335 + j * 180]));
+      textBlock(sec.querySelector('.perk-list'), perks.map((p, j) => [p, 335 + j * 90]));
     });
     // each caption under a film or picture
     document.querySelectorAll('.ShowcaseBlock_fullCaption > span').forEach(c => textBlock(c, [[mask(c), 0]]));

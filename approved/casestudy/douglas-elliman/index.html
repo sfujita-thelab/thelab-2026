@@ -873,44 +873,18 @@
     .Tabs_Tabs_underline, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel img { transition: none; }
   }
 
-  /* ======================================================== UP NEXT -> NEXT (upnext.js)
-     The block plays the next case study's own hero film under the 40% black; clicked,
-     the copy fades and the film grows to the whole screen, its darkening lifting.
-     Arriving, the hero film is full screen from the first paint (html.cs-arrive), on the
-     frame the last page left on, then settles under the title. */
-  @view-transition { navigation: auto; }
-  .CaseStudies_case-studies_nextStudyBlock { position: relative; z-index: 1; transition: opacity .35s ease; }
-  .nx-go .CaseStudies_case-studies_nextStudyBlock { opacity: 0; }
+  /* ======================================================== UP NEXT
+     The block plays the next case study's own hero film under the 40% black; its button
+     is a plain link to that page (2026-11-16: no hand-off move). */
+  .CaseStudies_case-studies_nextStudyBlock { position: relative; z-index: 1; }
   .nx__media { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--cs-media-bg); }
   .nx__media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   /* the 40% black, and over it a soft darkening from the left, under the copy, so the
      type holds on a bright frame (2026-11-13) */
-  .nx__media::after { content: ""; position: absolute; inset: 0; transition: opacity .9s ease;
+  .nx__media::after { content: ""; position: absolute; inset: 0;
     background: linear-gradient(to right, rgb(var(--black-base) / .5) 0%, rgb(var(--black-base) / .3) 35%, rgb(var(--black-base) / 0) 65%),
                 rgb(var(--black-base) / .4); }
-  .nx__media.is-full::after { opacity: 0; }
-  html.cs-arrive { overflow: hidden; }
-  html.cs-arrive .FullWidthMedia_root { aspect-ratio: 16 / 9; }   /* holds the film's place while it is away */
-  html.cs-arrive .FullWidthMedia_root > .VideoWithPlayPauseButton_root {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; aspect-ratio: auto; z-index: 1000;
-    clip-path: none; opacity: 1;
-    background: var(--cs-arrive-frame, none) center / cover, var(--cs-media-bg); }
 </style>
-<!-- UP NEXT HAND-OFF (upnext.js): arriving from the last page's Up Next, the hero film
-     starts full screen on the frame it left on, before anything paints -->
-<script>
-try {
-  var a = JSON.parse(sessionStorage.getItem('cs-arrive'));
-  if (a && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.documentElement.classList.add('cs-arrive');
-    if (a.frame) document.documentElement.style.setProperty('--cs-arrive-frame', 'url(' + a.frame + ')');
-  }
-} catch (e) {}
-// only the Up Next move crossfades in
-addEventListener('pagereveal', function (e) {
-  if (e.viewTransition && !document.documentElement.classList.contains('cs-arrive')) e.viewTransition.skipTransition();
-});
-</script>
 </head>
 <body class="theme-dark theme-black">
   <div class="page-bg" aria-hidden="true"></div>
@@ -1068,11 +1042,23 @@ addEventListener('pagereveal', function (e) {
 
   <script src="config.js?v=20261104e"></script>
   <script src="shaders.js?v=20261103"></script>
-  <script src="app.js?v=20261113"></script>
+  <script src="app.js?v=20261116"></script>
+  <script>
+  /* UP NEXT: the whole block is the link (2026-11-16); the button keeps its own hover */
+  (function () {
+    var sec = document.querySelector('.CaseStudies_case-studies_nextStudyBlockContainer');
+    var a = sec && sec.querySelector('a');
+    if (!a) return;
+    sec.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) { open(a.href, '_blank'); return; }
+      location.href = a.href;
+    });
+  })();
+  </script>
   <script src="footer.js?v=20261103"></script>
   <script src="footer-glow.js?v=20261103"></script>
   <script src="contact.js?v=20261113"></script>
-  <script src="upnext.js?v=20261113"></script>
   <script>
   window.CS_TABS = ["assets/de-5-1.webp", "assets/de-5-2.webp", "assets/de-5-3.webp"];   /* the tab panels' media, in tab order (the live page renders only the chosen one) */
   /* CASE STUDY: the tabs and the films, on the live page's markup.
@@ -1159,7 +1145,6 @@ addEventListener('pagereveal', function (e) {
        scroll back up, until the page is reloaded */
     const HERO_FILM_AT = /[?&]intro=0/.test(location.search) ? 0 : 1100;   // the hero's type lands ~1300 (480 + .82s)
     if (!REDUCED) document.querySelectorAll('.FullWidthMedia_root > .VideoWithPlayPauseButton_root, .ShowcaseBlock_showcaseImage, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > picture, .CaseStudies_case-studies_tabbedBlock .react-aria-TabPanel > .VideoWithPlayPauseButton_root, .SplitBlock_mediaWrapper > picture').forEach(m => {
-      if (m.closest('.FullWidthMedia_root') && document.documentElement.classList.contains('cs-arrive')) return;   // arriving from Up Next: already on screen
       m.style.transition = 'none';
       m.classList.add('pre');
       void m.offsetWidth;
